@@ -15,7 +15,7 @@ Canon is the versioned knowledge base for the SoftwareOne Marketplace platform. 
 ## Repository Structure
 
 ```
-marketplace-canon/
+mpt-marketplace-canon/
   preamble/
     PLATFORM_CANON_PREAMBLE.md        # Platform invariants, actor model, API conventions, namespace structure
   objects/
