@@ -15,6 +15,8 @@ If no output file is specified, prints to stdout.
 
 The script infers namespaces and objects from the API path structure:
     /public/v1/{namespace}/{object}/...
+    /public/v1/{namespace}/{object}/{id}/{child}/...
+    /public/v1/{namespace}/{object}/{id}/{child}/{id}/{grandchild}/...
 """
 
 import json
@@ -22,19 +24,42 @@ import sys
 from pathlib import Path
 
 
+# Segments that represent state transition actions, not objects.
+# These are excluded from the checklist.
+TRANSITION_VERBS = {
+    "accept", "accept-invite", "activate", "block", "cancel",
+    "complete", "deactivate", "disable", "enable", "execute",
+    "fail", "finalize", "ignore", "issue", "match", "notify",
+    "process", "publish", "query", "recalculate", "redeem",
+    "regenerate", "reject", "render", "renew", "resend-invite",
+    "reschedule", "reset", "retry", "review", "send-new-invite",
+    "set-password", "submit", "synchronize", "terminate", "transfer",
+    "unblock", "unpublish", "validate", "refresh", "execute",
+}
+
+
+def is_param(segment: str) -> bool:
+    return segment.startswith("{")
+
+
+def is_verb(segment: str) -> bool:
+    return segment.lower() in TRANSITION_VERBS
+
+
 def extract_objects(spec_path: Path) -> dict:
     """
     Parse the OpenAPI spec and return a dict of:
-        { namespace: { object: [paths] } }
+        { namespace: { object: { child: set(grandchild_objects) } } }
     """
     with open(spec_path, encoding="utf-8") as f:
         spec = json.load(f)
 
     paths = spec.get("paths", {})
+
+    # namespaces[namespace][object][child] = set of grandchildren
     namespaces = {}
 
     for path in paths:
-        # Expect paths like /public/v1/{namespace}/{object}/...
         parts = [p for p in path.split("/") if p]
 
         # Strip leading 'public', 'v1' or similar version prefix
@@ -47,15 +72,24 @@ def extract_objects(spec_path: Path) -> dict:
         namespace = parts[0]
         obj = parts[1]
 
-        # Skip path parameter segments as object names
-        if obj.startswith("{"):
+        if is_param(obj) or is_verb(obj):
             continue
 
         if namespace not in namespaces:
             namespaces[namespace] = {}
         if obj not in namespaces[namespace]:
-            namespaces[namespace][obj] = []
-        namespaces[namespace][obj].append(path)
+            namespaces[namespace][obj] = {}
+
+        # Child: /{namespace}/{obj}/{id}/{child}
+        if len(parts) >= 4 and is_param(parts[2]) and not is_param(parts[3]) and not is_verb(parts[3]):
+            child = parts[3]
+            if child not in namespaces[namespace][obj]:
+                namespaces[namespace][obj][child] = set()
+
+            # Grandchild: /{namespace}/{obj}/{id}/{child}/{id}/{grandchild}
+            if len(parts) >= 6 and is_param(parts[4]) and not is_param(parts[5]) and not is_verb(parts[5]):
+                grandchild = parts[5]
+                namespaces[namespace][obj][child].add(grandchild)
 
     return namespaces
 
@@ -74,6 +108,10 @@ def format_checklist(namespaces: dict) -> str:
         lines.append("")
         for obj in sorted(namespaces[namespace]):
             lines.append(f"- [ ] {obj}")
+            for child in sorted(namespaces[namespace][obj]):
+                lines.append(f"  - [ ] {child}")
+                for grandchild in sorted(namespaces[namespace][obj][child]):
+                    lines.append(f"    - [ ] {grandchild}")
         lines.append("")
 
     return "\n".join(lines)
@@ -95,7 +133,19 @@ def main():
     namespaces = extract_objects(spec_path)
 
     total_objects = sum(len(objs) for objs in namespaces.values())
-    print(f"Found {len(namespaces)} namespace(s), {total_objects} object(s).\n")
+    total_children = sum(
+        len(children)
+        for objs in namespaces.values()
+        for children in objs.values()
+    )
+    total_grandchildren = sum(
+        len(grandchildren)
+        for objs in namespaces.values()
+        for children in objs.values()
+        for grandchildren in children.values()
+    )
+    print(f"Found {len(namespaces)} namespace(s), {total_objects} object(s), "
+          f"{total_children} child object(s), {total_grandchildren} grandchild object(s).\n")
 
     checklist = format_checklist(namespaces)
 

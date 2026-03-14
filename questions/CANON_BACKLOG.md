@@ -1,19 +1,24 @@
-# Canon Backlog — Objects Requiring Future Canon
+# Canon Backlog
 
-> **Version:** 0.5
+> **Version:** 0.7
 > **Owner:** Stu
-> **Last Updated:** 2026-03-09
+> **Last Updated:** 2026-03-14
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
 
 ## Purpose
 
-This document tracks platform objects that have been identified but not yet canonised. Items are added here when referenced during canon development of other objects. Priority and sequencing to be determined by Stu.
+This document serves two purposes:
+
+1. **Curated Backlog** — objects that have been identified and contextualised during canon development. Includes status, notes, and sequencing intent.
+2. **Full Object Inventory** — a complete checklist of all objects identified from the OpenAPI spec, grouped by namespace. Used as the authoritative coverage tracker.
 
 ---
 
-## Catalog Namespace
+## Curated Backlog
+
+### Catalog Namespace
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
@@ -24,30 +29,24 @@ This document tracks platform objects that have been identified but not yet cano
 | Listing | 🟢 Complete | See CANON_OBJECT_Catalog_Listing.md | Listing/Authorization discussion |
 | Pricing Policy | 🔴 Not started | Catalog namespace. No further detail captured yet. | 2026-03-09 session |
 
----
+### Commerce Namespace
 
-## Commerce Namespace
+| Object | Status | Notes | Identified During |
+|--------|--------|-------|------------------|
+| Order | 🔴 Not started | Four types: Purchase, Change, Termination, Configuration. Has lines with old/new quantity. Querying state exists for Client parameter correction. | Parameter canon, Item discussion |
+| Agreement | 🔴 Not started | Active state. Holds parameter value snapshot from Order completion. Associated with one Listing. | Parameter canon, Template canon |
+| Subscription | 🔴 Not started | Referenced by Configuration Orders. Has auto-renewal flag. | Item discussion |
+| Asset | 🔴 Not started | Vendor-written parameters during fulfilment. | Parameter canon |
 
-| Object | Notes | Identified During |
-|--------|-------|------------------|
-| Order | Four types: Purchase, Change, Termination, Configuration. Has lines with old/new quantity. Querying state exists for Client parameter correction. | Parameter canon, Item discussion |
-| Agreement | Active state. Holds parameter value snapshot from Order completion. Associated with one Listing. | Parameter canon, Template canon |
-| Subscription | Referenced by Configuration Orders. Has auto-renewal flag. | Item discussion |
-| Asset | Vendor-written parameters during fulfillment. | Parameter canon |
+### Administration Namespace
 
----
+| Object | Status | Notes | Identified During |
+|--------|--------|-------|------------------|
+| Seller | 🔴 Not started | SoftwareOne subsidiary. Acts as Owner on Authorization, and as transacting party on Listing. | Listing/Authorization discussion |
+| Buyer | 🔴 Not started | Referenced on Agreement JSON. | Agreement JSON |
+| Licensee | 🔴 Not started | Referenced on Agreement JSON. | Agreement JSON |
 
-## Administration Namespace
-
-| Object | Notes | Identified During |
-|--------|-------|------------------|
-| Seller | SoftwareOne subsidiary. Acts as Owner on Authorization, and as transacting party on Listing. | Listing/Authorization discussion |
-| Buyer | Referenced on Agreement JSON. | Agreement JSON |
-| Licensee | Referenced on Agreement JSON. | Agreement JSON |
-
----
-
-## Audit Namespace
+### Audit Namespace
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
@@ -63,6 +62,254 @@ This document tracks platform objects that have been identified but not yet cano
 
 ---
 
+## Full Object Inventory
+
+Generated from OpenAPI spec. One entry per object identified from path structure. Update status as canon is completed.
+
+Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
+
+### Accounts
+
+- [ ] account-users
+  - [ ] groups
+- [ ] accounts
+  - [ ] icon
+  - [ ] settings
+  - [ ] users
+    - [ ] groups
+- [ ] api-tokens
+- [ ] buyers
+  - [ ] icon
+- [ ] cloud-tenants
+- [ ] erp-links
+- [ ] licensees
+  - [ ] icon
+- [ ] modules
+- [ ] sellers
+  - [ ] icon
+- [ ] services
+- [ ] user-groups
+- [ ] users
+  - [ ] accounts
+  - [ ] icon
+  - [ ] sso
+  - [ ] sso-check
+
+### Audit
+
+- [ ] event-types
+- [ ] records
+
+### Billing
+
+- [ ] analytics
+- [ ] credit-memos
+  - [ ] attachments
+- [ ] custom-ledgers
+  - [ ] attachments
+  - [ ] charges
+  - [ ] queue
+  - [ ] upload
+- [ ] invoices
+  - [ ] attachments
+- [ ] journals
+  - [ ] attachments
+  - [ ] charges
+  - [ ] enquiry
+  - [ ] sellers
+  - [ ] upload
+- [ ] ledgers
+  - [ ] attachments
+  - [ ] charges
+  - [ ] queue
+- [ ] manual-overrides
+- [ ] statements
+  - [ ] attachments
+  - [ ] charges
+  - [ ] children
+  - [ ] error
+  - [ ] pending
+  - [ ] queue
+
+### Catalog
+
+- [x] authorizations
+- [x] items
+- [x] listings
+- [x] price-lists
+  - [x] items
+- [ ] pricing-policies
+  - [ ] attachments
+- [x] products
+  - [ ] documents
+  - [ ] icon
+  - [x] item-groups
+  - [x] items
+  - [x] media
+    - [ ] image
+  - [x] parameter-groups
+  - [x] parameters
+  - [ ] settings
+  - [x] templates
+  - [x] terms
+    - [x] variants
+- [x] units-of-measure
+
+### Commerce
+
+- [ ] agreements
+  - [ ] attachments
+  - [ ] lines
+  - [ ] split
+  - [ ] template
+- [ ] assets
+  - [ ] lines
+- [ ] lines
+- [ ] orders
+  - [ ] assets
+  - [ ] lines
+  - [ ] quote
+  - [ ] subscriptions
+  - [ ] template
+- [ ] requests
+  - [ ] attachments
+  - [ ] messages
+  - [ ] template
+- [ ] subscriptions
+  - [ ] lines
+  - [ ] split
+
+### Exchange
+
+- [ ] currencies
+  - [ ] icon
+- [ ] pairs
+  - [ ] rates
+- [ ] rates
+
+### Extensibility
+
+- [ ] categories
+- [ ] extensions
+  - [ ] documents
+  - [ ] icon
+  - [ ] installations
+  - [ ] instances
+  - [ ] media
+    - [ ] image
+  - [ ] terms
+    - [ ] variants
+  - [ ] token
+- [ ] installations
+  - [ ] token
+
+### Helpdesk
+
+- [ ] cases
+- [ ] channels
+  - [ ] messages
+- [ ] chats
+  - [ ] attachments
+  - [ ] icon
+  - [ ] links
+  - [ ] messages
+  - [ ] participants
+- [ ] feedback
+  - [ ] attachments
+    - [ ] download
+- [ ] forms
+  - [ ] parameter-groups
+  - [ ] parameters
+- [ ] parameter-groups
+  - [ ] parameters
+- [ ] parameters
+- [ ] queues
+  - [ ] icon
+
+### Integration
+
+- [ ] categories
+- [ ] extensions
+  - [ ] documents
+  - [ ] icon
+  - [ ] installations
+  - [ ] instances
+  - [ ] media
+    - [ ] image
+  - [ ] terms
+    - [ ] variants
+  - [ ] token
+- [ ] installations
+  - [ ] token
+
+### Notifications
+
+- [ ] accounts
+  - [ ] categories
+    - [ ] contacts
+- [ ] batches
+  - [ ] attachments
+- [ ] categories
+- [ ] contacts
+- [ ] directories
+- [ ] footers
+- [ ] messages
+- [ ] subscribers
+- [ ] templates
+  - [ ] variants
+- [x] webhooks
+
+### Procurement
+
+- [ ] erp-items
+- [ ] sales-orders
+  - [ ] attachments
+- [ ] sales-quotes
+  - [ ] attachments
+
+### Program
+
+- [ ] certificates
+- [ ] enrollments
+  - [ ] attachments
+- [ ] programs
+  - [ ] documents
+  - [ ] icon
+  - [ ] media
+    - [ ] image
+  - [ ] parameter-groups
+  - [ ] parameters
+  - [ ] settings
+  - [ ] templates
+  - [ ] terms
+    - [ ] variants
+
+### Public-catalog
+
+- [ ] categories
+- [ ] industries
+- [ ] product-profiles
+  - [ ] icon
+  - [ ] media
+    - [ ] image
+- [ ] segments
+- [ ] vendor-profiles
+  - [ ] icon
+
+### Spotlight
+
+- [ ] objects
+- [ ] queries
+
+### System
+
+- [ ] tasks
+  - [ ] logs
+  - [ ] queue
+  - [ ] result
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -73,3 +320,4 @@ This document tracks platform objects that have been identified but not yet cano
 | 0.4 | 2026-03-09 | Stu / Claude | Unit of Measure marked complete. Catalog namespace canon queue complete. |
 | 0.5 | 2026-03-09 | Stu / Claude | Pricing Policy added to Catalog namespace. Audit namespace and Audit Record added. |
 | 0.6 | 2026-03-14 | Stu / Claude | Investigation Items section added. Webhook type / Product settings relationship added for future exploration. |
+| 0.7 | 2026-03-14 | Stu / Claude | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
