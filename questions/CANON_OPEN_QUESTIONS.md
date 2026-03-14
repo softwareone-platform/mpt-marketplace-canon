@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 0.6
-> **Last Updated:** 2026-03-09
+> **Version:** 1.3
+> **Last Updated:** 2026-03-14
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -30,6 +30,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 |---|----------|
 | ENV-001 | Which platform constraints are relaxed in non-PROD environments due to external system dependencies (e.g. ERP, vendor provisioning systems, payment processors)? Is there a complete list maintained anywhere, or is this tribal knowledge? This should be documented centrally and referenced from the preamble. |
 | ENV-002 | Beyond the ERP-linked Licensee status constraint, are there other external system dependencies that cause constraint relaxation in non-PROD environments (e.g. vendor provisioning systems, payment processors)? |
+| ENV-004 | Icon removal mechanism: how is a custom icon removed from an object with jdenticon behaviour? The `/icon` endpoint exposes GET only — the removal mechanism is not confirmed from the spec. |
 
 ---
 
@@ -48,3 +49,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 0.9 | 2026-03-14 | Stu / Claude | PRD-001, PRD-002 added. |
 | 1.0 | 2026-03-14 | Stu / Claude | PRD-002 resolved and removed. |
 | 1.1 | 2026-03-14 | Stu / Claude | PRD-001 resolved and removed. |
+| 1.2 | 2026-03-14 | Stu / Claude | ENV-003 added: icon upload HTTP method (PUT vs POST) unconfirmed. |
+| 1.3 | 2026-03-14 | Stu / Claude | ENV-003 resolved and moved to resolved file — /icon endpoint is GET only; icon upload is via multipart/form-data on the parent object endpoint. |
+| 1.4 | 2026-03-14 | Stu / Claude | ENV-004 added: icon removal mechanism unconfirmed. |

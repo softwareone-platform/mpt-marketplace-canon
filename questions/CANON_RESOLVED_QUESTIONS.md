@@ -1,7 +1,7 @@
 # Canon Resolved Questions
 
-> **Version:** 0.1
-> **Last Updated:** 2026-03-09
+> **Version:** 0.5
+> **Last Updated:** 2026-03-14
 > **Status:** Living Document — append-only reference
 
 ---
@@ -93,6 +93,14 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 
 ---
 
+## PLATFORM_CANON_PREAMBLE.md
+
+| # | Question | Resolution | Canon Reference |
+|---|----------|------------|-----------------|
+| ENV-003 | Icon upload endpoint HTTP method: is the custom icon upload a PUT or POST to the `/icon` endpoint? | The `/icon` endpoint exposes GET only. Icon upload is performed via a `multipart/form-data` request on the parent object's own endpoint. | Preamble Section 9.3 |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -101,3 +109,4 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 | 0.2 | 2026-03-14 | Stu / Claude | TPL-002 added. PRD-003 added. |
 | 0.3 | 2026-03-14 | Stu / Claude | PRD-002 added. |
 | 0.4 | 2026-03-14 | Stu / Claude | PRD-001 added. |
+| 0.5 | 2026-03-14 | Stu / Claude | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |

@@ -1,6 +1,6 @@
 # Canon Backlog
 
-> **Version:** 0.7
+> **Version:** 0.8
 > **Owner:** Stu
 > **Last Updated:** 2026-03-14
 > **Status:** Living Document — updated continuously as canon is developed
@@ -66,6 +66,8 @@ This document serves two purposes:
 
 Generated from OpenAPI spec. One entry per object identified from path structure. Update status as canon is completed.
 
+`icon` endpoints are excluded — icon behaviour is a platform-wide pattern documented in `PLATFORM_CANON_PREAMBLE.md` Section 9, not a per-object canon concern.
+
 Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 
 ### Accounts
@@ -73,25 +75,20 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] account-users
   - [ ] groups
 - [ ] accounts
-  - [ ] icon
   - [ ] settings
   - [ ] users
     - [ ] groups
 - [ ] api-tokens
 - [ ] buyers
-  - [ ] icon
 - [ ] cloud-tenants
 - [ ] erp-links
 - [ ] licensees
-  - [ ] icon
 - [ ] modules
 - [ ] sellers
-  - [ ] icon
 - [ ] services
 - [ ] user-groups
 - [ ] users
   - [ ] accounts
-  - [ ] icon
   - [ ] sso
   - [ ] sso-check
 
@@ -142,7 +139,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] attachments
 - [x] products
   - [ ] documents
-  - [ ] icon
   - [x] item-groups
   - [x] items
   - [x] media
@@ -182,7 +178,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 ### Exchange
 
 - [ ] currencies
-  - [ ] icon
 - [ ] pairs
   - [ ] rates
 - [ ] rates
@@ -192,7 +187,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] categories
 - [ ] extensions
   - [ ] documents
-  - [ ] icon
   - [ ] installations
   - [ ] instances
   - [ ] media
@@ -210,7 +204,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] messages
 - [ ] chats
   - [ ] attachments
-  - [ ] icon
   - [ ] links
   - [ ] messages
   - [ ] participants
@@ -224,14 +217,12 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] parameters
 - [ ] parameters
 - [ ] queues
-  - [ ] icon
 
 ### Integration
 
 - [ ] categories
 - [ ] extensions
   - [ ] documents
-  - [ ] icon
   - [ ] installations
   - [ ] instances
   - [ ] media
@@ -274,7 +265,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] attachments
 - [ ] programs
   - [ ] documents
-  - [ ] icon
   - [ ] media
     - [ ] image
   - [ ] parameter-groups
@@ -289,12 +279,10 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] categories
 - [ ] industries
 - [ ] product-profiles
-  - [ ] icon
   - [ ] media
     - [ ] image
 - [ ] segments
 - [ ] vendor-profiles
-  - [ ] icon
 
 ### Spotlight
 
@@ -321,3 +309,4 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 0.5 | 2026-03-09 | Stu / Claude | Pricing Policy added to Catalog namespace. Audit namespace and Audit Record added. |
 | 0.6 | 2026-03-14 | Stu / Claude | Investigation Items section added. Webhook type / Product settings relationship added for future exploration. |
 | 0.7 | 2026-03-14 | Stu / Claude | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
+| 0.8 | 2026-03-14 | Stu / Claude | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |

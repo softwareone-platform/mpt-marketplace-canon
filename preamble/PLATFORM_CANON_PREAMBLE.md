@@ -1,8 +1,8 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 0.8
+> **Version:** 1.0
 > **Owner:** Stu
-> **Last Updated:** 2026-03-09
+> **Last Updated:** 2026-03-14
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -279,6 +279,44 @@ The platform includes a Notification subsystem built on a message bus architectu
 
 ---
 
+## 9. Icon Pattern
+
+Many platform objects expose an `icon` string property representing a URL to a visual identity image. The `icon` property is not a standalone platform object — it has no ID prefix, no state machine, and no independent lifecycle. It is a read-only property exposed via a dedicated `/icon` endpoint on the parent object; writes are performed on the parent object itself.
+
+### 9.1 Two Icon Behaviours
+
+The platform implements two distinct icon behaviours, hardcoded per object type:
+
+| Behaviour | Description | Example Objects |
+|-----------|-------------|-----------------|
+| **Jdenticon** | Icon defaults to a server-generated jdenticon. A custom icon may be uploaded to replace it, and removed to revert to the jdenticon. | Accounts, Sellers, Buyers, Licensees, Users |
+| **Required** | No jdenticon fallback. A custom icon must be supplied and cannot be removed. | Products |
+
+Which behaviour applies to a given object type is hardcoded in the platform and documented in each object's canon.
+
+### 9.2 Jdenticon Default
+
+For objects that support the jdenticon behaviour, the default icon is generated server-side using the object's ID as the seed. This means:
+- The jdenticon is deterministic — the same object always produces the same jdenticon.
+- The jdenticon URL is returned as the value of the `icon` field in API responses — it is not null.
+- The jdenticon is not stored as an uploaded asset; it is generated on demand.
+
+### 9.3 Custom Icon Upload
+
+A custom icon is uploaded as a binary via a `multipart/form-data` request to the parent object's own endpoint (not the `/icon` endpoint). The `/icon` endpoint is read-only — it exposes only a `GET` method for retrieving the current icon URL. Once uploaded, the custom icon URL is returned as the value of the `icon` field in place of the jdenticon URL.
+
+### 9.4 Icon Removal
+
+For objects with jdenticon behaviour, a custom icon can be removed to revert to the jdenticon. The mechanism for removal is not yet confirmed — see ENV-004 in the Open Questions tracker.
+
+For objects with required icon behaviour, the icon cannot be removed. A replacement icon may be uploaded via the parent object endpoint, but removal is not permitted.
+
+### 9.5 Icon in API Responses
+
+The `icon` field is a nullable string. For jdenticon-capable objects, it is never null in practice — the platform always returns either the jdenticon URL or the custom icon URL. For required-icon objects, it is always populated. Absent from response when null, consistent with platform null suppression (see Section 6.1).
+
+---
+
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
 | 0.1 | 2026-03-07 | Stu / Claude | Initial stub. Principles captured from Product, Template, Media, Item Group, and Parameter Group canon sessions. |
@@ -289,3 +327,6 @@ The platform includes a Notification subsystem built on a message bus architectu
 | 0.6 | 2026-03-09 | Stu / Claude | Section 6 API Conventions added: null suppression, select=+ field omission, Actor-based field suppression. Canon JSON examples note added to Section 5. Sections renumbered. |
 | 0.7 | 2026-03-09 | Stu / Claude | Platform invariants 6 and 7 added: no-cascade deletion, deletion = permanently removed from API visibility. Audit namespace added to Section 4. Section 6.2 expanded to document full select= mechanism: field inclusion/exclusion operators, reference expansion, dot notation for nested field selection. |
 | 0.8 | 2026-03-09 | Stu / Claude | Section 5.3 added: Object ID Prefixes table. All Catalog and known non-Catalog prefixes documented. Section 5.4 renumbered from 5.3. |
+| 0.9 | 2026-03-14 | Stu / Claude | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
+| 1.0 | 2026-03-14 | Stu / Claude | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
+| 1.1 | 2026-03-14 | Stu / Claude | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
