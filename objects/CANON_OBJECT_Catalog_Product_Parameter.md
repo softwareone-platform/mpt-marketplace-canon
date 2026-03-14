@@ -199,6 +199,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial draft. |
-| 0.2 | 2026-03-08 | Stu / Claude | Added two-layer constraint model (BR-012–BR-015), scope-differentiated constraint availability, constraint copy behaviour on Order completion (BR-020), post-completion constraint mutability (BR-021). Expanded failure modes. |
-| 0.3 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. BR-002: Request scope added (deprecated, pending v5 removal). BR-003: Configuration phase added. BR-004: Configuration phase included in Order/Agreement scope rule. BR-006: Subdomain, Heading, DropDown types added with descriptions. Section 5: required fields on creation noted, all enums corrected, Request scope and Heading type notes added. Section 8: deletion language cleaned up. Section 10: cleaned up. |
+| 0.1 | 2026-03-08 | Stu | Initial draft. |
+| 0.2 | 2026-03-08 | Stu | Added two-layer constraint model (BR-012–BR-015), scope-differentiated constraint availability, constraint copy behaviour on Order completion (BR-020), post-completion constraint mutability (BR-021). Expanded failure modes. |
+| 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-002: Request scope added (deprecated, pending v5 removal). BR-003: Configuration phase added. BR-004: Configuration phase included in Order/Agreement scope rule. BR-006: Subdomain, Heading, DropDown types added with descriptions. Section 5: required fields on creation noted, all enums corrected, Request scope and Heading type notes added. Section 8: deletion language cleaned up. Section 10: cleaned up. |

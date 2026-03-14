@@ -38,17 +38,17 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial document. |
-| 0.2 | 2026-03-09 | Stu / Claude | Added ENV-001, ENV-002, PRI-001, ITM-001, AUT-001. |
-| 0.3 | 2026-03-09 | Stu / Claude | Added TPL-001, AUT-002, LST-001, LST-002, PRD-001, TCS-001, PAR-001, PAR-002, PAR-003. |
-| 0.4 | 2026-03-09 | Stu / Claude | ITM-001 resolved and moved to resolved file. |
-| 0.5 | 2026-03-09 | Stu / Claude | AUT-002, LST-001, LST-002, PRD-001, TPL-001, PRI-001, ITM-002, TCS-001, PAR-001, PAR-002, PAR-003 resolved and moved to resolved file. |
-| 0.6 | 2026-03-09 | Stu / Claude | Restructured: resolved questions moved to CANON_RESOLVED_QUESTIONS.md. Question IDs corrected to match object API prefixes. Status column removed — this file contains open questions only. |
-| 0.7 | 2026-03-14 | Stu / Claude | TPL-002 added: behaviour when Template created without a type field. |
-| 0.8 | 2026-03-14 | Stu / Claude | TPL-002 resolved and removed — Type is always required; API spec omission is a spec inaccuracy. |
-| 0.9 | 2026-03-14 | Stu / Claude | PRD-001, PRD-002 added. |
-| 1.0 | 2026-03-14 | Stu / Claude | PRD-002 resolved and removed. |
-| 1.1 | 2026-03-14 | Stu / Claude | PRD-001 resolved and removed. |
-| 1.2 | 2026-03-14 | Stu / Claude | ENV-003 added: icon upload HTTP method (PUT vs POST) unconfirmed. |
-| 1.3 | 2026-03-14 | Stu / Claude | ENV-003 resolved and moved to resolved file — /icon endpoint is GET only; icon upload is via multipart/form-data on the parent object endpoint. |
-| 1.4 | 2026-03-14 | Stu / Claude | ENV-004 added: icon removal mechanism unconfirmed. |
+| 0.1 | 2026-03-08 | Stu | Initial document. |
+| 0.2 | 2026-03-09 | Stu | Added ENV-001, ENV-002, PRI-001, ITM-001, AUT-001. |
+| 0.3 | 2026-03-09 | Stu | Added TPL-001, AUT-002, LST-001, LST-002, PRD-001, TCS-001, PAR-001, PAR-002, PAR-003. |
+| 0.4 | 2026-03-09 | Stu | ITM-001 resolved and moved to resolved file. |
+| 0.5 | 2026-03-09 | Stu | AUT-002, LST-001, LST-002, PRD-001, TPL-001, PRI-001, ITM-002, TCS-001, PAR-001, PAR-002, PAR-003 resolved and moved to resolved file. |
+| 0.6 | 2026-03-09 | Stu | Restructured: resolved questions moved to CANON_RESOLVED_QUESTIONS.md. Question IDs corrected to match object API prefixes. Status column removed — this file contains open questions only. |
+| 0.7 | 2026-03-14 | Stu | TPL-002 added: behaviour when Template created without a type field. |
+| 0.8 | 2026-03-14 | Stu | TPL-002 resolved and removed — Type is always required; API spec omission is a spec inaccuracy. |
+| 0.9 | 2026-03-14 | Stu | PRD-001, PRD-002 added. |
+| 1.0 | 2026-03-14 | Stu | PRD-002 resolved and removed. |
+| 1.1 | 2026-03-14 | Stu | PRD-001 resolved and removed. |
+| 1.2 | 2026-03-14 | Stu | ENV-003 added: icon upload HTTP method (PUT vs POST) unconfirmed. |
+| 1.3 | 2026-03-14 | Stu | ENV-003 resolved and moved to resolved file — /icon endpoint is GET only; icon upload is via multipart/form-data on the parent object endpoint. |
+| 1.4 | 2026-03-14 | Stu | ENV-004 added: icon removal mechanism unconfirmed. |

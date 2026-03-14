@@ -165,7 +165,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial canon. Derived from Terms Variant JSON examples (Online and File types) and conversation. |
-| 0.2 | 2026-03-09 | Stu / Claude | BR-006 and BR-009 reconciled — cascade exception from parent Terms deletion made explicit and prominent. Deletion section updated. |
-| 0.3 | 2026-03-09 | Stu / Claude | T4 corrected — Vendors cannot unpublish Terms Variants. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |
-| 0.4 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. BR-005 updated: File type Variants always require a language code — multi-language not supported for File type. Section 5: required fields on creation documented, language and file upload requirements noted per type, Revision marked read-only. Section 8: audit uncertainty resolved — Variant uses PlatformObjectAudit (created/updated only) by design. T6 and Section 7.1: hard delete language corrected. Section 10: cleaned up. |
+| 0.1 | 2026-03-08 | Stu | Initial canon. Derived from Terms Variant JSON examples (Online and File types) and conversation. |
+| 0.2 | 2026-03-09 | Stu | BR-006 and BR-009 reconciled — cascade exception from parent Terms deletion made explicit and prominent. Deletion section updated. |
+| 0.3 | 2026-03-09 | Stu | T4 corrected — Vendors cannot unpublish Terms Variants. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |
+| 0.4 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-005 updated: File type Variants always require a language code — multi-language not supported for File type. Section 5: required fields on creation documented, language and file upload requirements noted per type, Revision marked read-only. Section 8: audit uncertainty resolved — Variant uses PlatformObjectAudit (created/updated only) by design. T6 and Section 7.1: hard delete language corrected. Section 10: cleaned up. |

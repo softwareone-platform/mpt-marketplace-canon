@@ -302,11 +302,11 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial backlog. Seeded from Item canon development session. |
-| 0.2 | 2026-03-09 | Stu / Claude | Price List and Price List Item marked complete. Authorization and Listing added as pending. |
-| 0.3 | 2026-03-09 | Stu / Claude | Authorization and Listing marked complete. |
-| 0.4 | 2026-03-09 | Stu / Claude | Unit of Measure marked complete. Catalog namespace canon queue complete. |
-| 0.5 | 2026-03-09 | Stu / Claude | Pricing Policy added to Catalog namespace. Audit namespace and Audit Record added. |
-| 0.6 | 2026-03-14 | Stu / Claude | Investigation Items section added. Webhook type / Product settings relationship added for future exploration. |
-| 0.7 | 2026-03-14 | Stu / Claude | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
-| 0.8 | 2026-03-14 | Stu / Claude | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |
+| 0.1 | 2026-03-08 | Stu | Initial backlog. Seeded from Item canon development session. |
+| 0.2 | 2026-03-09 | Stu | Price List and Price List Item marked complete. Authorization and Listing added as pending. |
+| 0.3 | 2026-03-09 | Stu | Authorization and Listing marked complete. |
+| 0.4 | 2026-03-09 | Stu | Unit of Measure marked complete. Catalog namespace canon queue complete. |
+| 0.5 | 2026-03-09 | Stu | Pricing Policy added to Catalog namespace. Audit namespace and Audit Record added. |
+| 0.6 | 2026-03-14 | Stu | Investigation Items section added. Webhook type / Product settings relationship added for future exploration. |
+| 0.7 | 2026-03-14 | Stu | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
+| 0.8 | 2026-03-14 | Stu | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |

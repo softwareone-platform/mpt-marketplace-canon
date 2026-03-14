@@ -146,5 +146,5 @@ Audit block captures `created` and `updated` timestamps and Actors, consistent w
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-09 | Stu / Claude | Initial canon. |
-| 0.2 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. Section 2: Vendor write access clarified — settings only, not all update fields. Section 5: name marked required; currency marked required and immutable; vendor reference field added; journal and eligibility fields marked required on creation; revision marked read-only; statistics fields noted as platform-computed. Section 8: audit note corrected — both created and updated events recorded. Section 10: AUT-002 removed (resolved). SD-004 and SD-005 raised in spec discrepancy tracker. |
+| 0.1 | 2026-03-09 | Stu | Initial canon. |
+| 0.2 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 2: Vendor write access clarified — settings only, not all update fields. Section 5: name marked required; currency marked required and immutable; vendor reference field added; journal and eligibility fields marked required on creation; revision marked read-only; statistics fields noted as platform-computed. Section 8: audit note corrected — both created and updated events recorded. Section 10: AUT-002 removed (resolved). SD-004 and SD-005 raised in spec discrepancy tracker. |

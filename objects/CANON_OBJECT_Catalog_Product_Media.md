@@ -179,5 +179,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-07 | Stu / Claude | Initial canon. Derived from JSON and conversation. |
-| 0.2 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. BR-003 and BR-004 updated: Video type requires a thumbnail file upload in addition to the URL. Section 5: required fields on creation documented, File attribute added, filename/size/contentType notes corrected for both types, Revision marked read-only. Section 8: deletion language cleaned up. Section 9: Video URL failure mode updated to reflect confirmed platform behaviour per BR-012. |
+| 0.1 | 2026-03-07 | Stu | Initial canon. Derived from JSON and conversation. |
+| 0.2 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-003 and BR-004 updated: Video type requires a thumbnail file upload in addition to the URL. Section 5: required fields on creation documented, File attribute added, filename/size/contentType notes corrected for both types, Revision marked read-only. Section 8: deletion language cleaned up. Section 9: Video URL failure mode updated to reflect confirmed platform behaviour per BR-012. |

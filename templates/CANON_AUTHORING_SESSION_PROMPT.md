@@ -139,5 +139,5 @@ From there, I will ask clarifying questions and we will build each section toget
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 1.0 | 2026-03-09 | Stu / Claude | Initial version |
-| 2.0 | 2026-03-09 | Stu / Claude | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |
+| 1.0 | 2026-03-09 | Stu | Initial version |
+| 2.0 | 2026-03-09 | Stu | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |

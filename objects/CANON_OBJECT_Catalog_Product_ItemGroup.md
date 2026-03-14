@@ -140,6 +140,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-07 | Stu / Claude | Initial canon. Derived from JSON and conversation. |
-| 0.2 | 2026-03-09 | Stu / Claude | Namespace qualification applied to Parent Object and Section 6 relationship references. |
-| 0.3 | 2026-03-14 | Stu / Claude | Section 7.1: auto-creation event added — platform creates one Default Item Group on Product creation with known default values. |
+| 0.1 | 2026-03-07 | Stu | Initial canon. Derived from JSON and conversation. |
+| 0.2 | 2026-03-09 | Stu | Namespace qualification applied to Parent Object and Section 6 relationship references. |
+| 0.3 | 2026-03-14 | Stu | Section 7.1: auto-creation event added — platform creates one Default Item Group on Product creation with known default values. |

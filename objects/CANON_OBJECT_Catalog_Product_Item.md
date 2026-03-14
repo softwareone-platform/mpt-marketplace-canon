@@ -176,6 +176,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial canon. Derived from Items JSON and conversation. |
-| 0.2 | 2026-03-09 | Stu / Claude | BR-008 updated to reflect I-001 resolution (usage model → quantityNotApplicable = true, coupled). Section 10 updated. Unit of Measure references updated from earlier review. |
-| 0.3 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. BR-009 corrected: 3y removed from terms.period (valid for commitment only). BR-010 corrected: one-time removed from terms.commitment (valid for period only), nullable documented. Section 5: required fields on creation noted, terms enums corrected. Section 8: unpublished audit event added, history retention confirmed. Section 10 cleaned up. SD-001 raised in spec discrepancy tracker (name not in required array). |
+| 0.1 | 2026-03-08 | Stu | Initial canon. Derived from Items JSON and conversation. |
+| 0.2 | 2026-03-09 | Stu | BR-008 updated to reflect I-001 resolution (usage model → quantityNotApplicable = true, coupled). Section 10 updated. Unit of Measure references updated from earlier review. |
+| 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-009 corrected: 3y removed from terms.period (valid for commitment only). BR-010 corrected: one-time removed from terms.commitment (valid for period only), nullable documented. Section 5: required fields on creation noted, terms enums corrected. Section 8: unpublished audit event added, history retention confirmed. Section 10 cleaned up. SD-001 raised in spec discrepancy tracker (name not in required array). |

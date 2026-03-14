@@ -181,4 +181,4 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial canon. Derived from Product-scoped and global Webhook JSON exports and conversation. |
+| 0.1 | 2026-03-08 | Stu | Initial canon. Derived from Product-scoped and global Webhook JSON exports and conversation. |

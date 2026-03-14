@@ -319,14 +319,14 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-07 | Stu / Claude | Initial stub. Principles captured from Product, Template, Media, Item Group, and Parameter Group canon sessions. |
-| 0.2 | 2026-03-07 | Stu / Claude | Actor model expanded to five recognised Actors. Extension architecture documented. |
-| 0.3 | 2026-03-08 | Stu / Claude | Notifications namespace added. |
-| 0.4 | 2026-03-08 | Stu / Claude | Notification subsystem section added. Mechanics flagged as requiring engineering input. |
-| 0.5 | 2026-03-09 | Stu / Claude | Environments section added. Constraint relaxation pattern documented. Open questions ENV-001/ENV-002 logged. |
-| 0.6 | 2026-03-09 | Stu / Claude | Section 6 API Conventions added: null suppression, select=+ field omission, Actor-based field suppression. Canon JSON examples note added to Section 5. Sections renumbered. |
-| 0.7 | 2026-03-09 | Stu / Claude | Platform invariants 6 and 7 added: no-cascade deletion, deletion = permanently removed from API visibility. Audit namespace added to Section 4. Section 6.2 expanded to document full select= mechanism: field inclusion/exclusion operators, reference expansion, dot notation for nested field selection. |
-| 0.8 | 2026-03-09 | Stu / Claude | Section 5.3 added: Object ID Prefixes table. All Catalog and known non-Catalog prefixes documented. Section 5.4 renumbered from 5.3. |
-| 0.9 | 2026-03-14 | Stu / Claude | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
-| 1.0 | 2026-03-14 | Stu / Claude | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
-| 1.1 | 2026-03-14 | Stu / Claude | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
+| 0.1 | 2026-03-07 | Stu | Initial stub. Principles captured from Product, Template, Media, Item Group, and Parameter Group canon sessions. |
+| 0.2 | 2026-03-07 | Stu | Actor model expanded to five recognised Actors. Extension architecture documented. |
+| 0.3 | 2026-03-08 | Stu | Notifications namespace added. |
+| 0.4 | 2026-03-08 | Stu | Notification subsystem section added. Mechanics flagged as requiring engineering input. |
+| 0.5 | 2026-03-09 | Stu | Environments section added. Constraint relaxation pattern documented. Open questions ENV-001/ENV-002 logged. |
+| 0.6 | 2026-03-09 | Stu | Section 6 API Conventions added: null suppression, select=+ field omission, Actor-based field suppression. Canon JSON examples note added to Section 5. Sections renumbered. |
+| 0.7 | 2026-03-09 | Stu | Platform invariants 6 and 7 added: no-cascade deletion, deletion = permanently removed from API visibility. Audit namespace added to Section 4. Section 6.2 expanded to document full select= mechanism: field inclusion/exclusion operators, reference expansion, dot notation for nested field selection. |
+| 0.8 | 2026-03-09 | Stu | Section 5.3 added: Object ID Prefixes table. All Catalog and known non-Catalog prefixes documented. Section 5.4 renumbered from 5.3. |
+| 0.9 | 2026-03-14 | Stu | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
+| 1.0 | 2026-03-14 | Stu | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
+| 1.1 | 2026-03-14 | Stu | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |

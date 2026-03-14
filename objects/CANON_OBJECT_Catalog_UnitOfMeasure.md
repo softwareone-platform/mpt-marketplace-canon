@@ -122,4 +122,4 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-09 | Stu / Claude | Initial canon. Derived from PROD JSON sample (13 units). |
+| 0.1 | 2026-03-09 | Stu | Initial canon. Derived from PROD JSON sample (13 units). |

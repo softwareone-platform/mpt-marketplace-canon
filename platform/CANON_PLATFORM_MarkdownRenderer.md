@@ -264,4 +264,4 @@ Exhaust markdown bullets and manual bullet characters before reaching for HTML l
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-14 | Stu / Claude | Initial draft. Observations sourced from Product long description authoring sessions for Adobe VIP Marketplace and SoftwareOne Cloud Managed Services Essentials for AWS. |
+| 0.1 | 2026-03-14 | Stu | Initial draft. Observations sourced from Product long description authoring sessions for Adobe VIP Marketplace and SoftwareOne Cloud Managed Services Essentials for AWS. |

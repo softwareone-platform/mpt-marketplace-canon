@@ -211,4 +211,4 @@
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
 | 0.1 | [YYYY-MM-DD] | [Author] | Initial draft |
-| 0.2 | 2026-03-09 | Stu / Claude | Platform Invariants block replaced with reference to PLATFORM_CANON_PREAMBLE.md. ID Prefix field added to Section 1 with guidance note. Section 10 open questions guidance updated — question ID convention (object prefix), tracker workflow (CANON_OPEN_QUESTIONS.md → CANON_RESOLVED_QUESTIONS.md). No Example JSON section — JSON examples are not included in canon documents. |
+| 0.2 | 2026-03-09 | Stu | Platform Invariants block replaced with reference to PLATFORM_CANON_PREAMBLE.md. ID Prefix field added to Section 1 with guidance note. Section 10 open questions guidance updated — question ID convention (object prefix), tracker workflow (CANON_OPEN_QUESTIONS.md → CANON_RESOLVED_QUESTIONS.md). No Example JSON section — JSON examples are not included in canon documents. |

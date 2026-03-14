@@ -166,7 +166,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-08 | Stu / Claude | Initial canon. Derived from Terms and Variant JSON examples and conversation. |
-| 0.2 | 2026-03-09 | Stu / Claude | "Re-publish" normalised to "Republish" throughout for consistency. |
-| 0.3 | 2026-03-09 | Stu / Claude | T4 corrected — Vendors cannot unpublish Terms. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |
-| 0.4 | 2026-03-14 | Stu / Claude | Schema review against OpenAPI extract. Section 5: required fields on creation noted, Revision marked read-only. Section 8: unpublished audit event added. T6: hard delete language corrected. Section 10: cleaned up. |
+| 0.1 | 2026-03-08 | Stu | Initial canon. Derived from Terms and Variant JSON examples and conversation. |
+| 0.2 | 2026-03-09 | Stu | "Re-publish" normalised to "Republish" throughout for consistency. |
+| 0.3 | 2026-03-09 | Stu | T4 corrected — Vendors cannot unpublish Terms. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |
+| 0.4 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 5: required fields on creation noted, Revision marked read-only. Section 8: unpublished audit event added. T6: hard delete language corrected. Section 10: cleaned up. |

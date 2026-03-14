@@ -105,8 +105,8 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-09 | Stu / Claude | Initial file. All questions resolved to date migrated from CANON_OPEN_QUESTIONS.md. |
-| 0.2 | 2026-03-14 | Stu / Claude | TPL-002 added. PRD-003 added. |
-| 0.3 | 2026-03-14 | Stu / Claude | PRD-002 added. |
-| 0.4 | 2026-03-14 | Stu / Claude | PRD-001 added. |
-| 0.5 | 2026-03-14 | Stu / Claude | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |
+| 0.1 | 2026-03-09 | Stu | Initial file. All questions resolved to date migrated from CANON_OPEN_QUESTIONS.md. |
+| 0.2 | 2026-03-14 | Stu | TPL-002 added. PRD-003 added. |
+| 0.3 | 2026-03-14 | Stu | PRD-002 added. |
+| 0.4 | 2026-03-14 | Stu | PRD-001 added. |
+| 0.5 | 2026-03-14 | Stu | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |

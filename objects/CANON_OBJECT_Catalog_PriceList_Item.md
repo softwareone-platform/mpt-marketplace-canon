@@ -191,5 +191,5 @@ See CANON_OPEN_QUESTIONS.md for tracked open questions:
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-09 | Stu / Claude | Initial canon. |
-| 0.2 | 2026-03-09 | Stu / Claude | BR-012 updated with defaultMarkup fallback when unitLP unsupported. BR-018 updated to include Private items. name attribute added. |
+| 0.1 | 2026-03-09 | Stu | Initial canon. |
+| 0.2 | 2026-03-09 | Stu | BR-012 updated with defaultMarkup fallback when unitLP unsupported. BR-018 updated to include Private items. name attribute added. |
