@@ -35,18 +35,6 @@ mpt-marketplace-canon/
 
 ---
 
-## How to Generate Canon
-
-Canon is generated using an LLM authoring session guided by a structured prompt and two reference files.
-
-1. Paste the **Canon Authoring Session Prompt** (`templates/CANON_AUTHORING_SESSION.md`) into your LLM session.
-2. Upload the **Platform Canon Preamble** (`preamble/PLATFORM_CANON_PREAMBLE.md`) and the **Canon Object Template** (`templates/CANON_OBJECT_TEMPLATE.md`) alongside it.
-3. Tell the LLM which object you are canonising and begin working through the template section by section.
-
-Uploading sample API responses for the object you are documenting significantly improves output quality. Multiple examples are better than one.
-
----
-
 ## Authoring Principles
 
 **If it isn't observed, confirmed, and documented — it isn't canon.**
@@ -63,9 +51,16 @@ Uploading sample API responses for the object you are documenting significantly 
 
 ---
 
-## Contributing
+## Using this Canon with an LLM
 
-Contributions follow the standard GitHub workflow: branch, edit, pull request. All changes require a changelog entry in the affected document. Open questions should be tracked in `questions/CANON_OPEN_QUESTIONS.md` and closed in `questions/CANON_RESOLVED_QUESTIONS.md` once resolved.
+The structured format of this canon is designed to work well as context for large language models. Loading canon documents as project knowledge in an LLM lets you ask questions about platform behaviour, validate integration assumptions, and accelerate development without digging through documentation manually.
+
+**Recommended approach:**
+- Load `preamble/PLATFORM_CANON_PREAMBLE.md` into your LLM project knowledge first — it establishes the platform invariants and conventions that all object canon builds on.
+- Add the canon documents relevant to your integration (e.g. `objects/CANON_OBJECT_Catalog_PriceList.md`) alongside it.
+- You can then ask the LLM to explain behaviours, check assumptions, or walk through lifecycle scenarios for any canonised object.
+
+Canon documents are intentionally precise and unambiguous — which makes them significantly more reliable as LLM context than informal documentation or API reference alone.
 
 ---
 
