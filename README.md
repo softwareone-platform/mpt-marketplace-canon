@@ -61,9 +61,3 @@ The structured format of this canon is designed to work well as context for larg
 - You can then ask the LLM to explain behaviours, check assumptions, or walk through lifecycle scenarios for any canonised object.
 
 Canon documents are intentionally precise and unambiguous — which makes them significantly more reliable as LLM context than informal documentation or API reference alone.
-
----
-
-## Further Reading
-
-Internal documentation and background on the canon initiative is maintained on Confluence: [SoftwareOne Marketplace Canon](https://softwareone.atlassian.net/wiki/spaces/mpt/pages/7224131913/SoftwareOne+Marketplace+Canon).
