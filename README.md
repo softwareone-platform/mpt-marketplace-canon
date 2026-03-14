@@ -31,6 +31,8 @@ mpt-marketplace-canon/
   templates/
     CANON_OBJECT_TEMPLATE.md          # Standard template for object canon documents
     CANON_AUTHORING_SESSION.md        # LLM session prompt for canon authoring
+  scripts/
+    convert_to_docx.py                # Script to convert canon files to .docx for use as Copilot knowledge
 ```
 
 ---
@@ -61,3 +63,23 @@ The structured format of this canon is designed to work well as context for larg
 - You can then ask the LLM to explain behaviours, check assumptions, or walk through lifecycle scenarios for any canonised object.
 
 Canon documents are intentionally precise and unambiguous — which makes them significantly more reliable as LLM context than informal documentation or API reference alone.
+
+### Using Canon as Microsoft Copilot Agent Knowledge
+
+Microsoft Copilot Agent Builder requires knowledge files in `.docx` format. A conversion script is included in `scripts/` to convert all canon files from Markdown to `.docx` in one step.
+
+**Requirements:** [pandoc](https://pandoc.org/installing.html) and Python 3.
+
+**Usage:**
+```
+# Windows
+python scripts/convert_to_docx.py C:/Users/yourname/Desktop/docx
+
+# macOS
+python scripts/convert_to_docx.py ~/Desktop/docx
+
+# Linux
+python scripts/convert_to_docx.py ~/Documents/docx
+```
+
+The script converts all files in `preamble/`, `objects/`, and `platform/` and writes `.docx` files to the specified output directory. Re-run it whenever canon files are updated.
