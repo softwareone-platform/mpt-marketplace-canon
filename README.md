@@ -126,7 +126,7 @@ The structured format of this canon is designed to work well as context for larg
 
 **Recommended approach:**
 - Load `preamble/PLATFORM_CANON_PREAMBLE.md` into your LLM project knowledge first — it establishes the platform invariants and conventions that all object canon builds on.
-- Add the canon documents relevant to your integration (e.g. `objects/CANON_OBJECT_Catalog_PriceList.md`) alongside it.
+- Add the canon documents relevant to your integration (e.g. `objects/CANON_OBJECT_Catalog_PriceList.md`) alongside it. For use with Microsoft Copilot Agent Builder, run `scripts/convert_to_docx.py` first to convert the Markdown files to `.docx` — Copilot Agent Builder requires `.docx` format.
 - You can then ask the LLM to explain behaviours, check assumptions, or walk through lifecycle scenarios for any canonised object.
 
 Canon documents are intentionally precise and unambiguous — which makes them significantly more reliable as LLM context than informal documentation or API reference alone.
