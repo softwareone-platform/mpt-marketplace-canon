@@ -33,7 +33,7 @@ TRANSITION_VERBS = {
     "process", "publish", "query", "recalculate", "redeem",
     "regenerate", "reject", "render", "renew", "resend-invite",
     "reschedule", "reset", "retry", "review", "send-new-invite",
-    "set-password", "submit", "synchronize", "terminate", "transfer",
+    "set-password", "settings", "submit", "synchronize", "terminate", "transfer",
     "unblock", "unpublish", "validate", "refresh", "execute",
 }
 

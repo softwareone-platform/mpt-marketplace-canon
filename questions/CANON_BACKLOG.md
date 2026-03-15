@@ -75,7 +75,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] account-users
   - [ ] groups
 - [ ] accounts
-  - [ ] settings
   - [ ] users
     - [ ] groups
 - [ ] api-tokens
@@ -145,7 +144,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
     - [ ] image
   - [x] parameter-groups
   - [x] parameters
-  - [ ] settings
   - [x] templates
   - [x] terms
     - [x] variants
@@ -269,7 +267,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
     - [ ] image
   - [ ] parameter-groups
   - [ ] parameters
-  - [ ] settings
   - [ ] templates
   - [ ] terms
     - [ ] variants
@@ -310,3 +307,4 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 0.6 | 2026-03-14 | Stu | Investigation Items section added. Webhook type / Product settings relationship added for future exploration. |
 | 0.7 | 2026-03-14 | Stu | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
 | 0.8 | 2026-03-14 | Stu | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |
+| 0.9 | 2026-03-15 | Stu | settings removed from Full Object Inventory under products, accounts, and programs — settings is a property, not an object. |
