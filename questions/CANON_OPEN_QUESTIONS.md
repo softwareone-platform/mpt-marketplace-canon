@@ -1,6 +1,6 @@
 # Canon Open Questions
 
-> **Version:** 1.5
+> **Version:** 1.6
 > **Last Updated:** 2026-03-15
 > **Status:** Living Document — updated continuously as canon is developed
 
@@ -20,7 +20,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | # | Question |
 |---|----------|
-| AUT-001 | What are the full semantics of eligibility.partner = true/false? What specifically does partner eligibility gate, and how does it interact with the Partner actor model and Programs/Administration canon? |
+| AUT-001 | What are the full semantics of eligibility.partner = true/false? What specifically does partner eligibility gate, and how does it interact with the Partner actor model and Programs/Accounts canon? |
 
 ---
 
@@ -38,11 +38,13 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | # | Question |
 |---|----------|
-| SEL-001 | Status transition mechanics for Sellers are not confirmed. Transitions between `Active` and `Disabled` do not appear to be available via the platform API to any Actor. The executing mechanism, preconditions, and downstream platform effects of `Disabled` status on Authorizations, Listings, ErpLinks, and active transactions are unconfirmed. Believed to be managed by operational tooling outside the platform API surface. |
 | SEL-002 | The mechanism for accessing Buyer data associated with a Seller is not confirmed. The `buyers` field appears in `$meta.omitted` on Seller responses unconditionally — even when `select=+buyers` is explicitly requested. It is unclear whether Buyers can be queried via the Seller endpoint at all, or whether Buyer access is always via a dedicated Buyer endpoint. |
 | SEL-004 | One Seller in production (`BG_CPX`, `SEL-9696-0728`, Disabled) has no `icon` field in its API response, where all other Sellers return a jdenticon URL. Cause unknown — may be a data anomaly from migration or an edge case in icon behaviour for early-created or Disabled records. |
 | SEL-005 | The effect of removing a currency from a Seller's `currencies` array on existing Authorizations and Listings denominated in that currency is not confirmed. Whether the platform permits the removal of a currency that is actively referenced downstream is also unconfirmed. |
-| SEL-006 | Whether the platform enforces a minimum cardinality of one on the `currencies` array at creation time is not confirmed. |
+| SEL-007 | The `erpLink` field on the Seller object is a single `ErpLinkRef` reference, not a collection. The relationship between this field and the broader Seller:Buyer association model is not confirmed. Suspected to represent the Seller's relationship to its ERP instance rather than to a specific Buyer. Requires engineering input. |
+| SEL-008 | The `/deactivate` action endpoint exists in the API spec alongside `/disable`. How `deactivate` differs from `disable`, which state it produces, and what its downstream effects are, is not confirmed. |
+| SEL-009 | The `SellerStatus` enum includes `Offline` and `Deleted` in addition to `Active` and `Disabled`. The semantics, transition mechanics, and downstream effects of `Offline` and `Deleted` status values are not confirmed. `Deleted` may represent a soft-delete state distinct from the DELETE endpoint. |
+| SEL-010 | A `DELETE /v1/accounts/sellers/{id}` endpoint exists in the API spec (returns 204). Whether the platform enforces a deletion guard in practice — and what conditions permit or block deletion — is not confirmed. The downstream impact on Authorizations, Listings, and ErpLinks if a Seller is deleted is not confirmed. |
 
 ---
 
@@ -65,3 +67,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.3 | 2026-03-14 | Stu | ENV-003 resolved and moved to resolved file — /icon endpoint is GET only; icon upload is via multipart/form-data on the parent object endpoint. |
 | 1.4 | 2026-03-14 | Stu | ENV-004 added: icon removal mechanism unconfirmed. |
 | 1.5 | 2026-03-15 | Stu | SEL-001 through SEL-006 added from Seller canon session. Note: SEL-003 was resolved during the session (externalId is mutable via the API) and is not tracked here. |
+| 1.6 | 2026-03-15 | Stu | SEL-001 resolved and removed — status transitions confirmed as API endpoints (/activate, /disable, /deactivate). SEL-006 resolved and removed — currencies minItems: 1 confirmed in SellerCreate schema. SEL-007 through SEL-010 added from OpenAPI spec review. |

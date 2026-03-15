@@ -1,7 +1,7 @@
 # Canon Resolved Questions
 
-> **Version:** 0.5
-> **Last Updated:** 2026-03-14
+> **Version:** 0.6
+> **Last Updated:** 2026-03-15
 > **Status:** Living Document — append-only reference
 
 ---
@@ -101,6 +101,16 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 
 ---
 
+## CANON_OBJECT_Accounts_Seller.md
+
+| # | Question | Resolution | Canon Reference |
+|---|----------|------------|-----------------|
+| SEL-001 | Status transition mechanics for Sellers are not confirmed. Transitions between `Active` and `Disabled` do not appear to be available via the platform API to any Actor. | Resolved via OpenAPI spec review. Status transitions are available via dedicated action endpoints: `POST /activate` (Disabled → Active), `POST /disable` (Active → Disabled), and `POST /deactivate` (semantics unconfirmed — see SEL-008). | Seller canon Section 3.2 |
+| SEL-003 | Is `externalId` immutable via the API, or can Operations overwrite it directly? | Confirmed mutable — Operations can override `externalId` via the API. ERP Sync is the source of truth but the field is writable. | Seller canon Section 5 |
+| SEL-006 | Whether the platform enforces a minimum cardinality of one on the `currencies` array at creation time is not confirmed. | Confirmed via OpenAPI spec — `SellerCreate` schema has `minItems: 1` on the `currencies` array. Platform-enforced on creation. | Seller canon BR-003, Section 5 |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -110,3 +120,4 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 | 0.3 | 2026-03-14 | Stu | PRD-002 added. |
 | 0.4 | 2026-03-14 | Stu | PRD-001 added. |
 | 0.5 | 2026-03-14 | Stu | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |
+| 0.6 | 2026-03-15 | Stu | SEL-001, SEL-003, SEL-006 added — resolved during Seller canon session and OpenAPI spec review. |
