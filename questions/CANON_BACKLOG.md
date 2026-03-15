@@ -22,7 +22,7 @@ This document serves two purposes:
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
-| Pricing Policy | 🟡 In progress | See CANON_OBJECT_Catalog_PricingPolicy.md. Open questions: PRP-001, PRP-002, PRP-004. Soft-delete confirmed (PRP-003 resolved). | 2026-03-09 session |
+| Pricing Policy | 🟡 In progress | See CANON_OBJECT_Catalog_PricingPolicy.md. Open questions remain — see CANON_OPEN_QUESTIONS.md. | 2026-03-09 session |
 
 ### Commerce Namespace
 
@@ -37,7 +37,7 @@ This document serves two purposes:
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
-| Seller | 🟡 In progress | See CANON_OBJECT_Accounts_Seller.md. 5 open questions (SEL-001, SEL-002, SEL-004, SEL-005, SEL-006). | Listing/Authorization discussion, 2026-03-15 canon session |
+| Seller | 🟡 In progress | See CANON_OBJECT_Accounts_Seller.md. Open questions remain — see CANON_OPEN_QUESTIONS.md. | Listing/Authorization discussion, 2026-03-15 canon session |
 | ErpLink | 🔴 Not started | Join object between Buyer and Seller. Carries ERP-side customer identifiers (erpCompanyContact, erpCustomer, accountExternalId). Has status (at least: Blocked). JSON sample available. | Seller canon session |
 | Buyer | 🔴 Not started | Associated with Sellers via ErpLinks. May be replicated across multiple ERP instances by MDM team (many:many with Seller). Referenced on Agreement JSON. | Agreement JSON, Seller canon session |
 | Licensee | 🔴 Not started | Referenced on Agreement JSON. Must have Active status to place an Order in PROD (ERP-linked constraint — relaxed in STAGING). | Agreement JSON |
@@ -79,7 +79,7 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] erp-links
 - [ ] licensees
 - [ ] modules
-- [x] sellers
+- [~] sellers
 - [ ] services
 - [ ] user-groups
 - [ ] users
@@ -125,12 +125,12 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 
 ### Catalog
 
-- [x] authorizations
+- [~] authorizations
 - [x] items
 - [x] listings
 - [x] price-lists
   - [x] items
-- [x] pricing-policies
+- [~] pricing-policies
   - [ ] attachments
 - [x] products
   - [ ] documents
@@ -303,3 +303,4 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 1.1 | 2026-03-15 | Stu | Seller marked complete in Full Object Inventory. ErpLink added to Accounts backlog. Buyer and Licensee notes expanded. |
 | 1.2 | 2026-03-15 | Stu | Completed objects removed from Curated Backlog — purpose note updated. Seller marked in-progress (5 open questions). Authorization marked in-progress (1 open question). Administration namespace renamed to Accounts throughout. erp-links restored to [ ] in Full Object Inventory — curated backlog entry carries the contextual notes. |
 | 1.3 | 2026-03-16 | Stu | Pricing Policy marked complete in Curated Backlog and Full Object Inventory. |
+| 1.4 | 2026-03-16 | Stu | Open question IDs removed from In progress entries — too difficult to maintain. Entries now point to CANON_OPEN_QUESTIONS.md instead. |
