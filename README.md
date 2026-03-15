@@ -32,7 +32,9 @@ mpt-marketplace-canon/
     CANON_OBJECT_TEMPLATE.md          # Standard template for object canon documents
     CANON_AUTHORING_SESSION.md        # LLM session prompt for canon authoring
   scripts/
-    convert_to_docx.py                # Script to convert canon files to .docx for use as Copilot knowledge
+    convert_to_docx.py                # Convert canon Markdown files to .docx
+    extract_objects.py                # Extract a namespace/object checklist from the OpenAPI spec
+    extract_canon_schema.py           # Extract paths and schemas for a specific object from the OpenAPI spec
 ```
 
 ---
@@ -50,6 +52,71 @@ mpt-marketplace-canon/
 - **One source of truth.** Reference rules documented elsewhere rather than restating them. Duplication leads to drift.
 - **Version everything.** Every change must be reflected in the document's changelog. Canon is only trustworthy if its history is traceable.
 - **Canon describes the platform, not a vendor's use of it.** Vendor-specific behaviour belongs in vendor canon.
+
+---
+
+## Scripts
+
+Three Python scripts are included in `scripts/` to support canon development workflows.
+
+**Requirements for all scripts:** Python 3. `convert_to_docx.py` additionally requires [pandoc](https://pandoc.org/installing.html). `extract_objects.py` and `extract_canon_schema.py` require a copy of the SoftwareOne Marketplace OpenAPI spec in JSON format — not included in this repo.
+
+---
+
+### `convert_to_docx.py`
+
+Converts all canon Markdown files to `.docx` format using pandoc. Converts every file in `preamble/`, `objects/`, and `platform/` and writes the output to a specified directory.
+
+Used to produce `.docx` files for upload as Microsoft Copilot Agent knowledge (Copilot Agent Builder requires `.docx` format). Re-run whenever canon files are updated.
+
+```
+# Windows
+python scripts/convert_to_docx.py C:/Users/yourname/Desktop/docx
+
+# macOS / Linux
+python scripts/convert_to_docx.py ~/Desktop/docx
+```
+
+---
+
+### `extract_objects.py`
+
+Parses the OpenAPI spec and extracts a structured checklist of all namespaces, objects, child objects, and grandchild objects — formatted as a Markdown backlog ready for use in `CANON_BACKLOG.md`.
+
+Used to generate or refresh the Full Object Inventory in the backlog when the spec changes.
+
+```
+# Print to stdout
+python scripts/extract_objects.py openapi.json
+
+# Write to a file
+python scripts/extract_objects.py openapi.json canon_checklist.md
+```
+
+---
+
+### `extract_canon_schema.py`
+
+Extracts all API paths and component schemas for a specific platform object from the OpenAPI spec, producing a trimmed JSON file. Follows all `$ref` chains to include every nested schema the object depends on.
+
+Used to generate a focused, uploadable JSON extract for a canon authoring session — giving the LLM precise schema information for the object being canonised without loading the entire spec.
+
+The OpenAPI spec can be downloaded from the [SoftwareOne Marketplace developer documentation](https://docs.platform.softwareone.com/developer-resources/rest-api/openapi-specification).
+
+```
+# Top-level object (use --exact to avoid pulling in child object paths)
+python scripts/extract_canon_schema.py openapi.json catalog product --exact
+
+# Child object (no --exact needed — the child path is already specific)
+python scripts/extract_canon_schema.py openapi.json catalog template
+
+# Multi-word object names use hyphens
+python scripts/extract_canon_schema.py openapi.json catalog price-list
+```
+
+The `--exact` flag restricts matching to paths where the object is the terminal resource segment, excluding paths for child objects (e.g. `catalog/products/{id}/templates` would not be included when extracting `product --exact`). Without `--exact`, all paths containing the namespace and object keyword are matched.
+
+Output is saved as `openapi_extract_{namespace}_{object}.json` in the same directory as the input spec.
 
 ---
 
