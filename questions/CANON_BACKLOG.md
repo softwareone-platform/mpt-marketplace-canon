@@ -22,7 +22,7 @@ This document serves two purposes:
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
-| Pricing Policy | 🔴 Not started | Catalog namespace. No further detail captured yet. | 2026-03-09 session |
+| Pricing Policy | 🟡 In progress | See CANON_OBJECT_Catalog_PricingPolicy.md. Open questions: PRP-001, PRP-002, PRP-004. Soft-delete confirmed (PRP-003 resolved). | 2026-03-09 session |
 
 ### Commerce Namespace
 
@@ -130,7 +130,7 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [x] listings
 - [x] price-lists
   - [x] items
-- [ ] pricing-policies
+- [x] pricing-policies
   - [ ] attachments
 - [x] products
   - [ ] documents
@@ -302,3 +302,4 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 1.0 | 2026-03-15 | Stu | image removed from under all media entries — image is a binary upload endpoint, not an object. |
 | 1.1 | 2026-03-15 | Stu | Seller marked complete in Full Object Inventory. ErpLink added to Accounts backlog. Buyer and Licensee notes expanded. |
 | 1.2 | 2026-03-15 | Stu | Completed objects removed from Curated Backlog — purpose note updated. Seller marked in-progress (5 open questions). Authorization marked in-progress (1 open question). Administration namespace renamed to Accounts throughout. erp-links restored to [ ] in Full Object Inventory — curated backlog entry carries the contextual notes. |
+| 1.3 | 2026-03-16 | Stu | Pricing Policy marked complete in Curated Backlog and Full Object Inventory. |

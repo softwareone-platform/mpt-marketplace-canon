@@ -27,6 +27,8 @@ These invariants apply universally across all objects, actors, and namespaces. T
 6. **The platform never cascades deletions.** Deleting an object never automatically deletes any other object as a side effect. Each object must be deleted independently. Deletion guards exist to prevent removal of objects that have dependents — see Section 3.5.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
+   **Known exceptions:** Catalog: Pricing Policy uses a soft-delete model — Deleted policies remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
+
 ---
 
 ## 2. Actor Model
@@ -169,6 +171,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Price List Item | Catalog | PRI |
 | Authorization | Catalog | AUT |
 | Listing | Catalog | LST |
+| Pricing Policy | Catalog | PRP |
 | Webhook | Notifications | WBH |
 | Audit Record | Audit | AUD |
 | API Token | Accounts | TKN |
@@ -339,3 +342,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.1 | 2026-03-14 | Stu | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
 | 1.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — standardised on API path prefix. Section 4 namespace table updated with API path prefix column and naming note. Section 5.3 ID Prefixes table updated: SEL prefix added for Seller; TKN and ACC namespace updated to Accounts. Section 5.4 duplicate heading corrected to 5.5. Section 7.3 Licensee/Buyer references updated to Accounts namespace. |
 | 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
+| 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |

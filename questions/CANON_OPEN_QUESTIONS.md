@@ -24,6 +24,16 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Catalog_PricingPolicy.md
+
+| # | Question |
+|---|----------|
+| PRP-001 | What is the full behaviour of the `None` status? Not observed in real API responses — may be purely transitional immediately after creation. Needs testing to confirm. |
+| PRP-002 | What is the difference between `None` and `Inactive`? Can a policy go from `None` directly to `Inactive` without ever being activated? |
+| PRP-004 | When multiple active Pricing Policies exist for the same Client and eligibility, how does the platform resolve which cap to apply? |
+
+---
+
 ## PLATFORM_CANON_PREAMBLE.md
 
 | # | Question |
@@ -68,3 +78,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.4 | 2026-03-14 | Stu | ENV-004 added: icon removal mechanism unconfirmed. |
 | 1.5 | 2026-03-15 | Stu | SEL-001 through SEL-006 added from Seller canon session. Note: SEL-003 was resolved during the session (externalId is mutable via the API) and is not tracked here. |
 | 1.6 | 2026-03-15 | Stu | SEL-001 resolved and removed — status transitions confirmed as API endpoints (/activate, /disable, /deactivate). SEL-006 resolved and removed — currencies minItems: 1 confirmed in SellerCreate schema. SEL-007 through SEL-010 added from OpenAPI spec review. |
+| 1.7 | 2026-03-16 | Stu | PRP-001, PRP-002, PRP-004 added from Pricing Policy canon session. |

@@ -101,6 +101,14 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 
 ---
 
+## CANON_OBJECT_Catalog_PricingPolicy.md
+
+| # | Question | Resolution | Canon Reference |
+|---|----------|------------|-----------------|
+| PRP-003 | Does `Deleted` mean permanently removed from the API, or is this a soft delete? | Soft delete confirmed. Deleted Pricing Policies remain fully retrievable via the API, including in standard list responses. | Pricing Policy canon Section 3.1, Section 8 |
+
+---
+
 ## CANON_OBJECT_Accounts_Seller.md
 
 | # | Question | Resolution | Canon Reference |
@@ -121,3 +129,4 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 | 0.4 | 2026-03-14 | Stu | PRD-001 added. |
 | 0.5 | 2026-03-14 | Stu | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |
 | 0.6 | 2026-03-15 | Stu | SEL-001, SEL-003, SEL-006 added — resolved during Seller canon session and OpenAPI spec review. |
+| 0.7 | 2026-03-16 | Stu | PRP-003 added — Deleted is a soft delete confirmed from real API responses. |
