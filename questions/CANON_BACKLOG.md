@@ -141,7 +141,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [x] item-groups
   - [x] items
   - [x] media
-    - [ ] image
   - [x] parameter-groups
   - [x] parameters
   - [x] templates
@@ -188,7 +187,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] installations
   - [ ] instances
   - [ ] media
-    - [ ] image
   - [ ] terms
     - [ ] variants
   - [ ] token
@@ -224,7 +222,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
   - [ ] installations
   - [ ] instances
   - [ ] media
-    - [ ] image
   - [ ] terms
     - [ ] variants
   - [ ] token
@@ -264,7 +261,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] programs
   - [ ] documents
   - [ ] media
-    - [ ] image
   - [ ] parameter-groups
   - [ ] parameters
   - [ ] templates
@@ -277,7 +273,6 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] industries
 - [ ] product-profiles
   - [ ] media
-    - [ ] image
 - [ ] segments
 - [ ] vendor-profiles
 
@@ -308,3 +303,4 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 0.7 | 2026-03-14 | Stu | Full Object Inventory section added — generated from OpenAPI spec via extract_objects.py. Catalog namespace objects marked complete where canon exists. Document restructured into Curated Backlog and Full Object Inventory sections. |
 | 0.8 | 2026-03-14 | Stu | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |
 | 0.9 | 2026-03-15 | Stu | settings removed from Full Object Inventory under products, accounts, and programs — settings is a property, not an object. |
+| 1.0 | 2026-03-15 | Stu | image removed from under all media entries — image is a binary upload endpoint, not an object. |
