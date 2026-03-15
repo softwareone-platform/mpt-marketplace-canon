@@ -1,15 +1,15 @@
 # Canon Backlog
 
-> **Version:** 1.1
+> **Version:** 1.3
 > **Owner:** Stu
-> **Last Updated:** 2026-03-15
+> **Last Updated:** 2026-03-16
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
 
 ## Purpose
 
-This document is the authoritative backlog and coverage tracker for platform canon. It tracks every known platform object across all namespaces — whether not started, in progress, or complete — in a single unified table.
+This document is the authoritative backlog and coverage tracker for platform canon. It tracks every known platform object across all namespaces — whether not started, in progress, or complete — in a single unified reference.
 
 ---
 
@@ -17,189 +17,308 @@ This document is the authoritative backlog and coverage tracker for platform can
 
 | Status | Meaning |
 |--------|---------|
-| 🟢 Complete | Canon document exists and is considered current |
-| 🟡 In Progress | Canon session started; document exists but is incomplete or unreviewed |
-| 🔴 Not Started | Object identified; no canon work begun |
+| 🟢 Complete | Canon document exists and is considered current. No open questions. |
+| 🟡 In Progress | Canon session started; document exists but has open questions or is unreviewed. |
+| 🔴 Not Started | Object identified; no canon work begun. |
 
 ---
 
-## Object Backlog
+## Table of Contents
 
-| Namespace | Object | Parent | Status | Canon File | Notes |
-|-----------|--------|--------|--------|------------|-------|
-| Accounts | account-users | — | 🔴 Not Started | | |
-| Accounts | groups | account-users | 🔴 Not Started | | |
-| Accounts | accounts | — | 🔴 Not Started | | |
-| Accounts | users | accounts | 🔴 Not Started | | |
-| Accounts | groups | users | 🔴 Not Started | | |
-| Accounts | api-tokens | — | 🔴 Not Started | | |
-| Accounts | buyers | — | 🔴 Not Started | | |
-| Accounts | cloud-tenants | — | 🔴 Not Started | | |
-| Accounts | erp-links | — | 🔴 Not Started | | |
-| Accounts | licensees | — | 🔴 Not Started | | |
-| Accounts | modules | — | 🔴 Not Started | | |
-| Accounts | sellers | — | 🟡 In Progress | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | SoftwareOne subsidiary. Acts as Owner on Authorization and as transacting party on Listing. |
-| Accounts | services | — | 🔴 Not Started | | |
-| Accounts | user-groups | — | 🔴 Not Started | | |
-| Accounts | users | — | 🔴 Not Started | | |
-| Accounts | accounts | users | 🔴 Not Started | | |
-| Accounts | sso | users | 🔴 Not Started | | |
-| Accounts | sso-check | users | 🔴 Not Started | | |
-| Audit | event-types | — | 🔴 Not Started | | |
-| Audit | records | — | 🔴 Not Started | | Platform-wide. Generated for significant events on objects across all namespaces. JSON example available. Prefix: AUD. |
-| Billing | analytics | — | 🔴 Not Started | | |
-| Billing | credit-memos | — | 🔴 Not Started | | |
-| Billing | attachments | credit-memos | 🔴 Not Started | | |
-| Billing | custom-ledgers | — | 🔴 Not Started | | |
-| Billing | attachments | custom-ledgers | 🔴 Not Started | | |
-| Billing | charges | custom-ledgers | 🔴 Not Started | | |
-| Billing | queue | custom-ledgers | 🔴 Not Started | | |
-| Billing | upload | custom-ledgers | 🔴 Not Started | | |
-| Billing | invoices | — | 🔴 Not Started | | |
-| Billing | attachments | invoices | 🔴 Not Started | | |
-| Billing | journals | — | 🔴 Not Started | | |
-| Billing | attachments | journals | 🔴 Not Started | | |
-| Billing | charges | journals | 🔴 Not Started | | |
-| Billing | enquiry | journals | 🔴 Not Started | | |
-| Billing | sellers | journals | 🔴 Not Started | | |
-| Billing | upload | journals | 🔴 Not Started | | |
-| Billing | ledgers | — | 🔴 Not Started | | |
-| Billing | attachments | ledgers | 🔴 Not Started | | |
-| Billing | charges | ledgers | 🔴 Not Started | | |
-| Billing | queue | ledgers | 🔴 Not Started | | |
-| Billing | manual-overrides | — | 🔴 Not Started | | |
-| Billing | statements | — | 🔴 Not Started | | |
-| Billing | attachments | statements | 🔴 Not Started | | |
-| Billing | charges | statements | 🔴 Not Started | | |
-| Billing | children | statements | 🔴 Not Started | | |
-| Billing | error | statements | 🔴 Not Started | | |
-| Billing | pending | statements | 🔴 Not Started | | |
-| Billing | queue | statements | 🔴 Not Started | | |
-| Catalog | authorizations | — | 🟡 In Progress | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | |
-| Catalog | items | — | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | Top-level Item collection (cross-product). |
-| Catalog | listings | — | 🟢 Complete | [CANON_OBJECT_Catalog_Listing.md](../objects/CANON_OBJECT_Catalog_Listing.md) | |
-| Catalog | price-lists | — | 🟢 Complete | [CANON_OBJECT_Catalog_PriceList.md](../objects/CANON_OBJECT_Catalog_PriceList.md) | |
-| Catalog | items | price-lists | 🟢 Complete | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | |
-| Catalog | pricing-policies | — | 🟡 In Progress | [CANON_OBJECT_Catalog_PricingPolicy.md](../objects/CANON_OBJECT_Catalog_PricingPolicy.md) | |
-| Catalog | attachments | pricing-policies | 🔴 Not Started | | |
-| Catalog | products | — | 🟢 Complete | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | |
-| Catalog | documents | products | 🔴 Not Started | | |
-| Catalog | item-groups | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_ItemGroup.md](../objects/CANON_OBJECT_Catalog_Product_ItemGroup.md) | |
-| Catalog | items | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | |
-| Catalog | media | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Media.md](../objects/CANON_OBJECT_Catalog_Product_Media.md) | |
-| Catalog | parameter-groups | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_ParameterGroup.md](../objects/CANON_OBJECT_Catalog_Product_ParameterGroup.md) | |
-| Catalog | parameters | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Parameter.md](../objects/CANON_OBJECT_Catalog_Product_Parameter.md) | |
-| Catalog | templates | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Template.md](../objects/CANON_OBJECT_Catalog_Product_Template.md) | |
-| Catalog | terms | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Terms.md](../objects/CANON_OBJECT_Catalog_Product_Terms.md) | |
-| Catalog | variants | terms | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Terms_Variant.md](../objects/CANON_OBJECT_Catalog_Product_Terms_Variant.md) | |
-| Catalog | units-of-measure | — | 🟢 Complete | [CANON_OBJECT_Catalog_UnitOfMeasure.md](../objects/CANON_OBJECT_Catalog_UnitOfMeasure.md) | Platform-level reference object. 13 units in PROD as of 2026-03-09. |
-| Commerce | agreements | — | 🔴 Not Started | | Active state. Holds parameter value snapshot from Order completion. Associated with one Listing. |
-| Commerce | attachments | agreements | 🔴 Not Started | | |
-| Commerce | lines | agreements | 🔴 Not Started | | |
-| Commerce | split | agreements | 🔴 Not Started | | |
-| Commerce | template | agreements | 🔴 Not Started | | |
-| Commerce | assets | — | 🔴 Not Started | | Vendor-written parameters during fulfilment. |
-| Commerce | lines | assets | 🔴 Not Started | | |
-| Commerce | lines | — | 🔴 Not Started | | |
-| Commerce | orders | — | 🔴 Not Started | | Four types: Purchase, Change, Termination, Configuration. Has lines with old/new quantity. Querying state exists for Client parameter correction. |
-| Commerce | assets | orders | 🔴 Not Started | | |
-| Commerce | lines | orders | 🔴 Not Started | | |
-| Commerce | quote | orders | 🔴 Not Started | | |
-| Commerce | subscriptions | orders | 🔴 Not Started | | |
-| Commerce | template | orders | 🔴 Not Started | | |
-| Commerce | requests | — | 🔴 Not Started | | |
-| Commerce | attachments | requests | 🔴 Not Started | | |
-| Commerce | messages | requests | 🔴 Not Started | | |
-| Commerce | template | requests | 🔴 Not Started | | |
-| Commerce | subscriptions | — | 🔴 Not Started | | Referenced by Configuration Orders. Has auto-renewal flag. |
-| Commerce | lines | subscriptions | 🔴 Not Started | | |
-| Commerce | split | subscriptions | 🔴 Not Started | | |
-| Exchange | currencies | — | 🔴 Not Started | | |
-| Exchange | pairs | — | 🔴 Not Started | | |
-| Exchange | rates | pairs | 🔴 Not Started | | |
-| Exchange | rates | — | 🔴 Not Started | | |
-| Extensibility | categories | — | 🔴 Not Started | | |
-| Extensibility | extensions | — | 🔴 Not Started | | |
-| Extensibility | documents | extensions | 🔴 Not Started | | |
-| Extensibility | installations | extensions | 🔴 Not Started | | |
-| Extensibility | instances | extensions | 🔴 Not Started | | |
-| Extensibility | media | extensions | 🔴 Not Started | | |
-| Extensibility | terms | extensions | 🔴 Not Started | | |
-| Extensibility | variants | terms | 🔴 Not Started | | |
-| Extensibility | token | extensions | 🔴 Not Started | | |
-| Extensibility | installations | — | 🔴 Not Started | | |
-| Extensibility | token | installations | 🔴 Not Started | | |
-| Helpdesk | cases | — | 🔴 Not Started | | |
-| Helpdesk | channels | — | 🔴 Not Started | | |
-| Helpdesk | messages | channels | 🔴 Not Started | | |
-| Helpdesk | chats | — | 🔴 Not Started | | |
-| Helpdesk | attachments | chats | 🔴 Not Started | | |
-| Helpdesk | links | chats | 🔴 Not Started | | |
-| Helpdesk | messages | chats | 🔴 Not Started | | |
-| Helpdesk | participants | chats | 🔴 Not Started | | |
-| Helpdesk | feedback | — | 🔴 Not Started | | |
-| Helpdesk | attachments | feedback | 🔴 Not Started | | |
-| Helpdesk | download | attachments | 🔴 Not Started | | |
-| Helpdesk | forms | — | 🔴 Not Started | | |
-| Helpdesk | parameter-groups | forms | 🔴 Not Started | | |
-| Helpdesk | parameters | forms | 🔴 Not Started | | |
-| Helpdesk | parameter-groups | — | 🔴 Not Started | | |
-| Helpdesk | parameters | parameter-groups | 🔴 Not Started | | |
-| Helpdesk | parameters | — | 🔴 Not Started | | |
-| Helpdesk | queues | — | 🔴 Not Started | | |
-| Integration | categories | — | 🔴 Not Started | | |
-| Integration | extensions | — | 🔴 Not Started | | |
-| Integration | documents | extensions | 🔴 Not Started | | |
-| Integration | installations | extensions | 🔴 Not Started | | |
-| Integration | instances | extensions | 🔴 Not Started | | |
-| Integration | media | extensions | 🔴 Not Started | | |
-| Integration | terms | extensions | 🔴 Not Started | | |
-| Integration | variants | terms | 🔴 Not Started | | |
-| Integration | token | extensions | 🔴 Not Started | | |
-| Integration | installations | — | 🔴 Not Started | | |
-| Integration | token | installations | 🔴 Not Started | | |
-| Notifications | accounts | — | 🔴 Not Started | | |
-| Notifications | categories | accounts | 🔴 Not Started | | |
-| Notifications | contacts | categories | 🔴 Not Started | | |
-| Notifications | batches | — | 🔴 Not Started | | |
-| Notifications | attachments | batches | 🔴 Not Started | | |
-| Notifications | categories | — | 🔴 Not Started | | |
-| Notifications | contacts | — | 🔴 Not Started | | |
-| Notifications | directories | — | 🔴 Not Started | | |
-| Notifications | footers | — | 🔴 Not Started | | |
-| Notifications | messages | — | 🔴 Not Started | | |
-| Notifications | subscribers | — | 🔴 Not Started | | |
-| Notifications | templates | — | 🔴 Not Started | | |
-| Notifications | variants | templates | 🔴 Not Started | | |
-| Notifications | webhooks | — | 🟢 Complete | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | |
-| Procurement | erp-items | — | 🔴 Not Started | | |
-| Procurement | sales-orders | — | 🔴 Not Started | | |
-| Procurement | attachments | sales-orders | 🔴 Not Started | | |
-| Procurement | sales-quotes | — | 🔴 Not Started | | |
-| Procurement | attachments | sales-quotes | 🔴 Not Started | | |
-| Program | certificates | — | 🔴 Not Started | | |
-| Program | enrollments | — | 🔴 Not Started | | |
-| Program | attachments | enrollments | 🔴 Not Started | | |
-| Program | programs | — | 🔴 Not Started | | |
-| Program | documents | programs | 🔴 Not Started | | |
-| Program | media | programs | 🔴 Not Started | | |
-| Program | parameter-groups | programs | 🔴 Not Started | | |
-| Program | parameters | programs | 🔴 Not Started | | |
-| Program | templates | programs | 🔴 Not Started | | |
-| Program | terms | programs | 🔴 Not Started | | |
-| Program | variants | terms | 🔴 Not Started | | |
-| Public-catalog | categories | — | 🔴 Not Started | | |
-| Public-catalog | industries | — | 🔴 Not Started | | |
-| Public-catalog | product-profiles | — | 🔴 Not Started | | |
-| Public-catalog | media | product-profiles | 🔴 Not Started | | |
-| Public-catalog | segments | — | 🔴 Not Started | | |
-| Public-catalog | vendor-profiles | — | 🔴 Not Started | | |
-| Spotlight | objects | — | 🔴 Not Started | | |
-| Spotlight | queries | — | 🔴 Not Started | | |
-| System | tasks | — | 🔴 Not Started | | |
-| System | logs | tasks | 🔴 Not Started | | |
-| System | queue | tasks | 🔴 Not Started | | |
-| System | result | tasks | 🔴 Not Started | | |
+- [Accounts](#accounts)
+- [Audit](#audit)
+- [Billing](#billing)
+- [Catalog](#catalog)
+- [Commerce](#commerce)
+- [Exchange](#exchange)
+- [Extensibility](#extensibility)
+- [Helpdesk](#helpdesk)
+- [Integration](#integration)
+- [Notifications](#notifications)
+- [Procurement](#procurement)
+- [Program](#program)
+- [Public-catalog](#public-catalog)
+- [Spotlight](#spotlight)
+- [System](#system)
+- [Investigation Items](#investigation-items)
+
+---
+
+## Accounts
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| account-users | — | 🔴 Not Started | | |
+| groups | account-users | 🔴 Not Started | | |
+| accounts | — | 🔴 Not Started | | |
+| users | accounts | 🔴 Not Started | | |
+| groups | users | 🔴 Not Started | | |
+| api-tokens | — | 🔴 Not Started | | |
+| buyers | — | 🔴 Not Started | | Referenced on Agreement JSON. |
+| cloud-tenants | — | 🔴 Not Started | | |
+| erp-links | — | 🔴 Not Started | | |
+| licensees | — | 🔴 Not Started | | Referenced on Agreement JSON. |
+| modules | — | 🔴 Not Started | | |
+| sellers | — | 🟡 In Progress | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | SoftwareOne subsidiary. Acts as Owner on Authorization and as transacting party on Listing. |
+| services | — | 🔴 Not Started | | |
+| user-groups | — | 🔴 Not Started | | |
+| users | — | 🔴 Not Started | | |
+| accounts | users | 🔴 Not Started | | |
+| sso | users | 🔴 Not Started | | |
+| sso-check | users | 🔴 Not Started | | |
+
+---
+
+## Audit
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| event-types | — | 🔴 Not Started | | |
+| records | — | 🔴 Not Started | | Platform-wide. Generated for significant events on objects across all namespaces. JSON example available. Prefix: AUD. |
+
+---
+
+## Billing
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| analytics | — | 🔴 Not Started | | |
+| credit-memos | — | 🔴 Not Started | | |
+| attachments | credit-memos | 🔴 Not Started | | |
+| custom-ledgers | — | 🔴 Not Started | | |
+| attachments | custom-ledgers | 🔴 Not Started | | |
+| charges | custom-ledgers | 🔴 Not Started | | |
+| queue | custom-ledgers | 🔴 Not Started | | |
+| upload | custom-ledgers | 🔴 Not Started | | |
+| invoices | — | 🔴 Not Started | | |
+| attachments | invoices | 🔴 Not Started | | |
+| journals | — | 🔴 Not Started | | |
+| attachments | journals | 🔴 Not Started | | |
+| charges | journals | 🔴 Not Started | | |
+| enquiry | journals | 🔴 Not Started | | |
+| sellers | journals | 🔴 Not Started | | |
+| upload | journals | 🔴 Not Started | | |
+| ledgers | — | 🔴 Not Started | | |
+| attachments | ledgers | 🔴 Not Started | | |
+| charges | ledgers | 🔴 Not Started | | |
+| queue | ledgers | 🔴 Not Started | | |
+| manual-overrides | — | 🔴 Not Started | | |
+| statements | — | 🔴 Not Started | | |
+| attachments | statements | 🔴 Not Started | | |
+| charges | statements | 🔴 Not Started | | |
+| children | statements | 🔴 Not Started | | |
+| error | statements | 🔴 Not Started | | |
+| pending | statements | 🔴 Not Started | | |
+| queue | statements | 🔴 Not Started | | |
+
+---
+
+## Catalog
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| authorizations | — | 🟡 In Progress | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | |
+| items | — | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | Top-level Item collection (cross-product). |
+| listings | — | 🟢 Complete | [CANON_OBJECT_Catalog_Listing.md](../objects/CANON_OBJECT_Catalog_Listing.md) | |
+| price-lists | — | 🟢 Complete | [CANON_OBJECT_Catalog_PriceList.md](../objects/CANON_OBJECT_Catalog_PriceList.md) | |
+| items | price-lists | 🟢 Complete | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | |
+| pricing-policies | — | 🟡 In Progress | [CANON_OBJECT_Catalog_PricingPolicy.md](../objects/CANON_OBJECT_Catalog_PricingPolicy.md) | |
+| attachments | pricing-policies | 🔴 Not Started | | |
+| products | — | 🟢 Complete | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | |
+| documents | products | 🔴 Not Started | | |
+| item-groups | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_ItemGroup.md](../objects/CANON_OBJECT_Catalog_Product_ItemGroup.md) | |
+| items | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | |
+| media | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Media.md](../objects/CANON_OBJECT_Catalog_Product_Media.md) | |
+| parameter-groups | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_ParameterGroup.md](../objects/CANON_OBJECT_Catalog_Product_ParameterGroup.md) | |
+| parameters | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Parameter.md](../objects/CANON_OBJECT_Catalog_Product_Parameter.md) | |
+| templates | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Template.md](../objects/CANON_OBJECT_Catalog_Product_Template.md) | |
+| terms | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Terms.md](../objects/CANON_OBJECT_Catalog_Product_Terms.md) | |
+| variants | terms | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Terms_Variant.md](../objects/CANON_OBJECT_Catalog_Product_Terms_Variant.md) | |
+| units-of-measure | — | 🟢 Complete | [CANON_OBJECT_Catalog_UnitOfMeasure.md](../objects/CANON_OBJECT_Catalog_UnitOfMeasure.md) | Platform-level reference object. 13 units in PROD as of 2026-03-09. |
+
+---
+
+## Commerce
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| agreements | — | 🔴 Not Started | | Active state. Holds parameter value snapshot from Order completion. Associated with one Listing. |
+| attachments | agreements | 🔴 Not Started | | |
+| lines | agreements | 🔴 Not Started | | |
+| split | agreements | 🔴 Not Started | | |
+| template | agreements | 🔴 Not Started | | |
+| assets | — | 🔴 Not Started | | Vendor-written parameters during fulfilment. |
+| lines | assets | 🔴 Not Started | | |
+| lines | — | 🔴 Not Started | | |
+| orders | — | 🔴 Not Started | | Four types: Purchase, Change, Termination, Configuration. Has lines with old/new quantity. Querying state exists for Client parameter correction. |
+| assets | orders | 🔴 Not Started | | |
+| lines | orders | 🔴 Not Started | | |
+| quote | orders | 🔴 Not Started | | |
+| subscriptions | orders | 🔴 Not Started | | |
+| template | orders | 🔴 Not Started | | |
+| requests | — | 🔴 Not Started | | |
+| attachments | requests | 🔴 Not Started | | |
+| messages | requests | 🔴 Not Started | | |
+| template | requests | 🔴 Not Started | | |
+| subscriptions | — | 🔴 Not Started | | Referenced by Configuration Orders. Has auto-renewal flag. |
+| lines | subscriptions | 🔴 Not Started | | |
+| split | subscriptions | 🔴 Not Started | | |
+
+---
+
+## Exchange
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| currencies | — | 🔴 Not Started | | |
+| pairs | — | 🔴 Not Started | | |
+| rates | pairs | 🔴 Not Started | | |
+| rates | — | 🔴 Not Started | | |
+
+---
+
+## Extensibility
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| categories | — | 🔴 Not Started | | |
+| extensions | — | 🔴 Not Started | | |
+| documents | extensions | 🔴 Not Started | | |
+| installations | extensions | 🔴 Not Started | | |
+| instances | extensions | 🔴 Not Started | | |
+| media | extensions | 🔴 Not Started | | |
+| terms | extensions | 🔴 Not Started | | |
+| variants | terms | 🔴 Not Started | | |
+| token | extensions | 🔴 Not Started | | |
+| installations | — | 🔴 Not Started | | |
+| token | installations | 🔴 Not Started | | |
+
+---
+
+## Helpdesk
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| cases | — | 🔴 Not Started | | |
+| channels | — | 🔴 Not Started | | |
+| messages | channels | 🔴 Not Started | | |
+| chats | — | 🔴 Not Started | | |
+| attachments | chats | 🔴 Not Started | | |
+| links | chats | 🔴 Not Started | | |
+| messages | chats | 🔴 Not Started | | |
+| participants | chats | 🔴 Not Started | | |
+| feedback | — | 🔴 Not Started | | |
+| attachments | feedback | 🔴 Not Started | | |
+| download | attachments | 🔴 Not Started | | |
+| forms | — | 🔴 Not Started | | |
+| parameter-groups | forms | 🔴 Not Started | | |
+| parameters | forms | 🔴 Not Started | | |
+| parameter-groups | — | 🔴 Not Started | | |
+| parameters | parameter-groups | 🔴 Not Started | | |
+| parameters | — | 🔴 Not Started | | |
+| queues | — | 🔴 Not Started | | |
+
+---
+
+## Integration
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| categories | — | 🔴 Not Started | | |
+| extensions | — | 🔴 Not Started | | |
+| documents | extensions | 🔴 Not Started | | |
+| installations | extensions | 🔴 Not Started | | |
+| instances | extensions | 🔴 Not Started | | |
+| media | extensions | 🔴 Not Started | | |
+| terms | extensions | 🔴 Not Started | | |
+| variants | terms | 🔴 Not Started | | |
+| token | extensions | 🔴 Not Started | | |
+| installations | — | 🔴 Not Started | | |
+| token | installations | 🔴 Not Started | | |
+
+---
+
+## Notifications
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| accounts | — | 🔴 Not Started | | |
+| categories | accounts | 🔴 Not Started | | |
+| contacts | categories | 🔴 Not Started | | |
+| batches | — | 🔴 Not Started | | |
+| attachments | batches | 🔴 Not Started | | |
+| categories | — | 🔴 Not Started | | |
+| contacts | — | 🔴 Not Started | | |
+| directories | — | 🔴 Not Started | | |
+| footers | — | 🔴 Not Started | | |
+| messages | — | 🔴 Not Started | | |
+| subscribers | — | 🔴 Not Started | | |
+| templates | — | 🔴 Not Started | | |
+| variants | templates | 🔴 Not Started | | |
+| webhooks | — | 🟢 Complete | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | |
+
+---
+
+## Procurement
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| erp-items | — | 🔴 Not Started | | |
+| sales-orders | — | 🔴 Not Started | | |
+| attachments | sales-orders | 🔴 Not Started | | |
+| sales-quotes | — | 🔴 Not Started | | |
+| attachments | sales-quotes | 🔴 Not Started | | |
+
+---
+
+## Program
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| certificates | — | 🔴 Not Started | | |
+| enrollments | — | 🔴 Not Started | | |
+| attachments | enrollments | 🔴 Not Started | | |
+| programs | — | 🔴 Not Started | | |
+| documents | programs | 🔴 Not Started | | |
+| media | programs | 🔴 Not Started | | |
+| parameter-groups | programs | 🔴 Not Started | | |
+| parameters | programs | 🔴 Not Started | | |
+| templates | programs | 🔴 Not Started | | |
+| terms | programs | 🔴 Not Started | | |
+| variants | terms | 🔴 Not Started | | |
+
+---
+
+## Public-catalog
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| categories | — | 🔴 Not Started | | |
+| industries | — | 🔴 Not Started | | |
+| product-profiles | — | 🔴 Not Started | | |
+| media | product-profiles | 🔴 Not Started | | |
+| segments | — | 🔴 Not Started | | |
+| vendor-profiles | — | 🔴 Not Started | | |
+
+---
+
+## Spotlight
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| objects | — | 🔴 Not Started | | |
+| queries | — | 🔴 Not Started | | |
+
+---
+
+## System
+
+| Object | Parent | Status | Canon File | Notes |
+|--------|--------|--------|------------|-------|
+| tasks | — | 🔴 Not Started | | |
+| logs | tasks | 🔴 Not Started | | |
+| queue | tasks | 🔴 Not Started | | |
+| result | tasks | 🔴 Not Started | | |
 
 ---
 
@@ -227,3 +346,4 @@ This document is the authoritative backlog and coverage tracker for platform can
 | 1.0 | 2026-03-15 | Stu | image removed from under all media entries — image is a binary upload endpoint, not an object. |
 | 1.1 | 2026-03-15 | Stu | Curated Backlog and Full Object Inventory merged into single unified Object Backlog table. Status legend added. Canon file links added using relative paths. Seller and Pricing Policy status updated from new files found in objects/. |
 | 1.2 | 2026-03-16 | Stu | Authorization and Seller downgraded to In Progress — both have open questions. Open question IDs removed from backlog — maintained in CANON_OPEN_QUESTIONS.md only. |
+| 1.3 | 2026-03-16 | Stu | Object Backlog split into per-namespace sections with headings. Table of contents added. Namespace column removed from tables. |
