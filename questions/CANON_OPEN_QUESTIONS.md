@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 1.3
-> **Last Updated:** 2026-03-14
+> **Version:** 1.5
+> **Last Updated:** 2026-03-15
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -34,6 +34,18 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Accounts_Seller.md
+
+| # | Question |
+|---|----------|
+| SEL-001 | Status transition mechanics for Sellers are not confirmed. Transitions between `Active` and `Disabled` do not appear to be available via the platform API to any Actor. The executing mechanism, preconditions, and downstream platform effects of `Disabled` status on Authorizations, Listings, ErpLinks, and active transactions are unconfirmed. Believed to be managed by operational tooling outside the platform API surface. |
+| SEL-002 | The mechanism for accessing Buyer data associated with a Seller is not confirmed. The `buyers` field appears in `$meta.omitted` on Seller responses unconditionally — even when `select=+buyers` is explicitly requested. It is unclear whether Buyers can be queried via the Seller endpoint at all, or whether Buyer access is always via a dedicated Buyer endpoint. |
+| SEL-004 | One Seller in production (`BG_CPX`, `SEL-9696-0728`, Disabled) has no `icon` field in its API response, where all other Sellers return a jdenticon URL. Cause unknown — may be a data anomaly from migration or an edge case in icon behaviour for early-created or Disabled records. |
+| SEL-005 | The effect of removing a currency from a Seller's `currencies` array on existing Authorizations and Listings denominated in that currency is not confirmed. Whether the platform permits the removal of a currency that is actively referenced downstream is also unconfirmed. |
+| SEL-006 | Whether the platform enforces a minimum cardinality of one on the `currencies` array at creation time is not confirmed. |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -52,3 +64,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.2 | 2026-03-14 | Stu | ENV-003 added: icon upload HTTP method (PUT vs POST) unconfirmed. |
 | 1.3 | 2026-03-14 | Stu | ENV-003 resolved and moved to resolved file — /icon endpoint is GET only; icon upload is via multipart/form-data on the parent object endpoint. |
 | 1.4 | 2026-03-14 | Stu | ENV-004 added: icon removal mechanism unconfirmed. |
+| 1.5 | 2026-03-15 | Stu | SEL-001 through SEL-006 added from Seller canon session. Note: SEL-003 was resolved during the session (externalId is mutable via the API) and is not tracked here. |

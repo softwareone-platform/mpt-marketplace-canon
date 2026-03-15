@@ -1,8 +1,8 @@
 # Canon Backlog
 
-> **Version:** 0.8
+> **Version:** 1.2
 > **Owner:** Stu
-> **Last Updated:** 2026-03-14
+> **Last Updated:** 2026-03-15
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -11,8 +11,8 @@
 
 This document serves two purposes:
 
-1. **Curated Backlog** — objects that have been identified and contextualised during canon development. Includes status, notes, and sequencing intent.
-2. **Full Object Inventory** — a complete checklist of all objects identified from the OpenAPI spec, grouped by namespace. Used as the authoritative coverage tracker.
+1. **Curated Backlog** — objects that are in progress or not yet started, with contextual notes to guide future canon sessions. Completed objects are removed from this section — the Full Object Inventory below serves as the authoritative coverage tracker.
+2. **Full Object Inventory** — a complete checklist of all objects identified from the OpenAPI spec, grouped by namespace. Used to track canon coverage across the full platform.
 
 ---
 
@@ -22,11 +22,6 @@ This document serves two purposes:
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
-| Unit of Measure | 🟢 Complete | See CANON_OBJECT_Catalog_UnitOfMeasure.md. Platform-level reference object. 13 units in PROD as of 2026-03-09. | Item canon |
-| Price List | 🟢 Complete | See CANON_OBJECT_Catalog_PriceList.md | Price List canon session |
-| Price List Item | 🟢 Complete | See CANON_OBJECT_Catalog_PriceList_Item.md | Price List canon session |
-| Authorization | 🟢 Complete | See CANON_OBJECT_Catalog_Authorization.md | Listing/Authorization discussion |
-| Listing | 🟢 Complete | See CANON_OBJECT_Catalog_Listing.md | Listing/Authorization discussion |
 | Pricing Policy | 🔴 Not started | Catalog namespace. No further detail captured yet. | 2026-03-09 session |
 
 ### Commerce Namespace
@@ -38,13 +33,14 @@ This document serves two purposes:
 | Subscription | 🔴 Not started | Referenced by Configuration Orders. Has auto-renewal flag. | Item discussion |
 | Asset | 🔴 Not started | Vendor-written parameters during fulfilment. | Parameter canon |
 
-### Administration Namespace
+### Accounts Namespace
 
 | Object | Status | Notes | Identified During |
 |--------|--------|-------|------------------|
-| Seller | 🔴 Not started | SoftwareOne subsidiary. Acts as Owner on Authorization, and as transacting party on Listing. | Listing/Authorization discussion |
-| Buyer | 🔴 Not started | Referenced on Agreement JSON. | Agreement JSON |
-| Licensee | 🔴 Not started | Referenced on Agreement JSON. | Agreement JSON |
+| Seller | 🟡 In progress | See CANON_OBJECT_Accounts_Seller.md. 5 open questions (SEL-001, SEL-002, SEL-004, SEL-005, SEL-006). | Listing/Authorization discussion, 2026-03-15 canon session |
+| ErpLink | 🔴 Not started | Join object between Buyer and Seller. Carries ERP-side customer identifiers (erpCompanyContact, erpCustomer, accountExternalId). Has status (at least: Blocked). JSON sample available. | Seller canon session |
+| Buyer | 🔴 Not started | Associated with Sellers via ErpLinks. May be replicated across multiple ERP instances by MDM team (many:many with Seller). Referenced on Agreement JSON. | Agreement JSON, Seller canon session |
+| Licensee | 🔴 Not started | Referenced on Agreement JSON. Must have Active status to place an Order in PROD (ERP-linked constraint — relaxed in STAGING). | Agreement JSON |
 
 ### Audit Namespace
 
@@ -83,7 +79,7 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 - [ ] erp-links
 - [ ] licensees
 - [ ] modules
-- [ ] sellers
+- [x] sellers
 - [ ] services
 - [ ] user-groups
 - [ ] users
@@ -304,3 +300,5 @@ Legend: `[ ]` = not started · `[~]` = in progress · `[x]` = complete
 | 0.8 | 2026-03-14 | Stu | Icon endpoints removed from Full Object Inventory — icon behaviour canonised as a platform-wide pattern in PLATFORM_CANON_PREAMBLE.md Section 9. Explanatory note added above inventory. |
 | 0.9 | 2026-03-15 | Stu | settings removed from Full Object Inventory under products, accounts, and programs — settings is a property, not an object. |
 | 1.0 | 2026-03-15 | Stu | image removed from under all media entries — image is a binary upload endpoint, not an object. |
+| 1.1 | 2026-03-15 | Stu | Seller marked complete in Full Object Inventory. ErpLink added to Accounts backlog. Buyer and Licensee notes expanded. |
+| 1.2 | 2026-03-15 | Stu | Completed objects removed from Curated Backlog — purpose note updated. Seller marked in-progress (5 open questions). Authorization marked in-progress (1 open question). Administration namespace renamed to Accounts throughout. erp-links restored to [ ] in Full Object Inventory — curated backlog entry carries the contextual notes. |

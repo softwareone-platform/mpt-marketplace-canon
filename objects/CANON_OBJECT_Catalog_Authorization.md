@@ -1,8 +1,8 @@
 # Object Canon: Authorization
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-03-14
+> **Last Updated:** 2026-03-15
 > **Status:** Draft
 
 ---
@@ -47,7 +47,7 @@ This object has no state machine. An Authorization exists as a persistent record
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 |---------|---------------|---------------------|-------------|-------|
-| BR-001 | An Authorization records the commercial relationship between exactly one Administration: Seller (the Authorization Owner), one Vendor, one Catalog: Product, and one currency. This four-part tuple is the identity of the Authorization. | N/A | All | |
+| BR-001 | An Authorization records the commercial relationship between exactly one Accounts: Seller (the Authorization Owner), one Vendor, one Catalog: Product, and one currency. This four-part tuple is the identity of the Authorization. | N/A | All | |
 | BR-002 | Multiple Authorizations may exist with the same Seller, Vendor, Product, and currency. The platform does not enforce uniqueness on this tuple. Duplicate Authorizations may represent valid commercial configurations or may represent misconfiguration — the Vendor and Operations are responsible for managing this. | N/A | All | |
 | BR-003 | An Authorization is a precondition for creating a Listing. A Listing cannot exist without a parent Authorization. | N/A | All | |
 | BR-004 | An Authorization may be referenced by more than one Listing. | N/A | All | |
@@ -87,7 +87,7 @@ This object has no state machine. An Authorization exists as a persistent record
 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
 |----------------|------------------|-------------|-------------|----------------------|
-| Administration: Seller | Owner | Many:1 | The Seller that owns this Authorization — the SoftwareOne entity that holds the commercial relationship with the Vendor. Known as the Authorization Owner. | Yes — Authorization cannot exist without an Owner Seller. |
+| Accounts: Seller | Owner | Many:1 | The Seller that owns this Authorization — the SoftwareOne entity that holds the commercial relationship with the Vendor. Known as the Authorization Owner. | Yes — Authorization cannot exist without an Owner Seller. |
 | Catalog: Product | Association | Many:1 | An Authorization is scoped to exactly one Product. | No — deletion of Product behaviour not yet confirmed. |
 | Catalog: Listing | Parent of | One:Many | A Listing cannot exist without a parent Authorization. An Authorization may have multiple Listings. | Yes — Listings cannot exist without an Authorization. Authorization cannot be deleted while any Listing exists. |
 | Commerce: Agreement | Indirect | One:Many | Agreements are downstream of Listings which are downstream of Authorizations. Surfaced to Client on Agreement detail as id and name only. | No — direct lifecycle dependency is at Listing level. |
@@ -138,7 +138,7 @@ Audit block captures `created` and `updated` timestamps and Actors, consistent w
 
 ## 10. Open Questions
 
-- AUT-001: What are the full semantics of eligibility.partner = true/false? What specifically does partner eligibility gate, and how does it interact with the Partner actor model and Programs/Administration canon?
+- AUT-001: What are the full semantics of eligibility.partner = true/false? What specifically does partner eligibility gate, and how does it interact with the Partner actor model and Programs/Accounts canon?
 
 ---
 
@@ -148,3 +148,4 @@ Audit block captures `created` and `updated` timestamps and Actors, consistent w
 |---------|------|--------|-------|
 | 0.1 | 2026-03-09 | Stu | Initial canon. |
 | 0.2 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 2: Vendor write access clarified — settings only, not all update fields. Section 5: name marked required; currency marked required and immutable; vendor reference field added; journal and eligibility fields marked required on creation; revision marked read-only; statistics fields noted as platform-computed. Section 8: audit note corrected — both created and updated events recorded. Section 10: AUT-002 removed (resolved). SD-004 and SD-005 raised in spec discrepancy tracker. |
+| 0.3 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — BR-001 and Section 6 updated. |

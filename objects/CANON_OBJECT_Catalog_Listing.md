@@ -1,8 +1,8 @@
 # Object Canon: Listing
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** Stu
-> **Last Updated:** 2026-03-14
+> **Last Updated:** 2026-03-15
 > **Status:** Draft
 
 ---
@@ -85,7 +85,7 @@ This object has no state machine. A Listing exists as a persistent record from c
 |----------------|------------------|-------------|-------------|----------------------|
 | Catalog: Authorization | Parent | Many:1 | A Listing belongs to exactly one Authorization. Cannot be reassigned. | Yes — Listing cannot exist without a parent Authorization. Authorization cannot be deleted while any Listing exists. |
 | Catalog: Price List | Association | Many:1 | A Listing references exactly one Price List. Currency must match Authorization currency. | Yes (deletion guard) — a Price List cannot be deleted while any Listing references it. All referencing Listings must be deleted before the Price List can be deleted. |
-| Administration: Seller | Association | Many:1 | The Seller that will invoice Clients for Orders placed under this Listing. May differ from the Authorization Owner. | No — Sellers are never deleted, only disabled. When a Seller is disabled, new Orders cannot be placed under this Listing. The Listing itself is unaffected. |
+| Accounts: Seller | Association | Many:1 | The Seller that will invoice Clients for Orders placed under this Listing. May differ from the Authorization Owner. | No — Sellers are never deleted, only disabled. When a Seller is disabled, new Orders cannot be placed under this Listing. The Listing itself is unaffected. |
 | Commerce: Agreement | Association | One:Many | Agreements are created under a Listing. A Listing cannot be deleted while any Agreement is in a non-terminal state. | Yes (deletion guard) — Listing deletion blocked while active Agreements exist. |
 
 ---
@@ -150,3 +150,4 @@ Audit block captures `created` and `updated` timestamps and Actors, consistent w
 | 0.1 | 2026-03-09 | Stu | Initial canon. |
 | 0.2 | 2026-03-09 | Stu | LST-001 and LST-002 resolved. Section 6 Price List and Seller lifecycle dependencies updated. Seller disabled failure mode added to Section 9. Open questions closed. |
 | 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 5: eligibility fields marked required on creation; primary noted as optional (null = false); vendor convenience field added with rationale; statistics fields marked read-only and restricted from Clients with rationale; revision marked read-only. Section 8: audit note corrected — both created and updated recorded. Section 10: cleaned up. |
+| 0.4 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — Section 6 updated. |

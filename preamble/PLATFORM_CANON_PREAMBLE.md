@@ -1,8 +1,8 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.0
+> **Version:** 1.3
 > **Owner:** Stu
-> **Last Updated:** 2026-03-14
+> **Last Updated:** 2026-03-15
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -113,14 +113,20 @@ Objects are protected from deletion when doing so would leave dependent objects 
 
 The platform is organised into namespaces. Each namespace contains a set of primary objects and their child objects.
 
-| Namespace | Primary Objects |
-|-----------|----------------|
-| Catalog | Products, Programs, Enrollments, Certificates |
-| Commerce | Orders, Agreements, Subscriptions, Assets, Split Billing |
-| Billing | Journals, Ledgers, Statements |
-| Administration | Accounts, Buyers, Sellers, Licensees, API Tokens, Users, Groups |
-| Notifications | Webhooks |
-| Audit | Audit Records |
+| Namespace | API Path Prefix | Primary Objects |
+|-----------|----------------|----------------|
+| Catalog | `catalog` | Products, Programs, Enrollments, Certificates |
+| Commerce | `commerce` | Orders, Agreements, Subscriptions, Assets, Split Billing |
+| Billing | `billing` | Journals, Ledgers, Statements |
+| Accounts | `accounts` | Accounts, Buyers, Sellers, Licensees, API Tokens, Users, Groups |
+| Notifications | `notifications` | Webhooks |
+| Audit | `audit` | Audit Records |
+
+> **Naming note:** The Accounts namespace is known by two names depending on context:
+> - **"Administration"** — the label used in the platform UI and in internal SoftwareOne communications.
+> - **"Accounts"** — the API path prefix (`v1/accounts/...`) used across all platform endpoints in this namespace.
+>
+> Canon standardises on **Accounts** to match the API surface. When encountering the term "Administration" in UI documentation, support tickets, or internal communications, it refers to this namespace.
 
 Cross-namespace object references in canon documents use the fully qualified format: `Namespace: Object` (e.g. `Commerce: Order`, `Catalog: Product`).
 
@@ -165,16 +171,17 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Listing | Catalog | LST |
 | Webhook | Notifications | WBH |
 | Audit Record | Audit | AUD |
-| API Token | Administration | TKN |
-| Account | Administration | ACC |
+| API Token | Accounts | TKN |
+| Account | Accounts | ACC |
+| Seller | Accounts | SEL |
 
-Prefixes for Commerce, Billing, and remaining Administration objects are not yet confirmed — to be documented as those namespaces are canonised.
+Prefixes for Commerce, Billing, and remaining Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 
 ### 5.4 Open Questions
 
 Open questions in canon documents represent known unknowns — design spaces, not failures. They should be resolved and closed as canon matures. A canon document with no open questions is considered complete for its current version.
 
-### 5.4 Canon JSON Examples
+### 5.5 Canon JSON Examples
 
 All JSON examples used during canon development are retrieved using an Operations token. This is the authoritative approach — Operations tokens return all fields without Actor-based field suppression, providing the most complete representation of each object.
 
@@ -254,7 +261,7 @@ Clients interact exclusively with PROD. Non-PROD environments are used by:
 While the API surface is identical across all environments, certain business logic constraints are relaxed in non-PROD environments. These relaxations exist to enable testing without dependency on external production systems (e.g. ERP, vendor provisioning systems).
 
 **Known example:**
-- In PROD, a `Administration: Licensee` must have `Active` status to place an Order. This status reflects that the Licensee's linked `Administration: Buyer` is correctly linked to a customer record in SoftwareOne's ERP. In STAGING, this constraint is not enforced, allowing Order placement without a valid ERP link.
+- In PROD, an `Accounts: Licensee` must have `Active` status to place an Order. This status reflects that the Licensee's linked `Accounts: Buyer` is correctly linked to a customer record in SoftwareOne's ERP. In STAGING, this constraint is not enforced, allowing Order placement without a valid ERP link.
 
 > ⚠️ The full set of constraint relaxations across non-PROD environments is not comprehensively documented. Some relaxations are known only through tribal knowledge. See ENV-001 and ENV-002 in the Open Questions tracker. Do not assume that behaviour observed in STAGING is fully representative of PROD behaviour — verify constraints that involve external system dependencies against PROD documentation or engineering input.
 
@@ -330,3 +337,5 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 0.9 | 2026-03-14 | Stu | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
 | 1.0 | 2026-03-14 | Stu | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
 | 1.1 | 2026-03-14 | Stu | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
+| 1.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — standardised on API path prefix. Section 4 namespace table updated with API path prefix column and naming note. Section 5.3 ID Prefixes table updated: SEL prefix added for Seller; TKN and ACC namespace updated to Accounts. Section 5.4 duplicate heading corrected to 5.5. Section 7.3 Licensee/Buyer references updated to Accounts namespace. |
+| 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
