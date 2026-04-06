@@ -1,8 +1,8 @@
 # Canon Backlog
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Owner:** Stu
-> **Last Updated:** 2026-03-16
+> **Last Updated:** 2026-03-25
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -50,7 +50,7 @@ This document is the authoritative backlog and coverage tracker for platform can
 |--------|--------|--------|------------|-------|
 | account-users | — | 🔴 Not Started | | |
 | groups | account-users | 🔴 Not Started | | |
-| accounts | — | 🔴 Not Started | | |
+| accounts | — | 🟡 In Progress | [CANON_OBJECT_Accounts_Account.md](../objects/CANON_OBJECT_Accounts_Account.md) | 8 open questions (ACC-001 through ACC-008). |
 | users | accounts | 🔴 Not Started | | |
 | groups | users | 🔴 Not Started | | |
 | api-tokens | — | 🔴 Not Started | | |
@@ -347,3 +347,4 @@ This document is the authoritative backlog and coverage tracker for platform can
 | 1.1 | 2026-03-15 | Stu | Curated Backlog and Full Object Inventory merged into single unified Object Backlog table. Status legend added. Canon file links added using relative paths. Seller and Pricing Policy status updated from new files found in objects/. |
 | 1.2 | 2026-03-16 | Stu | Authorization and Seller downgraded to In Progress — both have open questions. Open question IDs removed from backlog — maintained in CANON_OPEN_QUESTIONS.md only. |
 | 1.3 | 2026-03-16 | Stu | Object Backlog split into per-namespace sections with headings. Table of contents added. Namespace column removed from tables. |
+| 1.4 | 2026-03-25 | Stu | Account marked In Progress — initial canon session completed, 8 open questions logged (ACC-001 through ACC-008). |

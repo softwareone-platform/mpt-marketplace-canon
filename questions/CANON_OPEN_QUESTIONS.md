@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 1.6
-> **Last Updated:** 2026-03-15
+> **Version:** 2.0
+> **Last Updated:** 2026-04-05
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -58,6 +58,18 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Accounts_Account.md
+
+| # | Question |
+|---|----------|
+| ACC-003 | The downstream effects of setting an Account to `Disabled` are not confirmed. Specifically: whether associated Users are locked out from logging in, whether associated API Tokens are invalidated, and whether active transactions are affected. Requires confirmation. |
+| ACC-004 | Whether the platform technically prevents creation of a second Operations Account or a second Account for the same Vendor entity is not confirmed. In PROD these are observed as 1:1 constraints but may be operational discipline rather than platform enforcement. |
+| ACC-006 | Whether `externalIds.pyraTenantId` is immutable after creation is not confirmed. Whether the platform enforces uniqueness of `pyraTenantId` across Accounts is also not confirmed. |
+| ACC-007 | The purpose and ownership of the `externalName` field is not confirmed. It is present in the spec on `AccountCreate` and `AccountUpdate` but was not observed in the production JSON samples. Whether it applies to all Account types or specific types is not confirmed. |
+| ACC-008 | The relationship between a Client Account and Buyers is not fully confirmed. Whether Buyers are directly associated with the Account, or only via ErpLinks, requires engineering input. |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -79,3 +91,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.5 | 2026-03-15 | Stu | SEL-001 through SEL-006 added from Seller canon session. Note: SEL-003 was resolved during the session (externalId is mutable via the API) and is not tracked here. |
 | 1.6 | 2026-03-15 | Stu | SEL-001 resolved and removed — status transitions confirmed as API endpoints (/activate, /disable, /deactivate). SEL-006 resolved and removed — currencies minItems: 1 confirmed in SellerCreate schema. SEL-007 through SEL-010 added from OpenAPI spec review. |
 | 1.7 | 2026-03-16 | Stu | PRP-001, PRP-002, PRP-004 added from Pricing Policy canon session. |
+| 1.8 | 2026-03-25 | Stu | ACC-001 through ACC-008 added from Account canon session. |
+| 1.9 | 2026-04-05 | Stu | ACC-001 resolved and removed — externalId applies to Vendor Accounts (ERP manufacturer code) and Client Accounts (CDG); irrelevant on Operations Account. Operations-only write confirmed. |
+| 2.0 | 2026-04-05 | Stu | ACC-002 resolved and removed — Vendor visibility is transaction-relationship-scoped; Client visibility is self-only; non-visible Accounts return 404. ACC-003 rewritten — state semantics and Disabled scope confirmed; downstream effects remain open. ACC-005 resolved and removed — automatic Administrators User Group creation confirmed. |
