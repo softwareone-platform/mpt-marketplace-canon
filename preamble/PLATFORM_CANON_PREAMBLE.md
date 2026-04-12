@@ -27,7 +27,7 @@ These invariants apply universally across all objects, actors, and namespaces. T
 6. **The platform never cascades deletions.** Deleting an object never automatically deletes any other object as a side effect. Each object must be deleted independently. Deletion guards exist to prevent removal of objects that have dependents — see Section 3.5.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
-   **Known exceptions:** Catalog: Pricing Policy uses a soft-delete model — Deleted policies remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
+   **Known exceptions:** Catalog: Pricing Policy and Commerce: Order use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
 
 ---
 
@@ -42,6 +42,29 @@ The platform recognises five Actor types, though only three carry platform-level
 | Vendor | The software manufacturer (e.g. Adobe, Microsoft, Miro). Vendors author and manage Product Definitions and transact through the SoftwareOne Marketplace. Direct platform interaction is expected and is the basis for scale. |
 | Operations | Employees of SoftwareOne. Act as platform stewards — reviewing, publishing, and supporting Vendors and Clients. |
 | Client | Customers of SoftwareOne, either direct or through a Tier 2 reselling partner model. A single permission profile regardless of relationship type. |
+
+### 2.1a User Account Context Model
+
+A User is not inherently typed as a Vendor, Operations, or Client Actor. A User may be a member of zero or more Accounts, and those Accounts may be of any type in any combination. A User with no Account memberships has no Actor permissions.
+
+The Actor permissions that apply to any given API call are determined by two factors in combination:
+
+1. **Account type** — the type of the Account the User is currently operating in (Vendor, Operations, or Client) defines the broad Actor permission profile.
+2. **Group membership** — within each Account, Users are members of one or more Groups. Groups define granular permission sets (for example, access to Marketplace features vs. Access Management vs. Account Management). Group permission sets are defined by the platform and are consistent across all Account types.
+
+The effective permission set for any given action is the intersection of the Account type permissions and the User's Group permissions within that Account.
+
+For example, a SoftwareOne employee may be a member of the Operations Account and also a member of one or more Client Accounts. When operating in the Operations Account, they act as the Operations Actor — but only within the scope of the Groups they belong to in that Account. When operating in a Client Account, they act as the Client Actor with the permissions of their Groups in that Account.
+
+This has practical implications for canon authorship:
+
+- The term "Operations user" or "Client user" is imprecise. The correct framing is "a User operating in an Operations Account" or "a User operating in a Client Account" — or more concisely, "the Operations Actor" or "the Client Actor."
+- Permissions described in canon as belonging to a specific Actor type represent the maximum available permissions for that Actor type. A User's actual permissions may be narrower depending on their Group memberships within their current Account.
+- Some platform actions are only available to a specific Actor type. A User who needs to perform an action available only to the Client Actor must switch to a Client Account to do so.
+
+API Tokens follow the same model. A Token is scoped to exactly one Account, inherits the Actor permission profile of that Account, and is a member of one or more Groups within that Account. The effective permission set for a Token is the intersection of the Account type permissions and its Group memberships.
+
+---
 
 ### 2.2 Recognised Non-Permission Actors
 
@@ -177,8 +200,10 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | API Token | Accounts | TKN |
 | Account | Accounts | ACC |
 | Seller | Accounts | SEL |
+| Order | Commerce | ORD |
+| Order Line | Commerce | ALI |
 
-Prefixes for Commerce, Billing, and remaining Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
+Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 
 ### 5.4 Open Questions
 
@@ -343,3 +368,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — standardised on API path prefix. Section 4 namespace table updated with API path prefix column and naming note. Section 5.3 ID Prefixes table updated: SEL prefix added for Seller; TKN and ACC namespace updated to Accounts. Section 5.4 duplicate heading corrected to 5.5. Section 7.3 Licensee/Buyer references updated to Accounts namespace. |
 | 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
 | 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |
+| 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |

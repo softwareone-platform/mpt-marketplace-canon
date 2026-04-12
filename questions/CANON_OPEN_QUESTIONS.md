@@ -58,6 +58,20 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Commerce_Order.md
+
+| # | Question |
+|---|----------|
+| ORD-001 | Can Operations move a Processing Order to Querying status, or is that transition Vendor-only? Gut says both Vendor and Operations, but unconfirmed. |
+| ORD-002 | Can a Querying Order transition directly to Failed, or must it return to Processing first? The state machine diagram suggests a direct transition is possible; prior discussion suggests it is not. |
+| ORD-003 | When submitting a new Order to the API, which initial status values are valid — is the Client limited to `Draft`, `Quoted`, and `Processing`, or can other values be set directly? |
+| ORD-004 | During Processing and Querying status, can Operations write to `parameters.ordering` and/or `parameters.fulfillment` directly, or must they switch to a Client or Vendor Account to do so? |
+| ORD-005 | Whether the platform handles simultaneous Order placement attempts against the same Agreement atomically — preventing race conditions where two Orders could both reach Processing status simultaneously — is not confirmed. |
+| ORD-006 | Split Billing is enabled at the Agreement level and has implications for Order behaviour. This section requires updating once Split Billing has been canonised in the Agreement canon. |
+| ORD-007 | The `certificates` array on the Order is always empty in observed samples where no Program is assigned to the Product. The full structure of a populated `certificates` entry, which Actors can read it, and whether it is suppressed for any Actor type is not confirmed. See Programs and Certificates canon — pending canonisation. |
+
+---
+
 ## CANON_OBJECT_Accounts_Account.md
 
 | # | Question |
@@ -94,3 +108,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.8 | 2026-03-25 | Stu | ACC-001 through ACC-008 added from Account canon session. |
 | 1.9 | 2026-04-05 | Stu | ACC-001 resolved and removed — externalId applies to Vendor Accounts (ERP manufacturer code) and Client Accounts (CDG); irrelevant on Operations Account. Operations-only write confirmed. |
 | 2.0 | 2026-04-05 | Stu | ACC-002 resolved and removed — Vendor visibility is transaction-relationship-scoped; Client visibility is self-only; non-visible Accounts return 404. ACC-003 rewritten — state semantics and Disabled scope confirmed; downstream effects remain open. ACC-005 resolved and removed — automatic Administrators User Group creation confirmed. |
+| 2.1 | 2026-04-12 | Stu | ORD-001 through ORD-007 added from Order canon session. |
