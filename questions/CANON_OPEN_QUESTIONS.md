@@ -72,6 +72,18 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Commerce_Agreement.md
+
+| # | Question |
+|---|----------|
+| AGR-001 | `startDate` and `endDate` fields appear in the Agreement OpenAPI schema as nullable date-time fields with no `x-rql` annotations. Neither field is observed in any API sample. Purpose, ownership, and whether these fields are actively used is not confirmed. |
+| AGR-002 | `error` field appears in the Agreement OpenAPI schema as a nullable `ParametrisedMessage` (`id`, `message`, `parameters`). Not observed in any API sample — suspected to be a Failed-state-only field analogous to Order `statusNotes`. Confirmation required. |
+| AGR-003 | Whether Attachments created via the Order `/attachments` endpoint are automatically visible via the Agreement `/attachments` endpoint, or whether they must be created against the Agreement separately, is not confirmed. |
+| AGR-007 | Split Billing configuration on the Agreement — full semantics, write rules, and relationship to Order and Subscription Split Billing — to be canonised separately. See ORD-006. |
+| AGR-008 | The `AgreementAudit` schema does not include a `failed` sub-key, but a Failed Agreement is expected to have a failure timestamp. Whether `failed` is a valid audit sub-key missing from the spec, or whether failure is recorded differently, is not confirmed. |
+
+---
+
 ## CANON_OBJECT_Accounts_Account.md
 
 | # | Question |
@@ -109,3 +121,5 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 1.9 | 2026-04-05 | Stu | ACC-001 resolved and removed — externalId applies to Vendor Accounts (ERP manufacturer code) and Client Accounts (CDG); irrelevant on Operations Account. Operations-only write confirmed. |
 | 2.0 | 2026-04-05 | Stu | ACC-002 resolved and removed — Vendor visibility is transaction-relationship-scoped; Client visibility is self-only; non-visible Accounts return 404. ACC-003 rewritten — state semantics and Disabled scope confirmed; downstream effects remain open. ACC-005 resolved and removed — automatic Administrators User Group creation confirmed. |
 | 2.1 | 2026-04-12 | Stu | ORD-001 through ORD-007 added from Order canon session. |
+| 2.2 | 2026-04-12 | Stu | AGR-001 through AGR-007 added from Agreement canon stub session. |
+| 2.3 | 2026-04-13 | Stu | AGR-004, AGR-005, AGR-006 resolved and removed — parameters model confirmed, icon confirmed as not applicable, writable fields confirmed. AGR-008 added: failed audit sub-key presence unconfirmed in schema. |

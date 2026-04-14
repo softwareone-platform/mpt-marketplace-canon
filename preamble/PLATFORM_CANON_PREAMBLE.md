@@ -1,8 +1,8 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.3
+> **Version:** 1.5
 > **Owner:** Stu
-> **Last Updated:** 2026-03-15
+> **Last Updated:** 2026-04-12
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -202,6 +202,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Seller | Accounts | SEL |
 | Order | Commerce | ORD |
 | Order Line | Commerce | ALI |
+| Agreement | Commerce | AGR |
 
 Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 
