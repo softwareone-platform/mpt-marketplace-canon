@@ -204,6 +204,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Order Line | Commerce | ALI |
 | Agreement | Commerce | AGR |
 | Subscription | Commerce | SUB |
+| Asset | Commerce | AST |
 
 Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 

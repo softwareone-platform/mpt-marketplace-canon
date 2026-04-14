@@ -72,6 +72,14 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Commerce_Asset.md
+
+| # | Question |
+|---|----------|
+| AST-001 | There is no `terminationDate` field on the Asset schema, unlike Subscription which has an explicit `terminationDate` set by the platform on termination. Whether this is an intentional design decision or a spec gap is not confirmed. The `audit.updated` timestamp is the current proxy for termination time. |
+
+---
+
 ## CANON_OBJECT_Commerce_Subscription.md
 
 | # | Question |
@@ -134,3 +142,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 2.2 | 2026-04-12 | Stu | AGR-001 through AGR-007 added from Agreement canon stub session. |
 | 2.3 | 2026-04-13 | Stu | AGR-004, AGR-005, AGR-006 resolved and removed — parameters model confirmed, icon confirmed as not applicable, writable fields confirmed. AGR-008 added: failed audit sub-key presence unconfirmed in schema. |
 | 2.4 | 2026-04-13 | Stu | SUB-001 through SUB-003 added from Subscription canon session. |
+| 2.5 | 2026-04-14 | Stu | AST-001 added from Asset canon session. |
