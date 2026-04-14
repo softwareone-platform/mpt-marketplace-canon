@@ -203,6 +203,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Order | Commerce | ORD |
 | Order Line | Commerce | ALI |
 | Agreement | Commerce | AGR |
+| Subscription | Commerce | SUB |
 
 Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 

@@ -72,6 +72,16 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Commerce_Subscription.md
+
+| # | Question |
+|---|----------|
+| SUB-001 | What fields are meaningful in the request body of the `/terminate` endpoint? Specifically whether `terminationDate` or other Subscription fields can be set by the Vendor at termination time, or whether the body is unused. |
+| SUB-002 | Whether `commitmentDate` is set by the Vendor Extension at Subscription creation, computed by the platform from `startDate + terms.commitment`, or both, is not confirmed. |
+| SUB-003 | Split Billing on Subscription — full semantics, write rules, and `splitStatus` lifecycle — to be canonised separately. See AGR-007. |
+
+---
+
 ## CANON_OBJECT_Commerce_Agreement.md
 
 | # | Question |
@@ -123,3 +133,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 2.1 | 2026-04-12 | Stu | ORD-001 through ORD-007 added from Order canon session. |
 | 2.2 | 2026-04-12 | Stu | AGR-001 through AGR-007 added from Agreement canon stub session. |
 | 2.3 | 2026-04-13 | Stu | AGR-004, AGR-005, AGR-006 resolved and removed — parameters model confirmed, icon confirmed as not applicable, writable fields confirmed. AGR-008 added: failed audit sub-key presence unconfirmed in schema. |
+| 2.4 | 2026-04-13 | Stu | SUB-001 through SUB-003 added from Subscription canon session. |
