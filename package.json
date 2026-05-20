@@ -1,0 +1,44 @@
+{
+  "name": "marketplace-canon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SoftwareOne Marketplace canon — authoritative product knowledge base. MD source of truth, derived in-memory graph, MCP read/edit interfaces.",
+  "type": "module",
+  "bin": {
+    "canon": ".canon/bin/canon.js",
+    "canon-read": ".canon/bin/canon-read.js",
+    "canon-edit": ".canon/bin/canon-edit.js",
+    "canon-apply": ".canon/bin/apply.js"
+  },
+  "scripts": {
+    "test": "node --test .canon/tests/*.test.js",
+    "setup": "node .canon/scripts/setup.js",
+    "align": "node .canon/scripts/align.js",
+    "build": "node .canon/scripts/build.js",
+    "validate": "node .canon/bin/canon.js validate",
+    "stats": "node .canon/bin/canon.js stats",
+    "overview": "node .canon/bin/canon.js overview",
+    "find": "node .canon/bin/canon.js find",
+    "reindex": "node .canon/bin/canon.js reindex",
+    "serve:read": "node .canon/bin/canon-read.js",
+    "serve:edit": "node .canon/bin/canon-edit.js",
+    "apply": "node .canon/bin/apply.js",
+    "viz:dump": "node .canon/scripts/dump-graph.js",
+    "viz:dev": "npm --prefix .canon/viz run dev"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "yaml": "^2.6.1"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "^3.0.0",
+    "onnxruntime-web": "^1.20.0"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.17",
+    "esbuild": "^0.24.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
