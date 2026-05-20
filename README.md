@@ -35,7 +35,60 @@ mpt-marketplace-canon/
     convert_to_docx.py                # Convert canon Markdown files to .docx
     extract_objects.py                # Extract a namespace/object checklist from the OpenAPI spec
     extract_canon_schema.py           # Extract paths and schemas for a specific object from the OpenAPI spec
+  .canon/                             # MCP runtime — see .canon/README.md
 ```
+
+---
+
+## Working with Canon through Claude
+
+The `.canon/` directory ships a pair of MCP servers that expose the canon graph to an agent — read-only navigation and patch-based editing. Setup once per clone:
+
+```bash
+npm install
+npm run setup
+```
+
+`setup` installs optional ML deps, warms up the local embedding model into `.canon/model-cache/`, builds the runtime bundles into `.canon/dist/`, and emits the user-facing extensions into `dist/` at the repo root with absolute paths baked in for THIS clone.
+
+### Install into Claude Desktop
+
+**Option A — drag-and-drop:**
+```bash
+open dist/canon-read.mcpb
+open dist/canon-edit.mcpb
+```
+
+**Option B — paste into `~/Library/Application Support/Claude/claude_desktop_config.json`:**
+```bash
+cat dist/claude_desktop_config.snippet.json
+```
+
+Restart Claude Desktop after installing.
+
+### Patch flow
+
+The agent never edits source files directly. Edits land under `.patches/<id>/` as whole-file replacements; you commit them deliberately:
+
+```bash
+npm run apply <patch-id>            # validate + write into objects/
+npm run apply <patch-id> -- --dry-run    # validate + report only
+```
+
+`apply` re-parses + validates from scratch before writing; refuses if anything is unclean. Git flow runs in parallel — branch / commit / push patches and committed canon however your team prefers.
+
+### Verify the install
+
+```bash
+npm test                            # full unit + integration suite
+npm run validate                    # parse + validate the live canon
+```
+
+### When to re-run setup
+
+- After cloning fresh
+- After moving / renaming the workdir (the absolute paths in `.mcpb` go stale)
+- After major dist changes (`npm run build` alone updates bundles, but the `.mcpb` manifests are emitted only by `setup`)
 
 ---
 
