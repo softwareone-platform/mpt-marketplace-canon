@@ -8,7 +8,8 @@
  */
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { dirname, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { parseRepo } from '../src/parse.js';
@@ -18,6 +19,8 @@ import { createReadServer } from '../src/mcp/read.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 process.chdir(repoRoot);
+
+const pkgVersion = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')).version;
 
 // pin model cache to the workdir-local location unless the caller
 // has explicitly set it themselves (via .mcpb env, etc.)
@@ -33,6 +36,6 @@ process.stderr.write(`canon-read: ${parsed.files.length} files, ${graph.nodes.le
 if (totalErr || mentionErr) process.stderr.write(` (parse errors: ${totalErr}, mention errors: ${mentionErr})`);
 process.stderr.write('\n');
 
-const server = createReadServer(kb, { repoRoot });
+const server = createReadServer(kb, { repoRoot, version: pkgVersion });
 const transport = new StdioServerTransport();
 await server.connect(transport);

@@ -31,13 +31,15 @@ None known.
 
 ---
 
+---
+
 ## 2. Ownership & Visibility
 
 > High-level Actor authority over this object. State-specific nuances belong in Section 4 (Business Rules).
 > For field-level visibility differences by Actor, use the Notes column in Section 5.
 
 | Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
-|-------|-----------|---------|-----------|-----------|-------|
+| --- | --- | --- | --- | --- | --- |
 | Vendor | No | Yes | Yes | No | Read is scoped to Agreements where they are the Vendor. Can update `parameters.ordering`, `parameters.fulfillment`, `template`, and `externalIds.vendor`. No DELETE endpoint exists. |
 | Operations | No | Yes | Yes | No | Read is not self-scoped — Operations sees all Agreements platform-wide. Can update `externalIds.operations`. No DELETE endpoint exists. |
 | Client | No | Yes | Yes | No | Read is scoped to Agreements belonging to their own Account. Can update `name`, `billingCurrency`, and `externalIds.client`. Cannot create or delete Agreements directly. |
@@ -48,20 +50,20 @@ None known.
 
 ### 3.1 States
 
-| State | Description |
-|-------|-------------|
-| Draft | The Agreement has been co-created with a Purchase Order but the Order has not yet been placed. The Agreement exists but has no active Subscriptions or Assets. Parameters are not yet present. |
-| Provisioning | The Purchase Order against this Agreement has been placed and is being processed by the Vendor's fulfilment Extension. |
-| Updating | A Change, Configuration, or Termination Order against this Agreement has been placed and is being processed. |
-| Active | The Agreement is active. At least one Subscription or Asset is live. The Agreement returns to Active when a Change, Configuration, or Termination Order completes or fails. |
-| Terminated | All Subscriptions on the Agreement have been terminated. Assets are unaffected. Terminal state — no outbound transitions. |
-| Failed | The Purchase Order against this Agreement failed. The Agreement cannot be transacted against and cannot be recovered. Terminal state — no outbound transitions. |
-| Deleted | The Agreement has been soft-deleted — moves to Deleted status and remains retrievable via the API including in standard list responses. Only reachable from Draft when the co-created Purchase Order is deleted. Terminal state — no outbound transitions. Deviates from Platform Invariant 7. |
+| State | Description | Initial State? | Terminal State? |
+| --- | --- | --- | --- |
+| Draft | The Agreement has been co-created with a Purchase Order but the Order has not yet been placed. The Agreement exists but has no active Subscriptions or Assets. Parameters are not yet present. | — | — |
+| Provisioning | The Purchase Order against this Agreement has been placed and is being processed by the Vendor's fulfilment Extension. | — | — |
+| Updating | A Change, Configuration, or Termination Order against this Agreement has been placed and is being processed. | — | — |
+| Active | The Agreement is active. At least one Subscription or Asset is live. The Agreement returns to Active when a Change, Configuration, or Termination Order completes or fails. | — | — |
+| Terminated | All Subscriptions on the Agreement have been terminated. Assets are unaffected. Terminal state — no outbound transitions. | — | — |
+| Failed | The Purchase Order against this Agreement failed. The Agreement cannot be transacted against and cannot be recovered. Terminal state — no outbound transitions. | — | — |
+| Deleted | The Agreement has been soft-deleted — moves to Deleted status and remains retrievable via the API including in standard list responses. Only reachable from Draft when the co-created Purchase Order is deleted. Terminal state — no outbound transitions. Deviates from Platform Invariant 7. | — | — |
 
 ### 3.2 Transitions
 
-| ID | From State | To State | Action | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-------|-------------|-------|
+| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
+| --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Draft | Co-created with Purchase Order | Platform | Purchase Order created by Client | Automated — executed by the platform under the Client's token context. Cannot be created independently. |
 | T2 | — | Provisioning | Co-created with Purchase Order (direct to Processing) | Platform | Purchase Order created and placed in a single call by Client | Agreement is created directly in Provisioning when a Client creates and places a Purchase Order without saving as Draft. Automated under Client's token context. |
 | T3 | Draft | Provisioning | Purchase Order placed | Platform | Purchase Order transitions to Processing | Automated — executed under Client's token context. |
@@ -91,11 +93,11 @@ None known.
 ## 4. Business Rules
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
-|---------|---------------|---------------------|-------------|-------|
+| --- | --- | --- | --- | --- |
 | BR-001 | An Agreement cannot be created independently. It is always co-created by the platform when a Purchase Order is first persisted. The Agreement and its originating Purchase Order are created simultaneously under the Client's token context. | All | Platform | See Commerce: Order canon BR-001. |
 | BR-002 | There is no DELETE endpoint on the Agreement. An Agreement can only reach Deleted status when its co-created Draft or Quoted Purchase Order is deleted by any Actor. No Actor can directly delete an Agreement. | All | All | Soft-deleted — remains retrievable via the API including in standard list responses. Only reachable from Draft. |
 | BR-003 | Agreement state transitions are driven entirely by the state transitions of its associated Orders and Subscriptions. No Actor can directly transition an Agreement's status via a dedicated endpoint. | All | All | See Commerce: Order canon Section 7.2 for the full cross-object state transition table. |
-| BR-004 | The Agreement `name` is auto-generated by the platform at creation. The observed pattern is "[Product Name] for [Client/Licensee Name]". The name may be updated by the Client at any time after creation. | All | Client | |
+| BR-004 | The Agreement `name` is auto-generated by the platform at creation. The observed pattern is "[Product Name] for [Client/Licensee Name]". The name may be updated by the Client at any time after creation. | All | Client | — |
 | BR-005 | The Agreement `template` is set by the platform to the Template of the most recently completed Order when that Order completes. The Vendor may update the Template directly on the Agreement at any time while Active. | Active | Vendor | The Agreement Template determines the rendered content shown to the Client when viewing their Agreement. Template type is inherited from the completing Order — typically `OrderCompleted`. |
 | BR-006 | When all Subscriptions on an Agreement are Terminated — whether via a Termination Order or direct Vendor action — the Agreement automatically transitions to Terminated. Assets are unaffected by this transition. | Active | Platform | Automated — executed by the platform. Agreement termination is driven by Subscription state, not directly by an Order. |
 | BR-007 | A Failed Agreement is permanently terminal. It cannot be recovered or reactivated. A new Purchase Order must be created to establish a new Agreement — the platform will co-create a new Agreement automatically. | Failed | All | See Commerce: Order canon Section 9 for the Purchase Order failure failure mode. |
@@ -107,7 +109,7 @@ None known.
 | BR-013 | The `billingCurrency` field specifies the currency in which the Client is invoiced. It must be a currency present in the Seller's `currencies` array. A forex conversion is applied between the Authorization currency and the billing currency for invoicing purposes. `billingCurrency` can only be updated by the Client while the Agreement is in Active status. | Active | Client | Absent from API response when null — consistent with null suppression. |
 | BR-014 | The `termsAndConditions` array on the Agreement records the T&Cs accepted at the time of the original Purchase Order. T&Cs from subsequent Change, Configuration, or Termination Orders are not accumulated on the Agreement. | All | Client | Empty array on Draft — populated when the Purchase Order is placed. |
 | BR-015 | The Agreement `price` object represents the aggregate pricing across all active Subscriptions and Assets by default. The Vendor may manually override the Agreement price when Entitlements are usage-based and carry no fixed price — for example, a pay-as-you-go cloud subscription where the Vendor sets the Agreement price to reflect the most recent invoice value. | Active | Vendor | The `source` field on the price object indicates whether the price is computed or manually set. |
-| BR-016 | Each Actor can update their own `externalIds` field on the Agreement: `externalIds.client` (Client), `externalIds.operations` (Operations), `externalIds.vendor` (Vendor). All are optional. | All | All | |
+| BR-016 | Each Actor can update their own `externalIds` field on the Agreement: `externalIds.client` (Client), `externalIds.operations` (Operations), `externalIds.vendor` (Vendor). All are optional. | All | All | — |
 | BR-017 | There can be only one Processing Order per Agreement at any time — the same constraint that applies at the Order level prevents concurrent Order processing. While an Order is Processing, the Agreement is in Updating or Provisioning status and no further Orders can be placed against it. | Provisioning, Updating | All | See Commerce: Order canon BR-005. |
 
 ---
@@ -115,9 +117,9 @@ None known.
 ## 5. Key Attributes
 
 | Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
-|-----------|------|-------------|--------|------------------------|-------|
+| --- | --- | --- | --- | --- | --- |
 | `id` | String | Unique platform identifier for the Agreement. | Platform | No | Format: AGR-XXXX-XXXX-XXXX. Immutable. |
-| `revision` | Integer | Increments each time the Agreement is updated. | Platform | Yes — platform-managed | |
+| `revision` | Integer | Increments each time the Agreement is updated. | Platform | Yes — platform-managed | — |
 | `name` | String | Human-readable name for the Agreement. | Platform (at creation), Client (updates) | Yes | Auto-generated at creation. Observed pattern: "[Product Name] for [Client/Licensee Name]". Updatable by Client. |
 | `status` | Enum | Current status of the Agreement. Valid values: `Draft`, `Provisioning`, `Updating`, `Active`, `Terminated`, `Failed`, `Deleted`. | Platform | Yes — platform-managed | Driven by Order and Subscription state transitions. Not directly writable by any Actor. |
 | `price` | Object | Aggregate pricing across all active Subscriptions and Assets. Contains `SPxY`, `SPxM` (selling price per year/month), `PPxY`, `PPxM` (purchase price per year/month), `currency`, `markup`, `margin`, `defaultMarkup`, `defaultMarkupSource`, `billingCurrency`, `source`. | Platform (computed) or Vendor (manual override) | Yes — Vendor can override | Absent on Draft. `PPxY`, `PPxM`, `markup`, `margin`, `defaultMarkup`, `defaultMarkupSource` suppressed for Vendor and Client — visible to Operations only. `SPxY`, `SPxM` visible to Client and Operations. `source` field indicates `Computed` or `Manual`. |
@@ -146,13 +148,14 @@ None known.
 | `buyer` | Object | Reference to the Accounts: Buyer associated with the Licensee. | Platform | No | Immutable after creation. |
 | `seller` | Object | Reference to the Accounts: Seller associated with the Listing. | Platform | No | Immutable after creation. |
 | `audit` | Object | Audit timestamps for key lifecycle events. Contains `created`, `updated`, `provisioning`, `active`, `terminated`, and `failed`. | Platform | No | Omitted by default — request via `select=+audit`. State-specific entries only present if the Agreement has reached that state. No `updating` audit sub-key — transitions to Updating are not individually timestamped. See AGR-008. |
+| References | object | Grouped immutable platform-set reference objects on the Agreement: listing, authorization, product, client (Account), vendor (Account), licensee, buyer, seller. All set at Agreement creation and cannot be modified by any Actor. | system | — | — |
 
 ---
 
 ## 6. Relationships to Other Objects
 
-| Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency |
-|----------------|------------------|-------------|-------------|---------------------|
+| Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
+| --- | --- | --- | --- | --- |
 | Commerce: Order | Child | One Agreement to many Orders | Every Order of every type exists within the scope of this Agreement. Purchase Orders co-create the Agreement. Change, Configuration, and Termination Orders are placed against an existing Active Agreement. | Agreement state is driven by Order state transitions. Deletion of a Draft or Quoted Purchase Order moves the Agreement to Deleted. |
 | Commerce: Subscription | Child | One Agreement to many Subscriptions | Subscriptions are created by the Vendor Extension during Order Processing and linked to the Agreement on Order completion. Each Subscription carries its own parameters, pricing, terms, template, and Lines. | All Subscriptions reaching Terminated status causes the Agreement to transition to Terminated — whether via Termination Order or direct Vendor action. |
 | Commerce: Asset | Child | One Agreement to many Assets | Assets are created by the Vendor Extension during Order Processing and linked to the Agreement on Order completion. Assets represent one-time purchase items. | Assets are unaffected by Agreement termination. |
@@ -176,7 +179,7 @@ None known.
 ### 7.1 Internal Events
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
-|-------|---------|-------------------|---------------------------------|
+| --- | --- | --- | --- |
 | Agreement name updated | Client updates `name` field via PUT | Client | Name updated. No state transition. |
 | Agreement template updated | Vendor updates `template` field via PUT | Vendor | Rendered content shown to Client updates immediately. No state transition. |
 | Agreement parameters updated | Vendor updates `parameters.ordering` or `parameters.fulfillment` directly on the Agreement | Vendor | Parameter values updated on the Agreement. No state transition. Applies to Agreement-scoped parameters only. |
@@ -189,7 +192,7 @@ None known.
 > See Commerce: Order canon Section 7.2 for the full cross-object state transition table covering Agreement state changes driven by Order transitions.
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
-|-----------------|----------------|--------------------------|------------|-----------|-------|
+| --- | --- | --- | --- | --- | --- |
 | All Subscriptions on Agreement reach Terminated | Commerce: Agreement | Agreement → Terminated | Yes — platform | All Subscriptions are Terminated | Whether via Termination Order or direct Vendor action. Assets are unaffected. |
 | Purchase Order completes | Commerce: Agreement `parameters` | Agreement-scoped parameters from Purchase Order carried over to Agreement | Yes — platform | Order type is Purchase, transitions to Completed | Both `ordering` and `fulfillment` Agreement-scoped parameters are persisted on the Agreement. |
 
@@ -215,7 +218,7 @@ Audit Records are generated for Agreement state transitions. Prior versions of p
 ## 9. Failure Modes & Edge Cases
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
-|----------|--------------------------|---------------|------------|-------|
+| --- | --- | --- | --- | --- |
 | Agreement remains in Provisioning or Updating indefinitely | No platform-level safeguard. The Agreement remains in a non-Active status if the associated Order is abandoned in Processing or Querying. No further Orders can be placed against the Agreement while it is in this state. | Client, Operations | High | Operations should monitor long-running Orders and intervene if necessary. See Commerce: Order canon Section 9. |
 | Purchase Order fails after Agreement reaches Provisioning | Agreement → Failed. Permanently terminal. A new Purchase Order must be created to retry — the platform co-creates a new Agreement automatically. | Client | High | The Failed Agreement remains retrievable via the API but cannot be transacted against. |
 | All Subscriptions terminated without a Termination Order | The platform automatically transitions the Agreement to Terminated when the last Subscription reaches Terminated status. Assets are unaffected and remain in their current state. | Client, Vendor | Medium | This can occur via direct Vendor action on Subscriptions outside of an Order. The Client may be surprised if the Agreement terminates without a Termination Order being placed. |
@@ -239,6 +242,6 @@ Audit Records are generated for Agreement state transitions. Prior versions of p
 ## 11. Changelog
 
 | Version | Date | Author | Notes |
-|---------|------|--------|-------|
+| --- | --- | --- | --- |
 | 0.1-stub | 2026-04-12 | Stu | Initial stub from Order canon session. State machine, core identity, and known business rules captured. Sections 4–9 incomplete. |
 | 0.2 | 2026-04-13 | Stu | Full canon session completed. All sections authored. Parameters model documented — Agreement-scoped vs Order-scoped parameter distinction, Vendor write rules, Client read suppression. billingCurrency field documented including Seller currency constraint and forex model. Agreement price manual override model documented for usage-based Entitlements. Split Billing deferred to separate canon session. AGR-004, AGR-005, AGR-006 resolved and removed from open questions. AGR-008 added. |

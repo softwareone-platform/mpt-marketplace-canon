@@ -273,8 +273,8 @@ const parseSections = (content, fileLabel = '<input>') => {
 
 // ── repo ───────────────────────────────────────────────────────────
 
-const parseRepo = (repoRoot) => ({
-  files: loadMdSet(repoRoot, 'objects').map(({ relPath, source, content }) => ({
+const parseRepo = (repoRoot, options = {}) => ({
+  files: loadMdSet(repoRoot, 'objects', options).map(({ relPath, source, content }) => ({
     relPath, source, ...parseSections(content, relPath),
   })),
 });

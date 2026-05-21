@@ -10,13 +10,14 @@
 // 5. emit dist/claude_desktop_config.snippet.json — manual-install fallback
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import AdmZip from 'adm-zip';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..');
+const pkgVersion = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')).version;
 const internalDist = join(repoRoot, '.canon', 'dist');     // bundled JS, RAG cache — devs
 const userDist = join(repoRoot, 'dist');                    // .mcpb + snippet — end users
 const modelCacheDir = join(repoRoot, '.canon', 'model-cache');
@@ -95,7 +96,7 @@ for (const [kind, label, description] of KINDS) {
     dxt_version: '0.1',
     name: `canon-${kind}-${workdirName}`,
     display_name: `Canon ${label} — ${workdirName}`,
-    version: '0.1.0',
+    version: pkgVersion,
     description,
     author: { name: workdirName },
     server: {

@@ -68,7 +68,7 @@ if (files.length === 0) {
 
 // ── independent validation ─────────────────────────────────────────
 
-const parsed = parseRepo(repoRoot);
+const parsed = parseRepo(repoRoot, { patchIds: [patchId] });
 const graph = toGraph(parsed.files);
 const errors = validate(graph);
 

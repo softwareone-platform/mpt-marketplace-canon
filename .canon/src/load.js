@@ -1,5 +1,10 @@
-// Patch-aware MD loader. originals + .patches/<id>/<base>/ overlays
-// applied in alphabetic patch-id order; last write per relPath wins.
+// Patch-aware MD loader. Originals under <baseDir>/ are the source of
+// truth. Optional .patches/<id>/<baseDir>/ overlays are applied only
+// when the caller explicitly opts in via `patchIds`:
+//   patchIds: undefined | [] — no overlay, originals only
+//   patchIds: 'all'          — every patch in .patches/ (alphabetic)
+//   patchIds: ['a', 'b']     — those patches, in that order
+// Last write per relPath wins.
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -28,7 +33,16 @@ const readEntry = (relPath, absDir, source) => ({
   source,
 });
 
-const loadMdSet = (repoRoot, baseDir) => {
+const resolvePatchIds = (repoRoot, patchIds) => {
+  if (patchIds === undefined || patchIds === null) return [];
+  if (patchIds === 'all') return listPatches(repoRoot);
+  if (!Array.isArray(patchIds)) {
+    throw new TypeError(`loadMdSet: patchIds must be undefined, 'all', or string[]; got ${typeof patchIds}`);
+  }
+  return patchIds;
+};
+
+const loadMdSet = (repoRoot, baseDir, { patchIds } = {}) => {
   const baseAbs = join(repoRoot, baseDir);
   const map = new Map();
 
@@ -36,7 +50,7 @@ const loadMdSet = (repoRoot, baseDir) => {
     map.set(name, readEntry(name, baseAbs, 'original'));
   }
 
-  for (const patchId of listPatches(repoRoot)) {
+  for (const patchId of resolvePatchIds(repoRoot, patchIds)) {
     const dir = join(repoRoot, PATCHES_DIR, patchId, baseDir);
     for (const name of listMd(dir)) map.set(name, readEntry(name, dir, `patch:${patchId}`));
   }

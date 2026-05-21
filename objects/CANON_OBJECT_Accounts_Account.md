@@ -31,10 +31,12 @@ None known.
 
 ---
 
+---
+
 ## 2. Ownership & Visibility
 
 | Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
-|-------|------------|----------|------------|------------|-------|
+| --- | --- | --- | --- | --- | --- |
 | Vendor | No | Yes* | Yes** | No | *A Vendor can read its own Account and all Client Accounts that have transacted its products. Non-transacting Accounts return 404 — their existence is masked entirely. **A Vendor can update its own Account only. |
 | Operations | Yes | Yes | Yes | No | Full read/write access to all Accounts. No DELETE endpoint exists in the spec. |
 | Client | No | Yes* | Yes** | No | *A Client can read its own Account only. All other Accounts return 404 — their existence is masked entirely. **A Client can update its own Account only. |
@@ -45,21 +47,23 @@ None known.
 
 ### 3.1 States
 
-| State | Description |
-|-------|-------------|
-| Active | Applies to Vendor and Client Accounts. On Client Accounts, `Active` means the `externalId` (CDG) is present and has been validated against SoftwareOne's ERP — the Account can transact and be billed. On Vendor Accounts, `Active` is the default creation state; no ERP validation is required or performed. |
-| Enabled | Applies to Client and Operations Accounts. On Client Accounts, `Enabled` means the Account is not Disabled but the CDG has not been ERP-validated — the Account cannot transact or be billed. On the Operations Account, `Enabled` is the default creation state; ERP validation is not applicable. |
-| Disabled | Applies to Vendor and Client Accounts. The Account is inactive. Set via ERP sync — not via the platform UI. The Operations Account cannot be set to `Disabled`. Downstream effects on Users, API Tokens, and active transactions are not confirmed. See ACC-003. |
+| State | Description | Initial State? | Terminal State? |
+| --- | --- | --- | --- |
+| Active | Applies to Vendor and Client Accounts. On Client Accounts, `Active` means the `externalId` (CDG) is present and has been validated against SoftwareOne's ERP — the Account can transact and be billed. On Vendor Accounts, `Active` is the default creation state; no ERP validation is required or performed. | — | — |
+| Enabled | Applies to Client and Operations Accounts. On Client Accounts, `Enabled` means the Account is not Disabled but the CDG has not been ERP-validated — the Account cannot transact or be billed. On the Operations Account, `Enabled` is the default creation state; ERP validation is not applicable. | — | — |
+| Disabled | Applies to Vendor and Client Accounts. The Account is inactive. Set via ERP sync — not via the platform UI. The Operations Account cannot be set to `Disabled`. Downstream effects on Users, API Tokens, and active transactions are not confirmed. See ACC-003. | — | — |
 
 ### 3.2 Transitions
 
-| ID | From State | To State | Action | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-------|-------------|-------|
+| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
+| --- | --- | --- | --- | --- | --- | --- |
 | T1a | — | Active | Create | Operations | None | Vendor Accounts are created directly into `Active` status. No ERP validation required. |
 | T1b | — | Enabled | Create | Operations | None | Client and Operations Accounts are created directly into `Enabled` status. |
-| T2 | Enabled | Active | ERP sync | Operations | CDG present in `externalId` and validated against ERP | Client Accounts only. Driven by ERP sync, not by a direct platform UI action. |
-| T3 | Active / Enabled | Disabled | ERP sync | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
-| T4 | Disabled | Active / Enabled | ERP sync | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
+| T2 | Enabled | Active | ERP Activate Account | Operations | CDG present in `externalId` and validated against ERP | Client Accounts only. Driven by ERP sync, not by a direct platform UI action. |
+| T3a | Active | Disabled | ERP Disable Account | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
+| T3b | Enabled | Disabled | ERP Disable Account | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
+| T4a | Disabled | Active | ERP Re-enable Account | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
+| T4b | Disabled | Enabled | ERP Re-enable Account | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
 
 ### 3.3 State Diagram
 
@@ -78,12 +82,12 @@ None known.
 ## 4. Business Rules
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
-|---------|---------------|---------------------|-------------|-------|
+| --- | --- | --- | --- | --- |
 | BR-001 | An Account's `type` is immutable after creation. The `type` field determines the Actor permission profile for all Users and API Tokens associated with the Account and cannot be changed once set. | All | All | Required on creation. One of: `Vendor`, `Operations`, `Client`. |
 | BR-002 | In PROD, there is exactly one Operations Account. It represents SoftwareOne as the platform steward and cannot be duplicated. | All | Operations | Platform convention, not a platform-enforced constraint. Whether the platform technically prevents creation of a second Operations Account is not confirmed. See ACC-004. |
 | BR-003 | In PROD, there is exactly one Account per Vendor entity. One real-world software manufacturer maps to one Vendor Account. | All | Operations | Platform convention, not a confirmed platform-enforced constraint. See ACC-004. |
 | BR-004 | A Client Account has a 1:1 relationship with a CDG (Customer Discount Group) in SoftwareOne's ERP. The CDG is the global identifier for a customer organisation. The CDG is represented on the Client Account via the `externalId` field. The relationship is 1:1 but a Client Account may have a null CDG — `externalId` is nullable. | All | Operations | The platform does not enforce CDG uniqueness across Client Accounts — this is an operational discipline. |
-| BR-005 | An Account cannot be deleted. No DELETE endpoint exists in the API spec. | All | All | |
+| BR-005 | An Account cannot be deleted. No DELETE endpoint exists in the API spec. | All | All | — |
 | BR-006 | Every Account has at least one User Group. The Default Protection Pattern applies — exactly one group must be marked `isDefault: true` at all times. The default group cannot be deleted directly; it must first be demoted. Marking a new group as default automatically demotes the existing default. | All | Operations | Consistent with Preamble Section 3.4 (Default Protection Pattern). The platform automatically creates a default "Administrators" User Group on Account creation. |
 | BR-007 | The `eligibility` field is applicable to Client Accounts only. It controls whether the Client may transact as a standard Client (`eligibility.client`) and/or as a Partner (`eligibility.partner`). For Vendor and Operations Accounts, `eligibility` is absent from the API response (null suppression). | All | Operations | Consistent with the `eligibility` model on Authorization and Listing. Full semantics of `eligibility.partner` are not confirmed — see AUT-001. |
 | BR-008 | The `externalIds.pyraTenantId` field is a UUID that maps the Account to SoftwareOne's internal identity platform (Pyra). It is present on all Account types. | All | Operations | UUID format. Set at creation and believed to be immutable. See ACC-006. |
@@ -99,7 +103,7 @@ None known.
 ## 5. Key Attributes
 
 | Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
-|-----------|------|-------------|--------|------------------------|-------|
+| --- | --- | --- | --- | --- | --- |
 | id | String | Platform-assigned unique identifier. Format: `ACC-NNNN-NNNN`. | System | No | Immutable. Assigned at creation. |
 | name | String | Human-readable name of the Account. | Operations, Vendor, Client | Yes | Required on creation and update. `minLength: 1`, `maxLength: 500`. |
 | type | Enum | Actor type for this Account. One of: `Vendor`, `Operations`, `Client`. | Operations | No | Required on creation. Immutable after creation. Determines the Actor permission profile for all associated Users and API Tokens. |
@@ -123,7 +127,7 @@ None known.
 ## 6. Relationships to Other Objects
 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
-|----------------|------------------|-------------|-------------|----------------------|
+| --- | --- | --- | --- | --- |
 | Accounts: User Group | Parent of | One:Many | Every Account owns one or more User Groups. User Groups cannot exist without a parent Account. | Yes — User Groups cannot exist without a parent Account. Account deletion is not possible. Default Protection Pattern applies — exactly one User Group must be `isDefault: true` at all times. |
 | Accounts: User | Association | Many:Many | Users are associated with Accounts. A User may belong to multiple Accounts. A single Account may have many Users. | No direct lifecycle dependency — User membership is managed independently. |
 | Accounts: API Token | Parent of | One:Many | API Tokens are scoped to an Account. A Token inherits the Actor permission profile of its parent Account. | Yes — API Tokens cannot exist without a parent Account. Account deletion is not possible. |
@@ -138,7 +142,7 @@ None known.
 ### 7.1 Internal Events
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
-|-------|---------|-------------------|---------------------------------|
+| --- | --- | --- | --- |
 | Account created | Operations creates an Account | Operations | Account becomes available for User and API Token association. The platform automatically creates a default "Administrators" User Group and assigns it to the Account. |
 | Account activated | ERP sync sets status = Active on a Client Account | Operations (via ERP sync) | Client Account becomes able to transact and be billed. |
 | Account disabled | ERP sync sets status = Disabled on a Vendor or Client Account | Operations (via ERP sync) | Account becomes inactive. Downstream effects on Users, API Tokens, and active transactions not confirmed. See ACC-003. |
@@ -147,8 +151,8 @@ None known.
 
 ### 7.2 Cross-Object State Effects
 
-| Triggering Event | Affected Object | Effect | Automated? | Condition | Notes |
-|-----------------|----------------|--------|------------|-----------|-------|
+| Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
+| --- | --- | --- | --- | --- | --- |
 | Account created | Accounts: User Group | A default "Administrators" User Group is created and linked to the Account | Yes | Always on Account creation | Platform-confirmed behaviour. |
 | Account disabled | Accounts: User | Effect on associated Users' ability to log in and transact is not confirmed | Not confirmed | — | See ACC-003. |
 | Account disabled | Accounts: API Token | Effect on associated API Tokens' ability to authenticate is not confirmed | Not confirmed | — | See ACC-003. |
@@ -171,7 +175,7 @@ The audit block captures `created` and `updated` timestamps and Actor references
 ## 9. Failure Modes & Edge Cases
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
-|----------|--------------------------|---------------|------------|-------|
+| --- | --- | --- | --- | --- |
 | Account disabled | Downstream effects on associated Users, API Tokens, and active transactions are not confirmed. | Operations, Vendor, Client | High | See ACC-003. Do not disable an Account without first confirming the downstream impact. |
 | Client Account created without ERP CDG linkage | The platform permits this — the 1:1 CDG constraint is an operational discipline, not a platform-enforced rule. A Client Account without a valid ERP CDG may cause billing and procurement failures. | Operations, Client | High | Operations is responsible for ensuring Client Accounts are properly linked to ERP records. |
 | `eligibility` absent on Client Account | If both `eligibility.client` and `eligibility.partner` are false or absent, the Client may be unable to place Orders under any Listing. | Client | High | Operations is responsible for ensuring Client Account eligibility is correctly configured. |
@@ -193,7 +197,7 @@ The audit block captures `created` and `updated` timestamps and Actor references
 ## 11. Changelog
 
 | Version | Date | Author | Notes |
-|---------|------|--------|-------|
+| --- | --- | --- | --- |
 | 0.1 | 2026-03-25 | Stu | Initial canon. |
 | 0.2 | 2026-04-05 | Stu | ACC-001 resolved: externalId applies to Vendor (ERP manufacturer code) and Client (CDG) Accounts; irrelevant on Operations Account; Operations-only write on all types. BR-004 updated to connect CDG relationship to externalId field and note nullability. BR-009 rewritten. Section 5 externalId attribute updated. |
 | 0.3 | 2026-04-05 | Stu | ACC-002 resolved: Vendor visibility is transaction-relationship-scoped (own Account plus transacting Client Accounts); Client visibility is self-only; non-visible Accounts return 404. ACC-003 partially resolved: Active/Enabled/Disabled semantics confirmed; Disabled driven by ERP sync not UI; Operations Account cannot be Disabled; downstream effects on Users/Tokens/transactions remain open. ACC-005 resolved: platform automatically creates default Administrators User Group on Account creation. State machine rewritten — T2/T3 replaced with ERP-sync-driven transitions T2/T3/T4. Sections 2, 3, 4, 5, 7, 9, 10 updated throughout. |
