@@ -56,13 +56,13 @@ This object has no state machine. It is created and modified as a unit, with no 
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | A Parameter Group belongs to exactly one Product and cannot be shared across Products. | N/A | All | — |
-| BR-002 | Exactly one Parameter Group per Product must be marked as Default. | N/A | All | — |
-| BR-003 | If a new Parameter is created without specifying a Parameter Group, it is automatically assigned to the Default Parameter Group. | N/A | All | — |
-| BR-004 | The `displayOrder` attribute controls the sequence in which Parameter Groups are presented during the ordering and configuration process. | N/A | All | — |
-| BR-005 | Parameter Group creation, modification, and deletion are not restricted by the state of the parent Product. | N/A | Vendor | Consistent with Product canon BR-001 and Item Group canon BR-007. |
-| BR-006 | The Default Parameter Group cannot be deleted. To delete a Default Parameter Group, the Vendor must first designate another Parameter Group as Default. | N/A | Vendor | Consistent with Default protection pattern in Template canon BR-004 and Item Group canon BR-008. |
-| BR-007 | A Parameter Group cannot be deleted if it contains Parameters. All Parameters must be removed or reassigned before the group can be deleted. | N/A | Vendor | Consistent with Item Group canon BR-009. |
+| BR-001 | A [[Parameter]] Group belongs to exactly one [[Product]] and cannot be shared across Products. | N/A | All | — |
+| BR-002 | Exactly one [[Parameter]] Group per [[Product]] must be marked as Default. | N/A | All | — |
+| BR-003 | If a new [[Parameter]] is created without specifying a [[Parameter]] Group, it is automatically assigned to the Default [[Parameter]] Group. | N/A | All | — |
+| BR-004 | The `displayOrder` attribute controls the sequence in which [[Parameter]] Groups are presented during the ordering and configuration process. | N/A | All | — |
+| BR-005 | [[Parameter]] Group creation, modification, and deletion are not restricted by the state of the parent [[Product]]. | N/A | Vendor | Consistent with [[Product]] canon BR-001 and [[Item Group]] canon BR-007. |
+| BR-006 | The Default [[Parameter]] Group cannot be deleted. To delete a Default [[Parameter]] Group, the Vendor must first designate another [[Parameter]] Group as Default. | N/A | Vendor | Consistent with Default protection pattern in [[Template]] canon BR-004 and [[Item Group]] canon BR-008. |
+| BR-007 | A [[Parameter]] Group cannot be deleted if it contains Parameters. All Parameters must be removed or reassigned before the group can be deleted. | N/A | Vendor | Consistent with [[Item Group]] canon BR-009. |
 
 ---
 

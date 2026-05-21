@@ -27,6 +27,14 @@ const NODES = Object.freeze({
     fields: { name: 'string!', description: 'string!', aliases: 'string[]' },
     refs: { parent: { min: 1, max: 1 } },
   },
+  // Business rules — one rule per row in Section 4. Promoted from
+  // anonymous constraint refs so `[[mentions]]` in the statement
+  // attach to the rule (not the owning entity) and paths/impact can
+  // reach individual rules.
+  rule: {
+    fields: { name: 'string!', description: 'string!' },
+    refs: { parent: { min: 1, max: 1 } },
+  },
 });
 
 const REFS = Object.freeze({

@@ -86,7 +86,7 @@ PRD (API identifier prefix)
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | Template creation, modification, and deletion under a Product are not restricted by the state of the Product. | All | Vendor | Confirmed in Template canon BR-021. |
+| BR-001 | [[Template]] creation, modification, and deletion under a Product are not restricted by the state of the Product. | All | Vendor | Confirmed in [[Template]] canon BR-021. |
 | BR-002 | Products cannot be deleted in any state. | All | All | Platform architectural invariant. |
 | BR-003 | Once a Product is submitted to Pending, the Vendor cannot withdraw it. The only exit from Pending is publication by Operations. | Pending | Vendor, Operations | Operations collaborates with the Vendor to resolve any issues rather than rejecting the Product. |
 | BR-004 | A Product in Pending state cannot be returned to Draft. | Pending | All | There is no reject or withdraw transition. |

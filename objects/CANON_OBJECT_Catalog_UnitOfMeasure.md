@@ -53,10 +53,10 @@ This object has no state machine. A Unit of Measure exists as a persistent platf
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | Units of Measure are platform-level reference objects. They are not scoped to any Product, Vendor, Account, or namespace. The same set is available to all Actors across all Products. | N/A | All | — |
+| BR-001 | Units of Measure are platform-level reference objects. They are not scoped to any [[Product]], Vendor, [[Account]], or namespace. The same set is available to all Actors across all Products. | N/A | All | — |
 | BR-002 | The set of available Units of Measure is fixed and maintained exclusively by Operations. Vendors cannot create, modify, or delete Units of Measure. | N/A | All | — |
 | BR-003 | A Unit of Measure cannot be deleted regardless of whether it is in use. | N/A | All | — |
-| BR-004 | A Vendor selects exactly one Unit of Measure when creating a Product Item. The Unit of Measure is immutable after Item creation. | N/A | Vendor | See Catalog: Product Item canon. |
+| BR-004 | A Vendor selects exactly one Unit of Measure when creating a [[Product]] [[Item]]. The Unit of Measure is immutable after [[Item]] creation. | N/A | Vendor | See Catalog: [[Product]] [[Item]] canon. |
 | BR-005 | Operations may update the name and description of a Unit of Measure at any time. Updates propagate immediately to all Items referencing that Unit of Measure. | N/A | Operations | — |
 
 ---

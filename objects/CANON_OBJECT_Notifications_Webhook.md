@@ -85,19 +85,19 @@ WBH (API identifier prefix)
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | A Webhook belongs to exactly one Account. The owning Account determines which Actor controls it. | All | All | — |
+| BR-001 | A Webhook belongs to exactly one [[Account]]. The owning [[Account]] determines which Actor controls it. | All | All | — |
 | BR-002 | A Webhook is created in Enabled state by default. | N/A | All | — |
 | BR-003 | A Webhook has a type that determines which platform event triggers it. Valid types are extensible as new object types and states are added to the platform. | All | All | See Section 5 for known types at time of writing. |
-| BR-004 | A Webhook has an objectType that determines which platform object type it listens to. | All | All | Observed values: Order, Enrollment, Request. Extensible as new object types are added. |
+| BR-004 | A Webhook has an objectType that determines which platform object type it listens to. | All | All | Observed values: [[Order]], Enrollment, Request. Extensible as new object types are added. |
 | BR-005 | A Webhook may have a criteria block containing any valid RQL expression, provided the expression is executable against the specified objectType. | All | All | Criteria validity is evaluated against the objectType's known fields. Invalid RQL or fields not applicable to the objectType will not match any events. |
 | BR-006 | When a Webhook fires, the platform makes an HTTP call to the configured URL. The owning Actor's Extension is responsible for handling the call. | Enabled | All | — |
 | BR-007 | The platform does not auto-disable a Webhook based on failure thresholds. The failuresSinceLastSuccess statistic is purely informational. | All | All | Consistent with platform philosophy of permissiveness over automated constraint. |
 | BR-008 | When a Webhook is Disabled, events that would have triggered it are not queued. Missed events are lost. | Disabled | All | — |
 | BR-009 | Deletion is a soft delete. Deleted Webhooks are not visible in normal API responses. Soft-deleted Webhooks are permanently removed from normal API visibility. | Deleted | Vendor, Operations | — |
-| BR-010 | A Webhook is always scoped to exactly one object instance via criteria. It cannot be configured to fire across multiple object instances. | All | All | e.g. A Webhook scoped to product.id fires only for that specific Product, not across all Products on the Account. |
+| BR-010 | A Webhook is always scoped to exactly one object instance via criteria. It cannot be configured to fire across multiple object instances. | All | All | e.g. A Webhook scoped to product.id fires only for that specific [[Product]], not across all Products on the [[Account]]. |
 | BR-011 | Clients cannot create, read, update, or delete Webhooks. | All | Client | — |
 | BR-012 | The platform does not retry failed Webhook calls. A failed call is recorded in statistics and lost. | All | All | The owning Actor's Extension is responsible for handling failures and implementing any retry logic externally if required. |
-| BR-013 | Webhooks are unaffected by the state of their owning Account. Since Accounts cannot be deleted, there is no cascade deletion path from Account to Webhook. | All | All | — |
+| BR-013 | Webhooks are unaffected by the state of their owning [[Account]]. Since Accounts cannot be deleted, there is no cascade deletion path from [[Account]] to Webhook. | All | All | — |
 
 ---
 

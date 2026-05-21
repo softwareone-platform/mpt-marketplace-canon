@@ -83,14 +83,14 @@ TCV (API identifier prefix)
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | A Terms Variant belongs to exactly one Terms object and cannot be shared across Terms objects. | All | All | — |
-| BR-002 | A Terms Variant has a type. Valid types are: Online, File. Type is immutable after creation. | All | All | — |
+| BR-001 | A [[Terms]] Variant belongs to exactly one [[Terms]] object and cannot be shared across [[Terms]] objects. | All | All | — |
+| BR-002 | A [[Terms]] Variant has a type. Valid types are: Online, File. Type is immutable after creation. | All | All | — |
 | BR-003 | An Online Variant delivers content via an external URL (assetUrl). File attributes (filename, size, contentType, fileId) are not applicable. | All | All | The platform does not validate the URL. Vendor is responsible for URL availability and correctness. |
 | BR-004 | A File Variant delivers content as a binary file upload. The file is stored on the platform and referenced by fileId. The assetUrl attribute is not applicable. | All | All | — |
-| BR-005 | A Terms Variant requires a language code on creation. For Online type, the language code may be null to indicate the Variant covers multiple languages. For File type, a specific language code is always required — multi-language is not supported for File Variants. | All | All | A single Terms object may have multiple Variants covering different languages. |
-| BR-006 | Variant state is fully independent of the parent Terms state. Publishing, unpublishing, or deleting a Terms object does not automatically affect its Variants' states, and Variant state changes do not affect the parent Terms state. | All | All | The platform does not cascade deletions. A Terms object cannot be deleted while it has any child Variants. All Variants must be deleted independently before the Terms can be deleted — see Terms canon BR-009a. |
-| BR-007 | Only Published Variants are shown to the Client when the parent Terms is presented for acceptance. | Published | Client | A Published Terms with no Published Variants is valid platform state. The platform does not prevent this configuration. |
-| BR-008 | Variant creation, modification, and deletion are not restricted by the state of the parent Terms or the parent Product. | All | Vendor | Consistent with platform permissiveness philosophy. |
+| BR-005 | A [[Terms]] Variant requires a language code on creation. For Online type, the language code may be null to indicate the Variant covers multiple languages. For File type, a specific language code is always required — multi-language is not supported for File Variants. | All | All | A single [[Terms]] object may have multiple Variants covering different languages. |
+| BR-006 | Variant state is fully independent of the parent [[Terms]] state. Publishing, unpublishing, or deleting a [[Terms]] object does not automatically affect its Variants' states, and Variant state changes do not affect the parent [[Terms]] state. | All | All | The platform does not cascade deletions. A [[Terms]] object cannot be deleted while it has any child Variants. All Variants must be deleted independently before the [[Terms]] can be deleted — see [[Terms]] canon BR-009a. |
+| BR-007 | Only Published Variants are shown to the Client when the parent [[Terms]] is presented for acceptance. | Published | Client | A Published [[Terms]] with no Published Variants is valid platform state. The platform does not prevent this configuration. |
+| BR-008 | Variant creation, modification, and deletion are not restricted by the state of the parent [[Terms]] or the parent [[Product]]. | All | Vendor | Consistent with platform permissiveness philosophy. |
 | BR-009 | Only Draft Variants may be deleted by the Vendor. Published, Pending, and Unpublished Variants cannot be deleted. | Draft | Vendor | Permanently removed — no longer retrievable via the API. |
 
 ---

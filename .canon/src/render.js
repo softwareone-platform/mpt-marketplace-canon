@@ -168,12 +168,13 @@ const buildTransitionsData = (kb, entityId) => {
 };
 
 const buildBusinessRulesData = (kb, entityId) => {
-  const rules = kb.from(entityId, 'constraint')
-    .filter(r => /^BR/.test(r.meta?.canonId || ''));
+  const rules = kb.descendants(entityId, { node: ['rule'] })
+    .filter(n => /^[A-Z]+-\d+/.test(n.meta?.canonId || ''))
+    .sort((a, b) => (a.meta?.canonId || '').localeCompare(b.meta?.canonId || ''));
   return {
     rules: rules.map(r => ({
       id: r.meta?.canonId || '',
-      statement: r.description || '',
+      statement: r.meta?.statement || r.description || '',
       states: orDash(r.meta?.states),
       actor_scope: orDash(r.meta?.actorScope),
       notes: orDash(r.meta?.notes),

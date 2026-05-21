@@ -83,14 +83,14 @@ TCS (API identifier prefix); "Terms and Conditions"
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | A Terms object belongs to exactly one Product and cannot be shared across Products. | All | All | — |
-| BR-002 | A Product may have multiple Terms objects. All Published Terms on a Product are presented to the Client during Order creation. | All | All | — |
-| BR-003 | Terms are presented to the Client in ascending displayOrder sequence during Order creation. | Published | Client | — |
-| BR-004 | A Client must accept all Published Terms on a Product before an Order can be submitted. | Published | Client | — |
-| BR-005 | Acceptance is recorded at the Terms level, not the Variant level. The acceptance record captures the Terms ID, timestamp, and the Actor token of the accepting party. | Published | Client | Visible on the resulting Agreement. |
+| BR-001 | A Terms object belongs to exactly one [[Product]] and cannot be shared across Products. | All | All | — |
+| BR-002 | A [[Product]] may have multiple Terms objects. All Published Terms on a [[Product]] are presented to the Client during [[Order]] creation. | All | All | — |
+| BR-003 | Terms are presented to the Client in ascending displayOrder sequence during [[Order]] creation. | Published | Client | — |
+| BR-004 | A Client must accept all Published Terms on a [[Product]] before an [[Order]] can be submitted. | Published | Client | — |
+| BR-005 | Acceptance is recorded at the Terms level, not the Variant level. The acceptance record captures the Terms ID, timestamp, and the Actor token of the accepting party. | Published | Client | Visible on the resulting [[Agreement]]. |
 | BR-006 | Only Published Variants are shown to the Client when Terms are presented for acceptance. A Published Terms object with no Published Variants is valid platform state — the Client will see the Terms entry but have no content to read. The Vendor is responsible for ensuring at least one Published Variant exists before a Client encounters the Terms. | Published | Client | Consistent with platform permissiveness philosophy — the platform does not prevent misconfiguration. |
 | BR-007 | Terms and their Variants have fully independent state machines. There is no state dependency or cascade in either direction — publishing or unpublishing a Terms object does not affect its Variants, and vice versa. | All | All | — |
-| BR-008 | Terms creation, modification, and deletion are not restricted by the state of the parent Product. | All | Vendor | Consistent with platform permissiveness philosophy. |
+| BR-008 | Terms creation, modification, and deletion are not restricted by the state of the parent [[Product]]. | All | Vendor | Consistent with platform permissiveness philosophy. |
 | BR-009 | Only Draft Terms may be deleted by the Vendor. Published, Pending, and Unpublished Terms cannot be deleted. | Draft | Vendor | Permanently removed — no longer retrievable via the API. |
 | BR-009a | A Terms object cannot be deleted while it has any child Variants, regardless of Variant state. All Variants must be deleted independently before the Terms can be deleted. The platform does not cascade deletions. | Draft | Vendor | Consistent with the platform no-cascade architectural invariant. |
 

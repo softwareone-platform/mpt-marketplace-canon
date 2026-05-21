@@ -56,15 +56,15 @@ This object has no state machine. It is created and modified as a unit, with no 
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | An Item Group belongs to exactly one Product and cannot be shared across Products. | N/A | All | — |
-| BR-002 | Exactly one Item Group per Product must be marked as Default. | N/A | All | — |
-| BR-003 | If a new Item is created without specifying an Item Group, it is automatically assigned to the Default Item Group. | N/A | All | — |
-| BR-004 | The `multiple` attribute controls whether a Client can select more than one Item from the group when placing an Order. | N/A | All | This constraint is enforced by the platform at Order submission — one of the few platform-enforced constraints outside the Vendor Extension. |
-| BR-005 | The `required` attribute controls whether a Client must select at least one Item from the group when placing an Order. | N/A | All | This constraint is enforced by the platform at Order submission — one of the few platform-enforced constraints outside the Vendor Extension. |
-| BR-006 | The `displayOrder` attribute controls the sequence in which Item Groups are presented during the ordering process. | N/A | All | — |
-| BR-007 | Item Group creation, modification, and deletion are not restricted by the state of the parent Product. | N/A | Vendor | Consistent with Template canon BR-021 and Product canon BR-001. |
-| BR-008 | The Default Item Group cannot be deleted. To delete a Default Item Group, the Vendor must first designate another Item Group as Default. | N/A | Vendor | Consistent with Default protection pattern established in Template canon BR-004. |
-| BR-009 | An Item Group cannot be deleted if it contains Items. All Items must be removed or reassigned before the group can be deleted. | N/A | Vendor | — |
+| BR-001 | An [[Item]] Group belongs to exactly one [[Product]] and cannot be shared across Products. | N/A | All | — |
+| BR-002 | Exactly one [[Item]] Group per [[Product]] must be marked as Default. | N/A | All | — |
+| BR-003 | If a new [[Item]] is created without specifying an [[Item]] Group, it is automatically assigned to the Default [[Item]] Group. | N/A | All | — |
+| BR-004 | The `multiple` attribute controls whether a Client can select more than one [[Item]] from the group when placing an [[Order]]. | N/A | All | This constraint is enforced by the platform at [[Order]] submission — one of the few platform-enforced constraints outside the Vendor Extension. |
+| BR-005 | The `required` attribute controls whether a Client must select at least one [[Item]] from the group when placing an [[Order]]. | N/A | All | This constraint is enforced by the platform at [[Order]] submission — one of the few platform-enforced constraints outside the Vendor Extension. |
+| BR-006 | The `displayOrder` attribute controls the sequence in which [[Item]] Groups are presented during the ordering process. | N/A | All | — |
+| BR-007 | [[Item]] Group creation, modification, and deletion are not restricted by the state of the parent [[Product]]. | N/A | Vendor | Consistent with [[Template]] canon BR-021 and [[Product]] canon BR-001. |
+| BR-008 | The Default [[Item]] Group cannot be deleted. To delete a Default [[Item]] Group, the Vendor must first designate another [[Item]] Group as Default. | N/A | Vendor | Consistent with Default protection pattern established in [[Template]] canon BR-004. |
+| BR-009 | An [[Item]] Group cannot be deleted if it contains Items. All Items must be removed or reassigned before the group can be deleted. | N/A | Vendor | — |
 
 ---
 

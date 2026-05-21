@@ -1,4 +1,4 @@
-export type TNodeType = 'domain' | 'entity' | 'state' | 'transition' | 'action' | 'term' | 'constraint' | 'risk';
+export type TNodeType = 'domain' | 'entity' | 'state' | 'transition' | 'action' | 'term' | 'constraint' | 'risk' | 'rule';
 
 export type TRefType =
   | 'parent'
