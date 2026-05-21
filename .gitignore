@@ -4,5 +4,6 @@ dist/
 .canon/node_modules/
 .canon/model-cache/
 .idea
+.playwright-mcp
 *.log
 .DS_Store
