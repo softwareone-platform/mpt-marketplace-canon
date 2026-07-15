@@ -1,6 +1,6 @@
 # Canon Backlog
 
-> **Version:** 2.6
+> **Version:** 2.7
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -108,7 +108,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 
 | Object | Parent | Status | Last Updated | Canon File | Notes |
 |--------|--------|--------|--------------|------------|-------|
-| authorizations | — | 🟡 Known Pending Issues | 2026-03-15 | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | 1 open question. |
+| authorizations | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | — |
 | items | — | 🟡 Known Pending Issues | 2026-03-14 | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | Top-level Item collection (cross-product). Not yet re-verified via canon-generate. |
 | listings | — | 🟡 Known Pending Issues | 2026-03-15 | [CANON_OBJECT_Catalog_Listing.md](../objects/CANON_OBJECT_Catalog_Listing.md) | Not yet re-verified via canon-generate. |
 | price-lists | — | 🟡 Known Pending Issues | 2026-03-14 | [CANON_OBJECT_Catalog_PriceList.md](../objects/CANON_OBJECT_Catalog_PriceList.md) | Not yet re-verified via canon-generate. |
@@ -337,3 +337,4 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | 2.4 | 2026-07-15 | Stu / canon-generate | Parameter Group (Product child) full refresh draft generated — resolved the long-standing soft-delete-vs-hard-delete ambiguity, plus new Display Order uniqueness and creation-required-field corrections. Draft pending PM review before promotion. |
 | 2.5 | 2026-07-15 | Stu / canon-submit-pr | Parameter Group marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. |
 | 2.6 | 2026-07-15 | Stu / canon-generate-batch | Sellers and Assets refresh drafts generated concurrently via canon-generate-batch's first dry run. Both marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint. Sellers: 0 open questions remaining (down from 7). Assets: AST-002 confirmed as a deliberate simplification, not a gap — 0 open questions remaining. |
+| 2.7 | 2026-07-15 | Stu / canon-submit-pr | Authorization marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. First object promoted in the Catalog completion push. 0 open questions remaining (down from 1, AUT-001 resolved). |

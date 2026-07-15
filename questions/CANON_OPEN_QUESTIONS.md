@@ -1,6 +1,6 @@
 # Canon Open Questions
 
-> **Version:** 3.1
+> **Version:** 3.2
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
 
@@ -13,14 +13,6 @@ This document tracks unresolved questions deferred during canon development. Que
 When a question is resolved, it is removed from this file and the answer is stated as a plain fact directly in the relevant canon section — there is no separate resolved-questions tracker, and no need for inline "confirmed by/on" provenance in canon content itself (a changelog row is enough of a record).
 
 Question IDs use the API identifier prefix of the object they concern (e.g. PAR-001 for a Parameter question). Exception: ENV-NNN for platform/environment questions that span multiple objects.
-
----
-
-## CANON_OBJECT_Catalog_Authorization.md
-
-| # | Question |
-|---|----------|
-| AUT-001 | What are the full semantics of eligibility.partner = true/false? What specifically does partner eligibility gate, and how does it interact with the Partner actor model and Programs/Accounts canon? |
 
 ---
 
@@ -128,3 +120,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 2.5 | 2026-04-14 | Stu | AST-001 added from Asset canon session. |
 | 3.0 | 2026-07-15 | Stu / canon-generate-batch | SEL-002, SEL-004, SEL-005, SEL-007, SEL-008, SEL-009, SEL-010 resolved and removed — Seller heading removed entirely (no open questions remain). AST-001 replaced by AST-002 (audit draft/active sub-keys never populated) — AST-003 was resolved directly via a live re-check and never tracked here. ENV-005 added — Seller's related-Licensee status-change guard, PROD-parity unconfirmed. All from a canon-generate-batch dry run refreshing Accounts: Seller and Commerce: Asset concurrently. |
 | 3.1 | 2026-07-15 | Stu / canon-generate-batch | AST-002 resolved and removed — confirmed as a deliberate simplification, not an unimplemented feature. Asset heading removed entirely (no open questions remain). |
+| 3.2 | 2026-07-15 | Stu / canon-generate | AUT-001 resolved and removed — exhaustive search across swo-platform, mpt-catalog, and mpt-billing found eligibility.client/eligibility.partner are never read by any downstream platform logic; confirmed as a contractual record only. Authorization heading removed entirely (no open questions remain). |
