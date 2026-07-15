@@ -1,0 +1,23 @@
+{
+  "environments": {
+    "staging": {
+      "baseUrl": null
+    },
+    "prod": {
+      "baseUrl": null,
+      "writesAllowed": false
+    }
+  },
+  "reposCacheDir": "~/.cache/mpt-canon-pipeline/repos",
+  "azdo": {
+    "orgUrl": null
+  },
+  "namespaceRepoMap": {
+    "catalog": null,
+    "commerce": null,
+    "billing": null,
+    "accounts": null,
+    "notifications": null,
+    "audit": null
+  }
+}
