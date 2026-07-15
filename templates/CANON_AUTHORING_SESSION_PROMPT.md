@@ -65,6 +65,12 @@ This is the heart of the document. Rules should be atomic — one constraint per
 
 Watch for rules that are actually platform invariants in disguise — don't restate invariants as object-specific rules.
 
+**Keep the Rule Statement short and to the point.** State the general constraint in one or two sentences. If the rule has supplementary detail — an enumerated list of concrete values, a mapping, an illustrative example — that detail belongs in the Notes column, not folded into the Rule Statement. For example, "A Webhook has a `type` that determines which platform event triggers it" is the Rule Statement; the actual list of confirmed `type` values is a Notes-column concern.
+
+**The Notes column holds additional behavioral information only** — enumerated values, a cross-reference, an important caveat about scope or confidence. It is never used for citations ("Confirmed directly", "Confirmed by [name]"), attribution, or a reference to what a prior version of canon said ("Corrects prior canon", "New, not in prior canon"). Canon is always a snapshot of the current state — corrections and their history belong exclusively in the Changelog (Section 11), never in body content. If a Notes cell has nothing left to add once free of these, write `—`.
+
+**Canon documents business rules and observed behavior — not technical implementation.** The OpenAPI spec, live JSON samples, and any source-code research are evidence used to arrive at a confirmed fact; the mechanism by which that fact was established (an internal class or method name, a file path, a query filter, an event name) does not belong in the canon document itself, even worded generically. This matters doubly because this repository is public — internal source-code identifiers from a separate, private engineering repo must never appear in canon content.
+
 **Section 5 — Key Attributes**
 Focus on attributes meaningful to product canon — not every API field. For each attribute, think carefully about: who sets it, whether it can change after creation, whether it can change after a specific state transition, whether its visibility varies by Actor, and whether null suppression applies. Enum fields must have all valid values documented.
 
@@ -82,6 +88,8 @@ Focus on failure modes that the platform *permits* but that cause harm — not v
 
 **Section 10 — Open Questions**
 Be honest about what you don't know. A canon document with open questions is better than one with confidently wrong answers. Use the ID format `PREFIX-NNN` where PREFIX matches the object's API identifier prefix (e.g. PAR-001 for a Parameter question). Use ENV-NNN for platform or environment-level questions. Track all open questions in CANON_OPEN_QUESTIONS.md. When resolved, remove it from that file and state the confirmed fact plainly in the relevant section of the canon — no separate resolved-questions tracker, and no inline "confirmed by/on" provenance needed in canon content itself (a changelog row is enough of a record).
+
+When there are no open questions, this section should say exactly "No open questions at this time." and stop there — do not recap which questions were previously resolved, descoped, or reopened, and do not cross-reference their resolutions. That history belongs in the Changelog (Section 11), not in a present-state section that exists to list what's *currently* unknown.
 
 ---
 
@@ -110,6 +118,9 @@ If you have a sample API response for the object being canonised, attach it to t
 - Use "deletion guard" not "deletion protection" or "deletion lock"
 - Use fully namespace-qualified object names in cross-references: `Namespace: Object`
 - Prefer system-truth language over transactional phrasing (e.g. "the platform prevents" not "you can't")
+- Never name internal source-code identifiers (class names, method names, file paths, line numbers, migration names, query-filter mechanics) — this repo is public, and those details belong to a separate, private engineering repo
+- Never write "Confirmed directly", "Confirmed by [name]", "Confirmed empirically/via live fetch", or similar attribution in canon body content
+- Never write "Corrects prior canon", "New, not in prior canon", or similar historical framing in canon body content — canon is always a present-state snapshot; that history belongs only in the Changelog
 
 ---
 
@@ -144,3 +155,4 @@ From there, I will ask clarifying questions and we will build each section toget
 | 1.0 | 2026-03-09 | Stu | Initial version |
 | 2.0 | 2026-03-09 | Stu | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |
 | 2.1 | 2026-07-15 | Stu | Section 3 guidance updated: the Transitions table's Endpoint / Verb column (template v0.3) is mandatory and must name the literal API mechanism, not just a human-readable Action description. |
+| 2.2 | 2026-07-15 | Stu | Section 4 guidance added — keep Rule Statements short, move enumerated/supplementary detail to Notes; Notes hold behavioral information only. Section 10 guidance added — an empty Open Questions section says only "No open questions at this time.", no recap of prior resolutions. Language and Terminology Standards expanded — no internal source-code identifiers (this repo is public), no inline attribution, no "corrects prior canon" framing in canon body content. |

@@ -1,6 +1,6 @@
 # Object Canon: [Object Name]
 
-> **Version:** 0.4
+> **Version:** 0.5
 > **Owner:** [PM Name]
 > **Last Updated:** 2026-07-15
 > **Status:** Draft
@@ -90,7 +90,9 @@
 > - Number sequentially. Use sub-rules (BR-001a, BR-001b) for closely related constraints.
 > - "Applies In State(s)" should be a specific state name, "All", or "N/A" for stateless objects.
 > - Rules should be atomic — one constraint per rule.
-> - Cross-reference related rules in the Notes column.
+> - **Keep the Rule Statement short and to the point** — one or two sentences stating the general constraint. Supplementary detail (an enumerated list of concrete values, a mapping, an illustrative example) belongs in the Notes column, not folded into the Rule Statement.
+> - **The Notes column holds additional behavioral information only** — enumerated values, a cross-reference, a caveat about scope or confidence. Never citations ("Confirmed directly", "Confirmed by [name]"), never attribution, never a reference to what a prior canon version said ("Corrects prior canon", "New, not in prior canon"). Canon is a snapshot of the current state; corrections and their history belong only in the Changelog. If there's nothing left to add, write `—`.
+> - Never name internal source-code identifiers (class/method names, file paths, line numbers, query-filter mechanics) anywhere in this table — this repo is public.
 > - Common rule categories to consider:
 >   - Ownership and scoping (e.g. "belongs to exactly one X")
 >   - Default protection pattern (exactly one Default must exist; Default cannot be deleted; marking a new Default auto-demotes the existing one)
@@ -200,6 +202,7 @@
 > Use the object's ID prefix as the question ID prefix (e.g. PAR-001 for Parameter questions, ENV-001 for platform/environment questions).
 > Track all open questions in CANON_OPEN_QUESTIONS.md.
 > When resolved, remove from CANON_OPEN_QUESTIONS.md and update the relevant section of this canon by stating the confirmed fact plainly — no separate resolved-questions tracker, and no inline "confirmed by/on" provenance needed in the section itself (a changelog row is enough of a record).
+> When there are no open questions, this section should say exactly "No open questions at this time." and stop — do not recap which questions were previously resolved, descoped, or reopened. That history belongs in the Changelog, not here.
 
 - [ ] [PRE-001]: [Question statement.]
 
@@ -215,3 +218,4 @@
 | 0.2 | 2026-03-09 | Stu | Platform Invariants block replaced with reference to PLATFORM_CANON_PREAMBLE.md. ID Prefix field added to Section 1 with guidance note. Section 10 open questions guidance updated — question ID convention (object prefix), tracker workflow (CANON_OPEN_QUESTIONS.md → CANON_RESOLVED_QUESTIONS.md). No Example JSON section — JSON examples are not included in canon documents. |
 | 0.3 | 2026-07-15 | Stu | Section 3.2 Transitions table: added mandatory "Endpoint / Verb" column for the literal API mechanism of each transition (e.g. `publish`, or an explicit note that it's a plain field/status write) — the existing "Action" column is a human description only and was found to be insufficient on its own for confirming real API behaviour without cross-referencing the live spec. |
 | 0.4 | 2026-07-15 | Stu | Section 10 guidance updated — `CANON_RESOLVED_QUESTIONS.md` tracker removed entirely; a resolved question is now incorporated directly into the relevant canon section with an inline citation, not moved to a separate file. |
+| 0.5 | 2026-07-15 | Stu | Refined further: no inline "confirmed by/on" provenance in canon content after all — a changelog row is enough of a record. Section 4 guidance added — keep Rule Statements short, move enumerated/supplementary detail to Notes; Notes hold behavioral information only, never citations, attribution, or "corrects prior canon" framing. Section 10 guidance added — an empty Open Questions section says only "No open questions at this time.", with no recap of previously resolved/descoped questions. |
