@@ -127,6 +127,7 @@
 
 > **Guidance on relationships:**
 > - Use fully namespace-qualified names: `Namespace: Object` (e.g. `Catalog: Product`, `Commerce: Order`).
+> - This Related Object column itself, and this table's Description column, are not `[[WikiLink]]`-bracketed — the Related Object column already names the object plainly, and bracketing the Description column too would be redundant. Elsewhere in this document (Description, Business Rules, Lifecycle Events, Section 8, Section 9), do bracket-link object mentions — see `.claude/skills/canon-generate/SKILL.md`'s "Wikilinking other objects" for the full policy.
 > - Relationship types:
 >   - **Parent** — this object cannot exist without the related object.
 >   - **Child** — the related object cannot exist without this object.

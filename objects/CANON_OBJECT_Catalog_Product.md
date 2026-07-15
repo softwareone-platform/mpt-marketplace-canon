@@ -24,7 +24,7 @@
 **ID Prefix:** PRD (confirmed via `preamble/PLATFORM_CANON_PREAMBLE.md` §5.3 and observed real object IDs, e.g. `PRD-2873-8874`, `PRD-3427-4385`).
 
 **Description:**
-A Product is the top-level unit of a Vendor's commercial offering on the SoftwareOne Marketplace. It is the container for everything that defines what can be sold and how — Items (orderable SKUs), Parameters (data fields), Templates (contextual communications), Terms (acceptance requirements), Media (visual assets), and pricing via Price Lists. A Product must go through a publication review before it is available to Clients. Once published, it can be made available through one or more Listings, each of which connects the Product to a SoftwareOne Seller, a currency, and an eligible Client population.
+A Product is the top-level unit of a Vendor's commercial offering on the SoftwareOne Marketplace. It is the container for everything that defines what can be sold and how — [[Item]]s (orderable SKUs), [[Parameter]]s (data fields), [[Template]]s (contextual communications), [[Terms]] (acceptance requirements), [[Media]] (visual assets), and pricing via [[Price List]]s. A Product must go through a publication review before it is available to Clients. Once published, it can be made available through one or more [[Listing]]s, each of which connects the Product to a SoftwareOne [[Seller]], a currency, and an eligible Client population.
 
 **Also Known As:**
 None known.
@@ -92,7 +92,7 @@ None known.
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
 | BR-001 | [[Template]] creation, modification, and deletion under a Product are not restricted by the state of the Product. | All | Vendor | Also documented in [[Template]] canon BR-021. |
-| BR-002 | A Product may be deleted by its Vendor only while in Draft state (T7). Deletion is a soft delete and cascades: Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Price Lists (and Price List Items), Authorizations, and Listings are removed via bulk delete, and Documents/Media/Icon are removed separately. Once a Product leaves Draft state (Pending, Published, or Unpublished), it can never be deleted by any Actor. | Draft (for the transition itself); all other states are permanently non-deletable | Vendor | This is a documented exception to Platform Invariant 6 — see preamble. |
+| BR-002 | A Product may be deleted by its Vendor only while in Draft state (T7). Deletion is a soft delete and cascades: [[Item]]s, [[Item Group]]s, [[Parameter]]s, [[Parameter Group]]s, [[Template]]s, [[Terms]] (and [[Terms Variant]]s), [[Price List]]s (and [[Price List Item]]s), [[Authorization]]s, and [[Listing]]s are removed via bulk delete, and Documents/Media/Icon are removed separately. Once a Product leaves Draft state (Pending, Published, or Unpublished), it can never be deleted by any Actor. | Draft (for the transition itself); all other states are permanently non-deletable | Vendor | This is a documented exception to Platform Invariant 6 — see preamble. |
 | BR-003 | Once a Product is submitted to Pending, the Vendor cannot withdraw it. The only exit from Pending is publication by Operations. | Pending | Vendor, Operations | Operations collaborates with the Vendor to resolve any issues rather than rejecting the Product (preamble §3.3). |
 | BR-004 | A Product in Pending state cannot be returned to Draft. | Pending | All | There is no reject or withdraw transition. |
 | BR-005 | All Product attributes are mutable in all non-terminal states, including Published. | Draft, Pending, Published, Unpublished | Vendor | No distinction between presentational and behavioral attributes. Vendor is responsible for consequences of editing a Published Product with active downstream objects. |
@@ -171,13 +171,13 @@ None known.
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Product created | Vendor creates Product | Vendor | Product enters Draft state. Revision counter initialised. Platform automatically creates the following default child objects: (1) one Item Group (Name: "Items", Label: "Items", Display order: 100, Description: "Default item group", Optional: false, Allow multiple: true, Default: true); (2) one Parameter Group (Name: "Parameters", Label: "Parameters", Display order: 100, Description: "Default parameter group", Default: true); (3) one Default Template for each of exactly three Order types: OrderProcessing, OrderQuerying, OrderCompleted. RequestProcessing is not a valid template type — it has been fully removed from the platform, not merely deprecated. This ensures the one-and-only-one Default invariant is satisfied from the moment of creation. |
+| Product created | Vendor creates Product | Vendor | Product enters Draft state. Revision counter initialised. Platform automatically creates the following default child objects: (1) one Item Group (Name: "Items", Label: "Items", Display order: 100, Description: "Default item group", Optional: false, Allow multiple: true, Default: true); (2) one Parameter Group (Name: "Parameters", Label: "Parameters", Display order: 100, Description: "Default parameter group", Default: true); (3) one Default Template for each of exactly three [[Order]] types: OrderProcessing, OrderQuerying, OrderCompleted. RequestProcessing is not a valid template type — it has been fully removed from the platform, not merely deprecated. This ensures the one-and-only-one Default invariant is satisfied from the moment of creation. |
 | Product submitted | T2 — Draft to Pending | Vendor | Product enters Operations review queue. |
 | Product published | T3 — Pending to Published | Operations | Product becomes visible and purchasable by Clients. |
 | Product unpublished | T4 — Published to Unpublished | Vendor, Operations | Product removed from Client discovery. Existing Agreements unaffected. |
 | Product republished | T5 — Unpublished to Published | Operations | Product restored to Client discovery. Vendor cannot perform this — see T5. |
 | Product returned for review | T6 — Unpublished to Pending | Vendor | Product re-enters the Operations review queue from Unpublished state. |
-| Product deleted | T7 — Draft to Deleted | Vendor | Cascade-deletes Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Variants), Price Lists (and Price List Items), Authorizations, and Listings; removes Documents/Media/Icon. Permanently removed — no longer retrievable via the API. |
+| Product deleted | T7 — Draft to Deleted | Vendor | Cascade-deletes [[Item]]s, [[Item Group]]s, [[Parameter]]s, [[Parameter Group]]s, [[Template]]s, [[Terms]] (and [[Terms Variant]]s), [[Price List]]s (and [[Price List Item]]s), [[Authorization]]s, and [[Listing]]s; removes Documents/Media/Icon. Permanently removed — no longer retrievable via the API. |
 | Product updated | Any attribute change | Vendor | Revision incremented. No state change. |
 
 ### 7.2 Cross-Object State Effects
@@ -185,7 +185,7 @@ None known.
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Product unpublished | Order, Agreement, Asset, Subscription | No direct state effect. Existing transactional objects continue normally. | Yes | Always | Unpublishing does not interrupt in-flight or active downstream objects. State transitions only append to the audit trail — no domain event is raised for them. |
-| Product deleted (Draft only) | Product Item, Product Item Group, Product Parameter, Product Parameter Group, Product Template, Product Terms (and Variants), Price List (and Price List Item), Authorization, Listing, Media, Documents, Icon | Cascade-deleted / removed alongside the Product. | Yes | Product must be in Draft state (BR-002) | Since only Draft Products qualify, none of these should have live Orders/Agreements/Subscriptions attached yet. |
+| Product deleted (Draft only) | Product Item, Product Item Group, Product Parameter, Product Parameter Group, Product Template, Product Terms (and Variants), Price List (and Price List Item), Authorization, Listing, Media, Documents, Icon | Cascade-deleted / removed alongside the Product. | Yes | Product must be in Draft state (BR-002) | Since only Draft Products qualify, none of these should have live [[Order]]s/[[Agreement]]s/[[Subscription]]s attached yet. |
 
 ---
 
@@ -197,7 +197,7 @@ None known.
 - Draft → Pending (T2) cannot be undone by the Vendor (BR-004) — the only reversal path is Operations publishing it (T3), or Operations never acting (see Failure Modes).
 
 **Deletion:**
-A Product may be deleted by its Vendor only while in Draft state (T7). This is a soft delete — the object is excluded from all normal API responses going forward (permanently removed — no longer retrievable via the API) — and it cascades to remove: Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Price Lists (and Price List Items), Authorizations, and Listings, plus Documents, Media, and Icon. This is a documented exception to Platform Invariant 6 (see preamble). Once a Product leaves Draft state (Pending, Published, or Unpublished), it can never be deleted by any Actor.
+A Product may be deleted by its Vendor only while in Draft state (T7). This is a soft delete — the object is excluded from all normal API responses going forward (permanently removed — no longer retrievable via the API) — and it cascades to remove: [[Item]]s, [[Item Group]]s, [[Parameter]]s, [[Parameter Group]]s, [[Template]]s, [[Terms]] (and [[Terms Variant]]s), [[Price List]]s (and [[Price List Item]]s), [[Authorization]]s, and [[Listing]]s, plus Documents, Media, and Icon. This is a documented exception to Platform Invariant 6 (see preamble). Once a Product leaves Draft state (Pending, Published, or Unpublished), it can never be deleted by any Actor.
 
 **Audit & history requirements:**
 The Product audit object records timestamps and Actor attribution for five events: created, updated, pending, published, and unpublished. The revision counter provides a change sequence. Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon. State transitions (Review/Publish/Unpublish) do not raise a distinct domain/integration event — they only append an audit-trail entry — so no downstream event handler observes them.
@@ -208,10 +208,10 @@ The Product audit object records timestamps and Actor attribution for five event
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
-| Vendor edits behavioral settings on a Published Product with active downstream objects | Settings update is applied immediately. No warning or guard. | Client, Vendor | High | BR-005 permits this. Vendor takes full responsibility. Settings such as preValidation and subscriptionCessation could affect in-flight Orders or active Subscriptions. |
+| Vendor edits behavioral settings on a Published Product with active downstream objects | Settings update is applied immediately. No warning or guard. | Client, Vendor | High | BR-005 permits this. Vendor takes full responsibility. Settings such as preValidation and subscriptionCessation could affect in-flight [[Order]]s or active [[Subscription]]s. |
 | Product remains in Pending indefinitely (Operations never acts) | Product stays in Pending. Vendor has no exit mechanism. | Vendor | Medium | Operational process dependency. No system-level resolution path. |
 | Operations publishes (or republishes) a Product with incomplete or low-quality content | Platform allows it — no validator or completeness check exists beyond the current-state guard (BR-010). | Client | Medium | No code path enforces "publishability" beyond state. Any manual review Operations performs is organizational practice, not a system-enforced gate. |
-| Vendor deletes a Draft Product that has child objects (Items, Templates, etc.) already configured | All child objects, Authorizations, and Listings referencing it are cascade-deleted with no additional confirmation step beyond the delete call itself. | Vendor | Medium | Since deletion is Draft-only, no live Orders/Agreements/Subscriptions can be affected — but configuration work on child objects is lost irrecoverably. |
+| Vendor deletes a Draft Product that has child objects (Items, Templates, etc.) already configured | All child objects, Authorizations, and Listings referencing it are cascade-deleted with no additional confirmation step beyond the delete call itself. | Vendor | Medium | Since deletion is Draft-only, no live [[Order]]s/[[Agreement]]s/[[Subscription]]s can be affected — but configuration work on child objects is lost irrecoverably. |
 
 ---
 
