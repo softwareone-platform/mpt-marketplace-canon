@@ -42,8 +42,11 @@ def normalise(s):
 
 def find_matching_paths(spec, namespace, object_name, exact=False):
     """
-    Find all API paths containing both the namespace and object keyword,
-    with the namespace appearing before the object in the path.
+    Find all API paths containing both the namespace and object as whole
+    path segments, with the namespace segment appearing before the object
+    segment. Matching is segment-based, not substring-based — this matters
+    because a raw substring search on "item" would also match inside
+    "item-groups", silently pulling in a different object's paths.
 
     If exact=True, only match paths where the object is the terminal resource
     segment (optionally followed by a single {id} parameter segment).
@@ -55,51 +58,59 @@ def find_matching_paths(spec, namespace, object_name, exact=False):
 
     matched = {}
     for path, definition in spec.get("paths", {}).items():
-        path_lower = path.lower()
+        segments = [s for s in path.split("/") if s]
+        segments_lower = [s.lower() for s in segments]
 
-        ns_index = path_lower.find(ns)
-        if ns_index == -1:
+        if ns not in segments_lower:
             continue
+        # Namespace is always the leading segment in this API's path convention,
+        # so the first occurrence is the one that matters even if the same
+        # word reappears later (e.g. /accounts/accounts/{id}/...).
+        ns_pos = segments_lower.index(ns)
 
         if exact:
-            # Split path into segments, ignoring empty strings
-            segments = [s for s in path.split("/") if s]
-            # Remove trailing {id}-style parameter segments to find terminal resource
-            clean_segments = [s for s in segments if not (s.startswith("{") and s.endswith("}"))]
-            if not clean_segments:
+            # Remove {id}-style parameter segments to find the terminal resource,
+            # scanning from the end so a repeated segment name elsewhere in the
+            # path can't be mistaken for the terminal one.
+            terminal_pos = None
+            for i in range(len(segments) - 1, -1, -1):
+                if not (segments[i].startswith("{") and segments[i].endswith("}")):
+                    terminal_pos = i
+                    break
+            if terminal_pos is None:
                 continue
-            terminal = clean_segments[-1].lower()
-            # Match if terminal segment is the object (singular or plural)
-            # and namespace appears before it
-            if terminal in (obj, obj_plural):
-                obj_index = path_lower.rfind(terminal)
-                if ns_index < obj_index:
-                    matched[path] = definition
+            terminal = segments_lower[terminal_pos]
+            if terminal in (obj, obj_plural) and ns_pos < terminal_pos:
+                matched[path] = definition
         else:
-            obj_index = path_lower.find(obj)
-            if obj_index == -1:
-                obj_index = path_lower.find(obj_plural)
-            if obj_index != -1 and ns_index < obj_index:
+            obj_positions = [i for i, s in enumerate(segments_lower) if s in (obj, obj_plural)]
+            if any(pos > ns_pos for pos in obj_positions):
                 matched[path] = definition
 
     return matched
 
 
 def collect_refs(obj, refs=None):
-    """Recursively collect all $ref values from a JSON object."""
+    """
+    Collect all $ref values from a JSON object. Iterative (explicit stack)
+    rather than recursive, so this has no dependency on Python's recursion
+    limit regardless of how deeply nested a schema is.
+    """
     if refs is None:
         refs = set()
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            if key == "$ref" and isinstance(value, str):
-                match = re.match(r"#/components/schemas/(.+)", value)
-                if match:
-                    refs.add(match.group(1))
-            else:
-                collect_refs(value, refs)
-    elif isinstance(obj, list):
-        for item in obj:
-            collect_refs(item, refs)
+    stack = [obj]
+    while stack:
+        current = stack.pop()
+        if isinstance(current, dict):
+            for key, value in current.items():
+                if key == "$ref" and isinstance(value, str):
+                    match = re.match(r"#/components/schemas/(.+)", value)
+                    if match:
+                        refs.add(match.group(1))
+                else:
+                    stack.append(value)
+        elif isinstance(current, list):
+            stack.extend(current)
     return refs
 
 

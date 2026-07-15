@@ -1,8 +1,8 @@
 # Object Canon: [Object Name]
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** [PM Name]
-> **Last Updated:** 2026-03-09
+> **Last Updated:** 2026-07-15
 > **Status:** Draft
 
 ---
@@ -59,10 +59,10 @@
 
 ### 3.2 Transitions
 
-| ID | From State | To State | Action | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-------|-------------|-------|
-| T1 | — | [Initial State] | Create | [Actor] | None | |
-| T2 | | | | | | |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+|----|-----------|---------|--------|-----------------|-------|-------------|-------|
+| T1 | — | [Initial State] | Create | `POST` (base collection endpoint) | [Actor] | None | |
+| T2 | | | | | | | |
 
 > **Guidance on transitions:**
 > - Every object must have a T1 creation transition from "—" to its initial state.
@@ -70,6 +70,7 @@
 > - For deletion transitions, use "Permanently removed — no longer retrievable via the API" in the Notes column. Never use "hard delete."
 > - Soft-deleted objects remain retrievable in some contexts — document this explicitly in Notes.
 > - Do not model cascade deletions. If another object must be deleted first before this one can be deleted, that is a precondition on this transition — not an automatic side effect.
+> - **Endpoint / Verb is mandatory and must be the literal API mechanism, not a paraphrase.** "Publish Product" in the Action column is a human-readable description; `publish` in this column is the literal, confirmable API mechanism (e.g. `POST .../publish`) — both are required, and one is not a substitute for the other. If the transition happens via a plain field/status write rather than a dedicated action endpoint, say so explicitly (e.g. `PATCH status field`, no dedicated endpoint) — never leave this column blank, and never guess at a literal name that isn't confirmed by the OpenAPI spec or source code. An unconfirmed mechanism is an open question, not an inferred value.
 
 ### 3.3 State Diagram
 
@@ -212,3 +213,4 @@
 |---------|------|--------|-------|
 | 0.1 | [YYYY-MM-DD] | [Author] | Initial draft |
 | 0.2 | 2026-03-09 | Stu | Platform Invariants block replaced with reference to PLATFORM_CANON_PREAMBLE.md. ID Prefix field added to Section 1 with guidance note. Section 10 open questions guidance updated — question ID convention (object prefix), tracker workflow (CANON_OPEN_QUESTIONS.md → CANON_RESOLVED_QUESTIONS.md). No Example JSON section — JSON examples are not included in canon documents. |
+| 0.3 | 2026-07-15 | Stu | Section 3.2 Transitions table: added mandatory "Endpoint / Verb" column for the literal API mechanism of each transition (e.g. `publish`, or an explicit note that it's a plain field/status write) — the existing "Action" column is a human description only and was found to be insufficient on its own for confirming real API behaviour without cross-referencing the live spec. |

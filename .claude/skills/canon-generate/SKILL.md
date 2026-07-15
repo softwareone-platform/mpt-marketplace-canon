@@ -35,15 +35,35 @@ Read these in full before Step 6 (they are not restated here):
 
 ## Step 1 — Schema grounding
 
-Run the existing script unmodified:
+Fetch the live OpenAPI spec for each environment in scope — do not rely on a manually-downloaded spec file, since STAGING can be ahead of PROD (preamble §7: STAGING is used for early access to major releases before PROD promotion), so a single cached spec can be stale for one environment even while current for the other:
 
 ```
-python scripts/extract_canon_schema.py <spec_path> <namespace> <object> [--exact]
+python scripts/canon_fetch_openapi_spec.py <staging|prod> --out .evidence/<namespace>_<object>/<run>/schema/openapi_<env>.json
 ```
 
-`<spec_path>` is the OpenAPI spec file the human provides (ask for it if not already available locally). Use `--exact` for top-level objects to avoid pulling in child-object paths (see the script's own docstring for guidance). Copy/move its output JSON into `.evidence/<namespace>_<object>/<run>/schema/`.
+This is an unauthenticated GET (no token needed). Then extract the object's schema from it with the existing script, unmodified:
+
+```
+python scripts/extract_canon_schema.py .evidence/<namespace>_<object>/<run>/schema/openapi_<env>.json <namespace> <object> [--exact]
+```
+
+Use `--exact` for top-level objects to avoid pulling in child-object paths (see the script's own docstring for guidance).
 
 This feeds template §1 (Identity) and §5 (Key Attributes — field names, types, required-ness, enum values). Note any spec ambiguity (e.g. a field plainly always-required but absent from the schema's `required` array — see existing precedent in `questions/CANON_SPEC_DISCREPANCIES.md` SD-001 through SD-005) as a candidate discrepancy for Step 7.
+
+If both STAGING and PROD are in scope, fetch and extract from both and compare — if the two schemas disagree (a field or path present in one environment's spec but not the other's), that's a genuine environment-drift finding, not something to silently resolve one way. Treat it the same as a spec-vs-observed-reality discrepancy.
+
+### Classify unrecognized action-suffix segments
+
+Look at the matched paths' segments that immediately follow an `{id}` (e.g. `publish` in `/catalog/items/{id}/publish`). Load `config/canon_path_segment_exclusions.json`. Its top-level keys are scopes — `_global` for patterns confirmed to apply across many objects (e.g. `icon`), or a dotted `namespace.object[.child...]` path matching where the segment was found (e.g. `catalog.items`, `catalog.products.media`) — each holding three categories: `state_transition_verbs`, `action_verbs`, and `non_object_resources`. Check the segment against the current object's own scope key and `_global`.
+
+For any segment **not classified at either scope**, confirm with the human before treating it either way — don't guess, and don't default to a flat/global classification when the evidence is really object-specific:
+- **Confirmed as a state transition** (changes the object's own lifecycle state — i.e. it belongs, or should belong, as a row in *this object's* template §3.2 Transitions table) — add it under this object's own scope key's `state_transition_verbs`, with a short reason citing where it's confirmed (this draft's own evidence, since the object is being generated right now). The segment itself is exactly the value that row's Endpoint / Verb column needs (see Step 6) — use it there, don't just file it away in the exclusions list and leave the draft's own table incomplete.
+- **Confirmed as a real action but not a lifecycle state change** (e.g. a supplementary operation named in Business Rules rather than the Transitions table — like "manage Split Billing" not itself moving the object between states) — add it under `action_verbs` at the same scope.
+- **Confirmed as a non-object sub-resource** (like `icon`) — add it under `non_object_resources`. Only use the `_global` scope if the pattern is genuinely confirmed to apply platform-wide (per the preamble or multiple objects) — default to this object's own scope key otherwise, since the same word can mean something different for a different object.
+- **Confirmed as something else** (a real, distinct object nobody's tracked yet) — do not add it to the exclusions file at all. Flag it in Step 8 as a candidate new object for its own future `canon-generate` run, the same way a cross-object dependency finding is flagged, rather than folding it into this draft.
+
+This is how `scripts/extract_objects.py`'s checklist (used to refresh `questions/CANON_BACKLOG.md`) gets more accurate over time without ever needing a hardcoded verb list maintained by hand — coverage builds up incrementally, per object, as objects get run through this Skill.
 
 The matched `paths` in the schema extract tell you the concrete API path template(s) (e.g. `/public/v1/catalog/products/{id}`) to use in Step 2 — pick the one that fetches a single object by ID (not a list endpoint).
 
@@ -90,7 +110,7 @@ If it exits with a `namespaceRepoMap.<namespace>` error, stop and tell the human
 Launch a general-purpose or Explore sub-agent (read-only — it must never write, commit, or push into the synced repo) scoped to the path(s) `canon_repo_sync.py` reported. Give it this brief, filled in for the specific object:
 
 > Search `<synced repo path(s)>` for the `<Object>` object (namespace: `<namespace>`). Report findings back to me, tagged by canon template section, with `file:line` citations for every claim:
-> - **§3 State Machine** — the state enum/type, every transition method and its guard conditions, any precondition not visible from the OpenAPI spec alone.
+> - **§3 State Machine** — the state enum/type, every transition method and its guard conditions, any precondition not visible from the OpenAPI spec alone. For every transition, report the literal route/endpoint or action name as written in the code (e.g. the exact string in a route attribute or controller action) — not just a paraphrase of what it does. If a transition has no dedicated endpoint (a plain field/status write), say so explicitly rather than leaving it ambiguous.
 > - **§4 Business Rules** — validation logic, deletion guards, Default-protection pattern implementation (see preamble §3.4/§3.5 if applicable), cardinality constraints.
 > - **§6/§7 Relationships & Lifecycle Events** — event publishers, cross-object writes, downstream triggers.
 > - **§9 Failure Modes** — exception/error-handling branches revealing permitted-but-risky states.
@@ -106,6 +126,7 @@ Write its findings to `.evidence/<namespace>_<object>/<run>/repo_notes.md`.
 Using the preamble, template, `CANON_AUTHORING_SESSION_PROMPT.md`'s guidance, and everything gathered in Steps 1–5, fill in every template section. Rules:
 
 - This draft covers `<namespace>`/`<object>` only. If drafting surfaces a needed change to a *different* object's canon, do not make that edit here (not even in that other object's `.evidence/` draft) — carry it forward as a flagged follow-up for Step 8. One `canon-generate` run touches exactly one object, so that a later `canon-submit-pr` can keep to one object per PR (its Core Rule 1).
+- **Every row in §3.2 Transitions must have its Endpoint / Verb column filled — this is mandatory, not optional (template v0.3).** Prefer Step 1's matched OpenAPI paths as the source (they give the literal, confirmed segment for any dedicated action endpoint); use Step 5's repo findings to corroborate or to identify transitions that are plain field/status writes with no dedicated endpoint. Never leave this column blank and never paraphrase the Action column's human description into it — if the literal mechanism genuinely isn't confirmed by either source, that's an open question (Section 10), not a blank cell or a guess. This is exactly the gap that caused `config/canon_path_segment_exclusions.json` to need re-deriving from the live spec instead of the existing docs — do not reintroduce it.
 - Raw JSON never appears in the draft — only prose/tables derived from it, exactly like the manual process already requires.
 - Every business rule is atomic and numbered `BR-NNN`; every cross-reference uses `Namespace: Object` (preamble §5.2) or `[[WikiLink]]`-style object-name links matching existing canon style (see e.g. `objects/CANON_OBJECT_Catalog_Product.md`).
 - Anything not confirmed by evidence becomes a numbered open question (correct ID prefix, next free `NNN` from Step 0.5) cross-referenced inline in the relevant section — never a guess, never an assumption based on analogy to other objects.
@@ -121,9 +142,10 @@ All edits below are scoped to `<namespace>`/`<object>` only — rows, IDs, and b
 - **`questions/CANON_RESOLVED_QUESTIONS.md`** — anything resolved by evidence gathered *in this same run* (e.g. a diff empirically confirms field suppression that was previously an open question) goes straight here with `Resolution` and `Canon Reference` filled in — it never touches the open-questions file at all (matches the existing SEL-003 precedent in this file's Changelog). Add its own Changelog row.
 - **`questions/CANON_SPEC_DISCREPANCIES.md`** — any confirmed spec-vs-observed-reality mismatch from Steps 1/2/5 becomes a new `SD-NNN` row in its existing table format, plus a Changelog row.
 - **`questions/CANON_BACKLOG.md`** — update the object's row: Status → 🟡 In Progress (**never** 🟢 Complete — promotion and completeness are a human call, made via `canon-submit-pr` and PM review, never by this Skill). Notes → e.g. `"Draft generated <date> via canon-generate — pending PM review. N open question(s). See .evidence/<namespace>_<object>/<run>/draft/."`. Leave the `Canon File` column empty until the draft is actually promoted into `objects/`. Add a changelog row if the file has one for this kind of change.
+- **`config/canon_path_segment_exclusions.json`** — add any segments confirmed during Step 1's classification under this object's own scope key (`namespace.object[.child...]`), in whichever of `state_transition_verbs` / `action_verbs` / `non_object_resources` fits, with a short reason. Only use `_global` for a pattern confirmed to apply across many objects, not as a default. Do not add segments confirmed as real, distinct objects — those are Step 8 follow-ups instead, not exclusions.
 
 ## Step 8 — Human checkpoint
 
 End with a summary: what was generated (or how it diffs from the existing canon file, if a refresh), where the draft lives, what open questions/spec discrepancies were added or resolved, and what changed in the backlog. Explicitly tell the human to review the draft, then run `/canon-submit-pr <namespace> <object>` when they're ready to open a PR — this Skill never promotes its own output into `objects/` or opens a PR itself.
 
-If Step 5 or Step 6 flagged a needed change to a different object's canon, list each one explicitly here — namespace, object, and what needs to change — and recommend the human run `/canon-generate` on that object as its own separate run. Never fold it into this run's draft or bookkeeping; it becomes its own future PR, per Core Rule 1 in `canon-submit-pr`.
+If Step 1, Step 5, or Step 6 flagged a needed change to a different object's canon — including an action-suffix segment from Step 1 confirmed as a real, distinct object rather than a verb/sub-resource — list each one explicitly here: namespace, object, and what needs to change. Recommend the human run `/canon-generate` on that object as its own separate run. Never fold it into this run's draft or bookkeeping; it becomes its own future PR, per Core Rule 1 in `canon-submit-pr`.

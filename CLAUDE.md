@@ -29,14 +29,16 @@ python scripts/extract_canon_schema.py <openapi.json> <namespace> <object> [--ex
 python scripts/extract_objects.py <openapi.json> [output.md]                          # namespace/object checklist from the spec
 python scripts/convert_to_docx.py <output_dir>                                         # requires pandoc; converts preamble/objects/platform to .docx
 ```
+`extract_objects.py` excludes non-object path segments via `config/canon_path_segment_exclusions.json`, not a hardcoded list — entries are scoped per-object (`namespace.object[.child...]`, e.g. `catalog.products`), split into `state_transition_verbs` / `action_verbs` / `non_object_resources`, with `_global` reserved for patterns confirmed to apply across many objects (e.g. `icon`). `canon-generate`'s Step 1 grows this file over time as it confirms new segments object-by-object, rather than needing a code change per new verb.
 
 **Canon-generation pipeline scripts** (`scripts/canon_*.py`, invoked by the `canon-generate` Skill, not normally run standalone):
 ```bash
+python scripts/canon_fetch_openapi_spec.py <staging|prod> --out <path>   # unauthenticated; live spec per environment.openapiUrl
 python scripts/canon_fetch_live.py <namespace> <object> <id> --path <api_path> --env <staging|prod> --out-dir <dir> [--actor <vendor|operations|client|all>]
 python scripts/canon_diff_actors.py --operations <path> [--vendor <path>] [--client <path>] --out <path>
 python scripts/canon_repo_sync.py <namespace>
 ```
-All three read config from `config/canon_pipeline.config.json` and secrets from `.env` (copy from `.env.example`; never commit real values). `canon_fetch_live.py` is architecturally GET-only for every environment — there is no `--method` flag and no code path for a write request; do not add one.
+All four read config from `config/canon_pipeline.config.json` and secrets from `.env` (copy from `.env.example`; never commit real values). `canon_fetch_live.py` is architecturally GET-only for every environment — there is no `--method` flag and no code path for a write request; do not add one. `canon_fetch_openapi_spec.py` exists because STAGING can be ahead of PROD (preamble §7) — always pull the spec for the environment you're about to call rather than reusing one cached copy across both.
 
 ## Canon-generation pipeline architecture
 

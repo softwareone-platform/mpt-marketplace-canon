@@ -1,0 +1,115 @@
+{
+  "_global": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "icon": "Read-only property endpoint present on many parent objects (jdenticon-default and required-icon behaviours) — not a standalone object in any case. preamble/PLATFORM_CANON_PREAMBLE.md Section 9 Icon Pattern."
+    }
+  },
+  "accounts.accounts": {
+    "state_transition_verbs": {
+      "activate": "CANON_OBJECT_Accounts_Account.md §3.2 T2 \"ERP Activate Account\"",
+      "disable": "CANON_OBJECT_Accounts_Account.md §3.2 T3a/T3b \"ERP Disable Account\"",
+      "enable": "CANON_OBJECT_Accounts_Account.md §3.2 T4a/T4b \"ERP Re-enable Account\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "accounts.sellers": {
+    "state_transition_verbs": {
+      "activate": "CANON_OBJECT_Accounts_Seller.md §3.2 T3 \"Activate Seller\" (dedicated action endpoint)",
+      "disable": "CANON_OBJECT_Accounts_Seller.md §3.2 T2 \"Disable Seller\" (dedicated action endpoint)",
+      "deactivate": "CANON_OBJECT_Accounts_Seller.md §3.2 T4 \"POST /deactivate\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.pricing-policies": {
+    "state_transition_verbs": {
+      "activate": "CANON_OBJECT_Catalog_PricingPolicy.md §3.2 T2a/T2b \"Activate Pricing Policy\"",
+      "disable": "CANON_OBJECT_Catalog_PricingPolicy.md §3.2 T3 \"Disable Pricing Policy\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.products": {
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Catalog_Product.md §3.2 T2 \"Submit Product for Publication\"",
+      "publish": "CANON_OBJECT_Catalog_Product.md §3.2 T3 \"Publish Product\"",
+      "unpublish": "CANON_OBJECT_Catalog_Product.md §3.2 T4 \"Unpublish Product\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.items": {
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T2 \"Submit Item for Publishing\"",
+      "publish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T3 \"Approve and Publish Item\"",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T4 \"Unpublish Item\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.products.media": {
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T2 \"Submit for Publication\"",
+      "publish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T3 \"Publish\"",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T4 \"Unpublish\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.products.terms": {
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Catalog_Product_Terms.md §3.2 T2 \"Submit for Publishing\"",
+      "publish": "CANON_OBJECT_Catalog_Product_Terms.md §3.2 T3 \"Approve and Publish\"",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Terms.md §3.2 T4 \"Unpublish\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "catalog.products.terms.variants": {
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T2 \"Submit for Publishing\"",
+      "publish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T3 \"Approve and Publish\"",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T4 \"Unpublish\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "commerce.assets": {
+    "state_transition_verbs": {
+      "terminate": "CANON_OBJECT_Commerce_Asset.md §3.2 T3 \"Terminate Asset\", via /terminate endpoint (BR-003, BR-009)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
+  "commerce.subscriptions": {
+    "state_transition_verbs": {
+      "terminate": "CANON_OBJECT_Commerce_Subscription.md §3.2 T5 \"Terminate Subscription\", via /terminate endpoint (BR-003)"
+    },
+    "action_verbs": {
+      "split": "CANON_OBJECT_Commerce_Subscription.md §4 BR-013/BR-014 \"manage Split Billing via /split endpoint\" — not a Section 3.2 transition, doesn't change Subscription's own lifecycle state"
+    },
+    "non_object_resources": {}
+  },
+  "commerce.orders": {
+    "state_transition_verbs": {
+      "quote": "CANON_OBJECT_Commerce_Order.md §3.2 T5 \"Quote Order\", via /quote endpoint (BR-007)",
+      "complete": "CANON_OBJECT_Commerce_Order.md §3.2 T10 \"Complete Order\"",
+      "fail": "CANON_OBJECT_Commerce_Order.md §3.2 T11 \"Fail Order\""
+    },
+    "action_verbs": {
+      "validate": "CANON_OBJECT_Commerce_Order.md §4 BR-028–BR-033 \"Order validated\", via /validate endpoint — not a Section 3.2 transition, a pre-check operation"
+    },
+    "non_object_resources": {}
+  },
+  "notifications.webhooks": {
+    "state_transition_verbs": {
+      "disable": "CANON_OBJECT_Notifications_Webhook.md §3.2 T2 \"Disable Webhook\"",
+      "enable": "CANON_OBJECT_Notifications_Webhook.md §3.2 T3 \"Enable Webhook\""
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  }
+}

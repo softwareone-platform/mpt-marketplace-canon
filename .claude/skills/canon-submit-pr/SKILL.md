@@ -9,7 +9,7 @@ The explicit, human-triggered promotion step referred to by `canon-generate`'s S
 
 ## Core rules — do not relax without the human explicitly overriding
 
-1. **One PR = one platform object.** A PR touches exactly one object's canon file in `objects/` (plus only that object's rows in the `questions/*.md` trackers). If evidence gathered during canon-generate revealed a dependency requiring changes to a *different* object's canon, that is out of scope for this PR — it needs its own `canon-generate` run and its own `canon-submit-pr` run, resulting in a separate PR. Never bundle two objects' changes into one commit or one PR, even if they were discovered in the same session.
+1. **One PR = one platform object.** A PR touches exactly one object's canon file in `objects/` (plus only that object's rows in the `questions/*.md` trackers and any entries this run's own paths surfaced in `config/canon_path_segment_exclusions.json`). If evidence gathered during canon-generate revealed a dependency requiring changes to a *different* object's canon, that is out of scope for this PR — it needs its own `canon-generate` run and its own `canon-submit-pr` run, resulting in a separate PR. Never bundle two objects' changes into one commit or one PR, even if they were discovered in the same session.
 2. **One commit per PR.** A PR is always exactly one commit. If this Skill is invoked again for the same object/branch (e.g. the draft was revised after review, or bookkeeping changed), **amend** the existing commit — never add a second commit. Push the amended commit with `git push --force-with-lease` (not a bare `--force`, so a push is rejected rather than silently clobbering someone else's work if the remote branch moved unexpectedly).
 
 ## Invocation
@@ -29,8 +29,8 @@ The explicit, human-triggered promotion step referred to by `canon-generate`'s S
 ## Step 2 — Show the human what will change
 
 1. If `objects/<target filename>` already exists, diff it against the draft and show the human a summary of what's changing section by section (this mirrors the refresh-diff `canon-generate` produces, but is the actual promotion this time).
-2. Run `git status --porcelain`. The working tree will typically already carry uncommitted edits to `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, and `CANON_BACKLOG.md` — these are `canon-generate`'s bookkeeping edits from the same run, meant to be committed together with the promoted draft. Show the human this diff too.
-3. **Check the bookkeeping diff is scoped to this one object only.** Inspect the rows/IDs actually being added or changed in each `questions/*.md` file — they should all carry this object's ID prefix (or reference this object). If you find edits belonging to a *different* object's prefix mixed in (a sign of the cross-object dependency case in Core Rule 1), stop: tell the human this must be split into a separate `canon-generate` + `canon-submit-pr` run/PR for that other object, and do not include those rows in this commit.
+2. Run `git status --porcelain`. The working tree will typically already carry uncommitted edits to `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, `CANON_BACKLOG.md`, and possibly `config/canon_path_segment_exclusions.json` — these are `canon-generate`'s bookkeeping edits from the same run, meant to be committed together with the promoted draft. Show the human this diff too.
+3. **Check the bookkeeping diff is scoped to this one object only.** Inspect the rows/IDs actually being added or changed in each `questions/*.md` file — they should all carry this object's ID prefix (or reference this object). Any new entries in `config/canon_path_segment_exclusions.json` should be segments that plausibly came from this object's own paths (Step 1 of `canon-generate`). If you find edits belonging to a *different* object's prefix mixed in (a sign of the cross-object dependency case in Core Rule 1), stop: tell the human this must be split into a separate `canon-generate` + `canon-submit-pr` run/PR for that other object, and do not include those rows in this commit.
 4. **If `git status` shows anything else** — changes unrelated to this object's canon/questions files, or pre-existing work you don't recognize — stop and ask the human how to proceed. Do not assume it's safe to bundle unrelated changes into this PR, and do not stash or discard anything without being told to.
 5. Ask the human to confirm they're happy with the draft content and the (single-object) bookkeeping diff before continuing. Do not proceed to Step 3 without an explicit go-ahead.
 
@@ -49,7 +49,7 @@ The explicit, human-triggered promotion step referred to by `canon-generate`'s S
 
 ## Step 5 — Commit (exactly one)
 
-Stage exactly: the promoted `objects/<target filename>`, and any of `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, `CANON_BACKLOG.md` that show pending changes **for this object only**. Do not use `git add -A`.
+Stage exactly: the promoted `objects/<target filename>`, and any of `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, `CANON_BACKLOG.md`, `config/canon_path_segment_exclusions.json` that show pending changes **for this object only**. Do not use `git add -A`.
 
 - **First promotion for this object/branch:** `git commit` with a fresh commit.
 - **Re-run on an existing branch (Step 3 reused it):** `git commit --amend` — the branch must never accumulate a second commit.
