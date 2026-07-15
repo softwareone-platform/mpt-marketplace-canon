@@ -60,7 +60,7 @@
 ### 3.2 Transitions
 
 | ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-----------------|-------|-------------|-------|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | [Initial State] | Create | `POST` (base collection endpoint) | [Actor] | None | |
 | T2 | | | | | | | |
 

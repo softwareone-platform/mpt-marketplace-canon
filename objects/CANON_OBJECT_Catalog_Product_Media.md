@@ -64,14 +64,14 @@ MED (API identifier prefix)
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Media | Vendor | None | Media created in Draft state. |
-| T2 | Draft | Pending | Submit for Publication | Vendor | None | Media enters review queue. Vendor cannot reverse this transition. |
-| T3 | Pending | Published | Publish | Operations | None | Media becomes visible to Clients on the Product page. |
-| T4 | Published | Unpublished | Unpublish | Vendor, Operations | None | Media removed from Client view. |
-| T5 | Unpublished | Published | Republish | Vendor, Operations | None | Media restored to Client view. |
-| T6 | Draft | Deleted | Delete | Vendor | Media must be in Draft state | Permanently removed — no longer retrievable via the API. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Media | Unconfirmed — pending refresh | Vendor | None | Media created in Draft state. |
+| T2 | Draft | Pending | Submit for Publication | Unconfirmed — pending refresh | Vendor | None | Media enters review queue. Vendor cannot reverse this transition. |
+| T3 | Pending | Published | Publish | Unconfirmed — pending refresh | Operations | None | Media becomes visible to Clients on the Product page. |
+| T4 | Published | Unpublished | Unpublish | Unconfirmed — pending refresh | Vendor, Operations | None | Media removed from Client view. |
+| T5 | Unpublished | Published | Republish | Unconfirmed — pending refresh | Vendor, Operations | None | Media restored to Client view. |
+| T6 | Draft | Deleted | Delete | Unconfirmed — pending refresh | Vendor | Media must be in Draft state | Permanently removed — no longer retrievable via the API. |
 
 ### 3.3 State Diagram
 

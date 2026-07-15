@@ -57,14 +57,14 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1a | — | Active | Create | Operations | None | Sellers may be created directly into Active status. |
-| T1b | — | Disabled | Create | Operations | None | Sellers may be created directly into Disabled status. |
-| T2 | Active | Disabled | Disable Seller | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
-| T3 | Disabled | Active | Activate Seller | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
-| T4 | Unknown | Unknown | POST `/deactivate` | Operations | Not confirmed | Dedicated action endpoint in the API spec. How `deactivate` differs from `disable`, and which state it produces, is not confirmed. See SEL-008. |
-| T5 | Unknown | Deleted | DELETE `/{id}` | Operations | Not confirmed | DELETE endpoint exists in the API spec (returns 204). Whether a deletion guard exists in practice is not confirmed. See SEL-010. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1a | — | Active | Create | Unconfirmed — pending refresh | Operations | None | Sellers may be created directly into Active status. |
+| T1b | — | Disabled | Create | Unconfirmed — pending refresh | Operations | None | Sellers may be created directly into Disabled status. |
+| T2 | Active | Disabled | Disable Seller | Unconfirmed — pending refresh | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
+| T3 | Disabled | Active | Activate Seller | Unconfirmed — pending refresh | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
+| T4 | Unknown | Unknown | POST `/deactivate` | Unconfirmed — pending refresh | Operations | Not confirmed | Dedicated action endpoint in the API spec. How `deactivate` differs from `disable`, and which state it produces, is not confirmed. See SEL-008. |
+| T5 | Unknown | Deleted | DELETE `/{id}` | Unconfirmed — pending refresh | Operations | Not confirmed | DELETE endpoint exists in the API spec (returns 204). Whether a deletion guard exists in practice is not confirmed. See SEL-010. |
 
 ### 3.3 State Diagram
 

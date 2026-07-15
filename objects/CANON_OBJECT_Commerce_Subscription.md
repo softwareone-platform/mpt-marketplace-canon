@@ -62,18 +62,18 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Active | Order completed — copied from OrderSubscription | Platform | Purchase or Change Order transitions to Completed | Platform copies the OrderSubscription to create the live Subscription under Vendor token context. Same ID retained. Subscription linked to Agreement simultaneously. |
-| T2 | — | Active | Vendor creates directly | Vendor | None — Vendor discretion | Used for migration scenarios or direct vendor sync. Subscription created directly in Active status without an Order. |
-| T3 | Active | Updating | Change or Configuration Order placed | Platform | Change or Configuration Order transitions to Processing | Automated under Client token context. Subscription returns to Active when the Order completes or fails. |
-| T4 | Active | Terminating | Termination Order placed | Platform | Termination Order transitions to Processing | Automated under Client token context. |
-| T5 | Active | Terminated | Terminate Subscription | Vendor | Subscription must be Active | Via `/terminate` endpoint. `terminationDate` set automatically by platform. If this is the last Active Subscription on the Agreement, Agreement → Terminated. |
-| T6 | Active | Expired | Renewal service — not renewed | Platform | `autoRenew = false` and `commitmentDate < today` | Automated daily. Executed by the platform's renewal service. Terminal state. |
-| T7 | Active | Active | Renewal service — renewed | Platform | `autoRenew = true` and `commitmentDate < today` | Not a state transition — Subscription remains Active. `commitmentDate` updated to `commitmentDate + term`. `renewed` audit event recorded. |
-| T8 | Updating | Active | Change or Configuration Order completed or failed | Platform | Order transitions to Completed or Failed | Automated under Vendor or Operations token context. |
-| T9 | Terminating | Terminated | Termination Order completed | Platform | Termination Order transitions to Completed | Automated under Vendor token context. `terminationDate` set automatically by platform. If this is the last Active/Terminating Subscription on the Agreement, Agreement → Terminated. |
-| T10 | Terminating | Active | Termination Order failed | Platform | Termination Order transitions to Failed | Automated under Vendor or Operations token context. Subscription reverts to Active unchanged. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Active | Order completed — copied from OrderSubscription | Unconfirmed — pending refresh | Platform | Purchase or Change Order transitions to Completed | Platform copies the OrderSubscription to create the live Subscription under Vendor token context. Same ID retained. Subscription linked to Agreement simultaneously. |
+| T2 | — | Active | Vendor creates directly | Unconfirmed — pending refresh | Vendor | None — Vendor discretion | Used for migration scenarios or direct vendor sync. Subscription created directly in Active status without an Order. |
+| T3 | Active | Updating | Change or Configuration Order placed | Unconfirmed — pending refresh | Platform | Change or Configuration Order transitions to Processing | Automated under Client token context. Subscription returns to Active when the Order completes or fails. |
+| T4 | Active | Terminating | Termination Order placed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Processing | Automated under Client token context. |
+| T5 | Active | Terminated | Terminate Subscription | Unconfirmed — pending refresh | Vendor | Subscription must be Active | Via `/terminate` endpoint. `terminationDate` set automatically by platform. If this is the last Active Subscription on the Agreement, Agreement → Terminated. |
+| T6 | Active | Expired | Renewal service — not renewed | Unconfirmed — pending refresh | Platform | `autoRenew = false` and `commitmentDate < today` | Automated daily. Executed by the platform's renewal service. Terminal state. |
+| T7 | Active | Active | Renewal service — renewed | Unconfirmed — pending refresh | Platform | `autoRenew = true` and `commitmentDate < today` | Not a state transition — Subscription remains Active. `commitmentDate` updated to `commitmentDate + term`. `renewed` audit event recorded. |
+| T8 | Updating | Active | Change or Configuration Order completed or failed | Unconfirmed — pending refresh | Platform | Order transitions to Completed or Failed | Automated under Vendor or Operations token context. |
+| T9 | Terminating | Terminated | Termination Order completed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Completed | Automated under Vendor token context. `terminationDate` set automatically by platform. If this is the last Active/Terminating Subscription on the Agreement, Agreement → Terminated. |
+| T10 | Terminating | Active | Termination Order failed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Failed | Automated under Vendor or Operations token context. Subscription reverts to Active unchanged. |
 
 ### 3.3 State Diagram
 

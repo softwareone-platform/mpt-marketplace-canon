@@ -167,6 +167,7 @@ const emitTransitions = (entityId, parsed) => {
       name: cell(row.action),
       meta: {
         canonId,
+        endpoint: cell(row.endpoint),
         actors: splitList(row.actors),
         preconditions: cell(row.preconditions),
         outcome: cell(row.outcome),

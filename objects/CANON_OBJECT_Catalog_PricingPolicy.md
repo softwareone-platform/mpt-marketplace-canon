@@ -58,15 +58,15 @@ Yield cap
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | None | Create Pricing Policy | Operations | None | Policy created. Yield cap not yet enforced. |
-| T2a | None | Active | Activate Pricing Policy | Operations | None | Yield cap begins being observed on matching Orders during Order creation. |
-| T2b | Inactive | Active | Activate Pricing Policy | Operations | None | Yield cap begins being observed on matching Orders during Order creation. |
-| T3 | Active | Inactive | Disable Pricing Policy | Operations | None | Yield cap no longer observed on new Orders. Existing Orders unaffected. |
-| T4a | None | Deleted | Delete Pricing Policy | Operations | None | Soft delete. Policy remains retrievable via the API. |
-| T4b | Active | Deleted | Delete Pricing Policy | Operations | None | Soft delete. Policy remains retrievable via the API. |
-| T4c | Inactive | Deleted | Delete Pricing Policy | Operations | None | Soft delete. Policy remains retrievable via the API. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | None | Create Pricing Policy | Unconfirmed — pending refresh | Operations | None | Policy created. Yield cap not yet enforced. |
+| T2a | None | Active | Activate Pricing Policy | Unconfirmed — pending refresh | Operations | None | Yield cap begins being observed on matching Orders during Order creation. |
+| T2b | Inactive | Active | Activate Pricing Policy | Unconfirmed — pending refresh | Operations | None | Yield cap begins being observed on matching Orders during Order creation. |
+| T3 | Active | Inactive | Disable Pricing Policy | Unconfirmed — pending refresh | Operations | None | Yield cap no longer observed on new Orders. Existing Orders unaffected. |
+| T4a | None | Deleted | Delete Pricing Policy | Unconfirmed — pending refresh | Operations | None | Soft delete. Policy remains retrievable via the API. |
+| T4b | Active | Deleted | Delete Pricing Policy | Unconfirmed — pending refresh | Operations | None | Soft delete. Policy remains retrievable via the API. |
+| T4c | Inactive | Deleted | Delete Pricing Policy | Unconfirmed — pending refresh | Operations | None | Soft delete. Policy remains retrievable via the API. |
 
 ### 3.3 State Diagram
 

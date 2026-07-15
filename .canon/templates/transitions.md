@@ -1,7 +1,7 @@
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 { #each row in transitions }
-| { row.id } | { row.from } | { row.to } | { row.action } | { row.actors } | { row.preconditions } | { row.outcome } |
+| { row.id } | { row.from } | { row.to } | { row.action } | { row.endpoint } | { row.actors } | { row.preconditions } | { row.outcome } |
 { /each }

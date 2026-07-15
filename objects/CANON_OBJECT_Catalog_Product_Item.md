@@ -57,14 +57,14 @@ ITM (API identifier prefix); SKU
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Item | Vendor | None | Item created under Product. Auto-assigned to Default Item Group if no group specified. |
-| T2 | Draft | Pending | Submit Item for Publishing | Vendor | None | Item awaiting Operations review. |
-| T3 | Pending | Published | Approve and Publish Item | Operations | None | Item available for inclusion in Price Lists and ordering by Clients. |
-| T4 | Published | Unpublished | Unpublish Item | Vendor, Operations | None | Item withdrawn from Client visibility. |
-| T5 | Unpublished | Published | Re-publish Item | Operations | None | Item restored to Client visibility. |
-| T6 | Draft | Deleted | Delete Item | Vendor | Item must be in Draft state | Permanently removed — no longer retrievable via the API. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Item | Unconfirmed — pending refresh | Vendor | None | Item created under Product. Auto-assigned to Default Item Group if no group specified. |
+| T2 | Draft | Pending | Submit Item for Publishing | Unconfirmed — pending refresh | Vendor | None | Item awaiting Operations review. |
+| T3 | Pending | Published | Approve and Publish Item | Unconfirmed — pending refresh | Operations | None | Item available for inclusion in Price Lists and ordering by Clients. |
+| T4 | Published | Unpublished | Unpublish Item | Unconfirmed — pending refresh | Vendor, Operations | None | Item withdrawn from Client visibility. |
+| T5 | Unpublished | Published | Re-publish Item | Unconfirmed — pending refresh | Operations | None | Item restored to Client visibility. |
+| T6 | Draft | Deleted | Delete Item | Unconfirmed — pending refresh | Vendor | Item must be in Draft state | Permanently removed — no longer retrievable via the API. |
 
 ### 3.3 State Diagram
 
