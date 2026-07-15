@@ -81,7 +81,9 @@
     "state_transition_verbs": {
       "terminate": "CANON_OBJECT_Commerce_Asset.md §3.2 T3 \"Terminate Asset\", via /terminate endpoint (BR-003, BR-009)"
     },
-    "action_verbs": {},
+    "action_verbs": {
+      "render": "CANON_OBJECT_Commerce_Asset.md §4 BR-026 \"render\" — not a Section 3.2 transition, doesn't change Asset's own lifecycle state"
+    },
     "non_object_resources": {}
   },
   "commerce.subscriptions": {
