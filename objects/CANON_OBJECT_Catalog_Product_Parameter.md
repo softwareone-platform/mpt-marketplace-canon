@@ -24,7 +24,7 @@
 **ID Prefix:** PAR
 
 **Description:**
-A Parameter is a vendor-defined data field associated with a Product, used to collect, store, and communicate data values across the lifecycle of Orders, Agreements, Assets, and Subscriptions. Parameters are part of the Product Definition and are scoped to the Product under which they are created. Each Parameter has a scope (which platform object type it is associated with) and a phase (when in the lifecycle it is relevant). Parameter definitions are authored by the Vendor; parameter values are written by the Vendor, Operations, or Client depending on scope, phase, and object state.
+A Parameter is a vendor-defined data field associated with a [[Product]], used to collect, store, and communicate data values across the lifecycle of [[Order]]s, [[Agreement]]s, [[Asset]]s, and [[Subscription]]s. Parameters are part of the Product Definition and are scoped to the Product under which they are created. Each Parameter has a scope (which platform object type it is associated with) and a phase (when in the lifecycle it is relevant). Parameter definitions are authored by the Vendor; parameter values are written by the Vendor, Operations, or Client depending on scope, phase, and object state.
 
 **Also Known As:**
 None known.
@@ -74,11 +74,11 @@ None known.
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
 | BR-001 | A Parameter belongs to exactly one [[Product]] and cannot be shared across Products. | All | All | — |
-| BR-002 | A Parameter has a scope, which determines which platform object type the Parameter is associated with. | All | All | Confirmed values: `Agreement`, `Asset`, `Item`, `Order`, `Subscription`. |
-| BR-002a | The `context` property is applicable to Order-scoped Parameters only. It defines the type of Order the Parameter is designed for. | All | All | Valid values: `Purchase`, `Change`, `Configuration`, `Termination`, `None`. `None` means the Parameter applies to all Order types. For all other scopes, `context` is always `None`. |
+| BR-002 | A Parameter has a scope, which determines which platform object type the Parameter is associated with. | All | All | Confirmed values: [[Agreement]], [[Asset]], [[Item]], [[Order]], [[Subscription]]. |
+| BR-002a | The `context` property is applicable to [[Order]]-scoped Parameters only. It defines the type of Order the Parameter is designed for. | All | All | Valid values: `Purchase`, `Change`, `Configuration`, `Termination`, `None`. `None` means the Parameter applies to all Order types. For all other scopes, `context` is always `None`. |
 | BR-003 | A Parameter has a phase, which determines when in the lifecycle the parameter is relevant. | All | All | Confirmed values: `Configuration`, `Order`, `Fulfillment`. |
-| BR-004 | Each scope is only valid for specific phases — not every scope/phase combination is permitted. | All | All | `Agreement` scope: `Order` or `Fulfillment` phase. `Order` scope: `Order` phase only. `Item` scope: `Configuration` phase only. `Asset` and `Subscription` scopes: `Fulfillment` phase only. |
-| BR-005 | A Parameter Group is optional on most Parameters — a Parameter may be created, and remain, with no Group at all. | All | All | The platform requires a Group at creation only for Agreement-scoped, Order-phase Parameters and Order-scoped Parameters — creation is rejected without one. Consistent with [[Parameter Group]] canon BR-003. |
+| BR-004 | Each scope is only valid for specific phases — not every scope/phase combination is permitted. | All | All | [[Agreement]] scope: `Order` or `Fulfillment` phase. [[Order]] scope: `Order` phase only. [[Item]] scope: `Configuration` phase only. [[Asset]] and [[Subscription]] scopes: `Fulfillment` phase only. |
+| BR-005 | A [[Parameter Group]] is optional on most Parameters — a Parameter may be created, and remain, with no Group at all. | All | All | The platform requires a Group at creation only for [[Agreement]]-scoped, Order-phase Parameters and [[Order]]-scoped Parameters — creation is rejected without one. Consistent with [[Parameter Group]] canon BR-003. |
 | BR-006 | A Parameter has a type that determines the shape of its value and how it is rendered in the UI. | All | All | Confirmed values: `SingleLineText`, `MultiLineText`, `Choice`, `DropDown`, `Checkbox`, `Address`, `Contact`, `Email`, `Date`, `DataObject`, `Subdomain`, `Heading`. `DropDown` is similar to `Choice` but its options have no description property. `Subdomain` collects a subdomain string value; the platform validates that it does not contain a dot (`.`). `Heading` is presentational only — it carries no value. |
 | BR-006a | `Address`, `Contact`, and `Email` type Parameters may declare a default-value preset (e.g. `Buyer`, `Seller`, `Licensee` for Address; `CurrentlySignedInUser` for Contact/Email). | All | All | This is a hint to the API consumer, not a platform-enforced default — the platform does not itself resolve the preset into a real value; a consuming UI may choose to use the hint to pre-populate a default, but is not required to. |
 | BR-007 | A Parameter has a `multiple` flag. When true, multiple values can be associated with a single parameter instance. | All | All | — |
@@ -86,24 +86,24 @@ None known.
 | BR-008 | A Parameter has an `externalId` — a Vendor-defined identifier used to reference the parameter in integrations and Extensions. | All | All | — |
 | BR-009 | Parameter creation, modification, and deletion are not restricted by the state of the parent [[Product]]. | All | Vendor | — |
 | BR-010 | Parameters are soft-deleted only. Soft-deleted Parameters remain retrievable in some contexts (e.g. [[Template]] substitution rendering) but are no longer visible in normal API listing responses. | All | Vendor | — |
-| BR-011 | A Parameter's values already written to live objects (Orders, Agreements, Assets, Subscriptions) are unaffected by later changes to the Parameter definition — including the definition being soft-deleted. Templates referencing soft-deleted Parameters via substitution tokens continue to render correctly. | Deleted | All | Live object Parameter values are independent copies, not references to the definition — see Section 6. |
+| BR-011 | A Parameter's values already written to live objects ([[Order]]s, [[Agreement]]s, [[Asset]]s, [[Subscription]]s) are unaffected by later changes to the Parameter definition — including the definition being soft-deleted. Templates referencing soft-deleted Parameters via substitution tokens continue to render correctly. | Deleted | All | Live object Parameter values are independent copies, not references to the definition — see Section 6. |
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-012 | Parameters have constraints that control visibility and editability. Available constraints differ by scope. | All | All | `Agreement` and `Order` scoped parameters support `required`, `hidden`, and `readonly`. `Asset`, `Subscription`, and `Item` scoped parameters support `required` only. `capacity` (BR-007a) is exempt from this table — it's available to any scope. |
+| BR-012 | Parameters have constraints that control visibility and editability. Available constraints differ by scope. | All | All | [[Agreement]] and [[Order]] scoped parameters support `required`, `hidden`, and `readonly`. [[Asset]], [[Subscription]], and [[Item]] scoped parameters support `required` only. `capacity` (BR-007a) is exempt from this table — it's available to any scope. |
 | BR-013 | Constraints operate at two layers: definition-level and instance-level. Definition-level constraints are set on the Parameter definition and serve as the default applied when a new object instance is created. Instance-level constraints are set by the Vendor Extension on a specific live object and override the definition-level constraints for that instance. Instance-level always wins. | All | All | — |
-| BR-014 | The Vendor Extension can modify instance-level constraints on any live object type (Order, Agreement, Asset, Subscription) independently of the Parameter definition. | All | Vendor | Enables operational patterns such as hiding deprecated parameter instances via migration tooling, without modifying the underlying Parameter definition. |
+| BR-014 | The Vendor Extension can modify instance-level constraints on any live object type ([[Order]], [[Agreement]], [[Asset]], [[Subscription]]) independently of the Parameter definition. | All | Vendor | Enables operational patterns such as hiding deprecated parameter instances via migration tooling, without modifying the underlying Parameter definition. |
 | BR-015 | Definition-level constraints are a default template, not a contract. Once a live object instance exists, the definition-level constraints are irrelevant to that instance. Definition-level constraints only apply at the moment a new instance is created and the defaults are first applied. | All | All | — |
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-016 | Agreement-scoped and Order-scoped, Order-phase parameter values are collected from the Client when an Order is being created (Order in Draft state). | Active | Client | — |
-| BR-017 | A Client can edit Agreement-scoped and Order-scoped parameter values while an Order is in Draft or Querying state. Querying state exists specifically to allow the Client to correct invalid parameter values. | Active | Client | — |
+| BR-016 | [[Agreement]]-scoped and [[Order]]-scoped, Order-phase parameter values are collected from the Client when an Order is being created (Order in Draft state). | Active | Client | — |
+| BR-017 | A Client can edit [[Agreement]]-scoped and [[Order]]-scoped parameter values while an Order is in Draft or Querying state. Querying state exists specifically to allow the Client to correct invalid parameter values. | Active | Client | — |
 | BR-018 | Fulfillment-phase parameter values are written by the Vendor (via Extension). Clients cannot write Fulfillment-phase parameter values. Operations may edit Fulfillment-phase parameter values in exceptional circumstances. | Active | Vendor, Operations | — |
-| BR-019 | Asset-scoped and Subscription-scoped parameter values are exclusively written by the Vendor during fulfillment. Clients cannot write these values. | Active | Vendor, Operations | — |
-| BR-020 | When an Order reaches Completed state, Agreement-scoped, Order-phase parameter values are copied to the resulting Agreement. The copy is a value snapshot — it includes both the parameter values and the instance-level constraints as they existed on the Order at the time of completion. | Active | All | This is not a reference to the Parameter definition. If the Vendor Extension modified instance-level constraints on the Order prior to completion, those modified constraints are what is copied — not the definition defaults. |
-| BR-021 | After an Order reaches Completed state and the Agreement becomes Active, the Vendor can continue to modify instance-level constraints on Agreement parameter instances at any time. This is independent of the Parameter definition. | Active | Vendor | — |
-| BR-022 | Item-scoped Parameters store Vendor-defined metadata about a Product Item. They are surfaced in the Items list during the ordering UI and are filterable. | Active | Vendor | A common use case is a "Product Family" parameter (e.g. values: "Document Cloud", "Creative Cloud") that allows Clients to filter Items by family during ordering. |
+| BR-019 | [[Asset]]-scoped and [[Subscription]]-scoped parameter values are exclusively written by the Vendor during fulfillment. Clients cannot write these values. | Active | Vendor, Operations | — |
+| BR-020 | When an [[Order]] reaches Completed state, [[Agreement]]-scoped, Order-phase parameter values are copied to the resulting Agreement. The copy is a value snapshot — it includes both the parameter values and the instance-level constraints as they existed on the Order at the time of completion. | Active | All | This is not a reference to the Parameter definition. If the Vendor Extension modified instance-level constraints on the [[Order]] prior to completion, those modified constraints are what is copied — not the definition defaults. |
+| BR-021 | After an [[Order]] reaches Completed state and the [[Agreement]] becomes Active, the Vendor can continue to modify instance-level constraints on Agreement parameter instances at any time. This is independent of the Parameter definition. | Active | Vendor | — |
+| BR-022 | [[Item]]-scoped Parameters store Vendor-defined metadata about a Product Item. They are surfaced in the Items list during the ordering UI and are filterable. | Active | Vendor | A common use case is a "Product Family" parameter (e.g. values: "Document Cloud", "Creative Cloud") that allows Clients to filter Items by family during ordering. |
 
 ---
 
@@ -153,7 +153,7 @@ None known.
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Parameter created | Vendor creates Parameter under a Product | Vendor | Parameter enters Active state. Assigned to a Parameter Group only if one was specified (or if one is required — see BR-005); otherwise remains groupless. |
+| Parameter created | Vendor creates Parameter under a [[Product]] | Vendor | Parameter enters Active state. Assigned to a Parameter Group only if one was specified (or if one is required — see BR-005); otherwise remains groupless. |
 | Parameter deleted | T2 — Active to Deleted | Vendor | Soft delete. Parameter values on all live objects preserved. Templates referencing this Parameter continue to render correctly. |
 | Instance-level constraint overridden | Vendor Extension writes constraint override to a live object instance | Vendor | Constraint on that specific object instance updated. Definition-level constraints unchanged. All other instances of that Parameter on other objects are unaffected. |
 
@@ -161,8 +161,8 @@ None known.
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Order reaches Completed state | Commerce: Agreement | Agreement-scoped, Order-phase parameter values and instance-level constraints are copied to the Agreement as a snapshot | Yes | Always — on every Order completion | Snapshot includes both values and constraints as they existed on the Order instance at time of completion. Not a reference to the Parameter definition. |
-| Order enters Draft state | Commerce: Order | Agreement-scoped and Order-scoped, Order-phase parameters are presented to the Client for input, using definition-level constraints as the initial defaults | Yes | Always | — |
+| [[Order]] reaches Completed state | Commerce: Agreement | [[Agreement]]-scoped, Order-phase parameter values and instance-level constraints are copied to the Agreement as a snapshot | Yes | Always — on every Order completion | Snapshot includes both values and constraints as they existed on the [[Order]] instance at time of completion. Not a reference to the Parameter definition. |
+| [[Order]] enters Draft state | Commerce: Order | [[Agreement]]-scoped and [[Order]]-scoped, Order-phase parameters are presented to the Client for input, using definition-level constraints as the initial defaults | Yes | Always | — |
 
 ---
 
@@ -175,7 +175,7 @@ None. Soft deletion is terminal and not reversible.
 - Parameters are soft-deleted only. Once soft-deleted, a Parameter is no longer visible in normal API listing responses but its values on all live objects are preserved indefinitely and remain resolvable.
 
 **Audit & history requirements:**
-Historical parameter values (prior values before each change) are not retained on the Parameter definition or on a dedicated history store. They are captured only in the Audit log of the object that exposes the parameter value — Order, Agreement, Subscription, Asset, Item, etc. — not in a Parameter-specific audit trail.
+Historical parameter values (prior values before each change) are not retained on the Parameter definition or on a dedicated history store. They are captured only in the Audit log of the object that exposes the parameter value — [[Order]], [[Agreement]], [[Subscription]], [[Asset]], [[Item]], etc. — not in a Parameter-specific audit trail.
 
 ---
 
@@ -183,11 +183,11 @@ Historical parameter values (prior values before each change) are not retained o
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
-| Parameter soft-deleted while referenced by a Template substitution token | Template continues to render correctly. Soft-deleted parameter values are preserved and resolvable. | None | Low | See Template canon Section 9 and BR-011. |
-| Parameter soft-deleted while referenced by a live Order, Agreement, Asset, or Subscription | Parameter values are preserved on all live objects. No render failure. No cascade. | None | Low | Soft delete is designed specifically to preserve this behavior. |
-| Vendor Extension modifies instance-level constraints on an Order prior to completion | Modified constraints — not definition defaults — are copied to the Agreement on Order completion. | None | Low | Expected behavior per BR-020. Vendor is responsible for intentional constraint state at completion time. |
+| Parameter soft-deleted while referenced by a [[Template]] substitution token | Template continues to render correctly. Soft-deleted parameter values are preserved and resolvable. | None | Low | See Template canon Section 9 and BR-011. |
+| Parameter soft-deleted while referenced by a live [[Order]], [[Agreement]], [[Asset]], or [[Subscription]] | Parameter values are preserved on all live objects. No render failure. No cascade. | None | Low | Soft delete is designed specifically to preserve this behavior. |
+| Vendor Extension modifies instance-level constraints on an [[Order]] prior to completion | Modified constraints — not definition defaults — are copied to the [[Agreement]] on [[Order]] completion. | None | Low | Expected behavior per BR-020. Vendor is responsible for intentional constraint state at completion time. |
 | Vendor updates definition-level constraints after live object instances exist | Definition-level change has no effect on existing instances. Instance-level constraints on live objects are unaffected regardless of whether they were previously overridden or defaulted from the definition. | None | Low | Instance-level always wins per BR-013 and BR-015. |
-| Required parameter has no value when Order is submitted | Behavior governed by shared Commerce-wide parameter validation logic, triggered from Order transitions and (for Agreement-scoped parameters) independently from Agreement creation. | Client | Medium | Not yet fully documented in Commerce: Order or Commerce: Agreement canon. |
+| Required parameter has no value when [[Order]] is submitted | Behavior governed by shared Commerce-wide parameter validation logic, triggered from [[Order]] transitions and (for [[Agreement]]-scoped parameters) independently from Agreement creation. | Client | Medium | Not yet fully documented in Commerce: [[Order]] or Commerce: [[Agreement]] canon. |
 
 ---
 
