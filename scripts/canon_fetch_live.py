@@ -7,7 +7,12 @@ Client). Used by the canon-generate pipeline to gather real JSON samples
 and empirically diff Actor-based field suppression.
 
 Usage:
-    python scripts/canon_fetch_live.py <namespace> <object> <id> --path <api_path> --env <staging|prod> --out-dir <dir> [--actor <vendor|operations|client|all>]
+    python scripts/canon_fetch_live.py <namespace> <object> <id> --path <api_path> --env <staging|prod> --out-dir <dir> [--actor <vendor|operations|client|all>] [--select <value>]
+
+--select is an optional passthrough of the platform's own read-only field-
+inclusion / reference-expansion query parameter (preamble Section 6.2) —
+e.g. `--select +secret,+statistics` to see fields omitted by default. It
+never changes the request method or adds any write capability.
 
 Examples:
     python scripts/canon_fetch_live.py catalog product PRD-1234 \\
@@ -17,6 +22,11 @@ Examples:
     python scripts/canon_fetch_live.py catalog product PRD-1234 \\
         --path /public/v1/catalog/products/{id} --env prod --actor operations \\
         --out-dir .evidence/catalog_product/20260715T120000Z
+
+    python scripts/canon_fetch_live.py notifications webhook WBH-1234 \\
+        --path /public/v1/notifications/webhooks/{id} --env staging --actor operations \\
+        --select +secret,+statistics,+lastSuccess,+lastFailure,+lastCall \\
+        --out-dir .evidence/notifications_webhook/20260715T120000Z/omitted-fields
 
 SAFETY — READ BEFORE MODIFYING:
 This tool performs HTTP GET requests only. There is no --method flag and
@@ -42,6 +52,7 @@ import sys
 import json
 import urllib.request
 import urllib.error
+import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -67,7 +78,7 @@ def assert_get_only(env, method):
         sys.exit(1)
 
 
-def build_url(base_url, path, object_id):
+def build_url(base_url, path, object_id, select=None):
     if not base_url:
         print("Error: no baseUrl configured. Fill in config/canon_pipeline.config.json "
               "environments.<env>.baseUrl before fetching.")
@@ -75,7 +86,13 @@ def build_url(base_url, path, object_id):
     if not path.startswith("/"):
         print(f"Error: --path must start with '/' (got '{path}').")
         sys.exit(1)
-    return base_url.rstrip("/") + path.replace("{id}", object_id)
+    url = base_url.rstrip("/") + path.replace("{id}", object_id)
+    if select:
+        # select= is a read-only field-inclusion/reference-expansion parameter
+        # (preamble Section 6.2) — it does not change the request method or
+        # add any write capability.
+        url += "?select=" + urllib.parse.quote(select, safe=",+-")
+    return url
 
 
 def fetch_one(url, token):
@@ -116,7 +133,7 @@ def parse_args(argv):
     if len(argv) < 3:
         print("Usage: python scripts/canon_fetch_live.py <namespace> <object> <id> "
               "--path <api_path> --env <staging|prod> --out-dir <dir> "
-              "[--actor <vendor|operations|client|all>]")
+              "[--actor <vendor|operations|client|all>] [--select <value>]")
         sys.exit(1)
 
     namespace, object_name, object_id = argv[0], argv[1], argv[2]
@@ -126,7 +143,7 @@ def parse_args(argv):
     i = 0
     while i < len(rest):
         flag = rest[i]
-        if flag in ("--path", "--env", "--out-dir", "--actor") and i + 1 < len(rest):
+        if flag in ("--path", "--env", "--out-dir", "--actor", "--select") and i + 1 < len(rest):
             opts[flag[2:].replace("-", "_")] = rest[i + 1]
             i += 2
         else:
@@ -155,7 +172,7 @@ def main():
     load_dotenv()
     config = load_config()
     base_url = config.get("environments", {}).get(env, {}).get("baseUrl")
-    url = build_url(base_url, opts["path"], object_id)
+    url = build_url(base_url, opts["path"], object_id, select=opts.get("select"))
 
     out_dir = Path(opts["out_dir"])
     actors_to_fetch = ACTORS if actor == "all" else [actor]
