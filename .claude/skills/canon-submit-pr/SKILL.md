@@ -39,6 +39,15 @@ That said, still use judgment and still confirm with the human (Step 2) rather t
 4. **If `git status` shows anything you don't recognize** (not attributable to any canon-generate run or a change the human has already told you about) — stop and ask the human how to proceed. Do not assume it's safe to bundle unrecognized changes into this PR, and do not stash or discard anything without being told to.
 5. Ask the human to confirm they're happy with the draft content and the full bookkeeping diff (whatever objects it now spans) before continuing. Do not proceed to Step 3 without an explicit go-ahead.
 
+## Step 2.5 — Completion checkpoint
+
+`canon-generate` always leaves `questions/CANON_BACKLOG.md`'s status at 🟡 In Progress — it never marks 🟢 Complete itself, since that's a PM judgment call. This is the point where that call actually gets made, so it doesn't get silently skipped: for each object being promoted in this PR, ask the human directly — "is `<Object>`'s canon coverage complete now, or are there known gaps (deferred sections, follow-ups flagged for another object, etc.)?"
+
+- **Complete** — update its `CANON_BACKLOG.md` row: status → 🟢 Complete, fill in the `Canon File` column if not already set, and clear/finalize the Notes column (remove the "pending PM review" language). This edit is staged and committed as part of this same PR (Step 5) — no separate follow-up PR needed.
+- **Known gaps remain** — leave the row at 🟡 In Progress, and update its Notes column to describe what's still outstanding (not just "pending PM review" — the actual gap, e.g. "Split Billing deferred to a future session").
+
+Never infer completeness yourself from the absence of Section 10 open questions — a clean Section 10 means no *known unknowns*, not that coverage is exhaustive. Always ask.
+
 ## Step 3 — Branch
 
 1. `git fetch origin`. If local `main` is behind `origin/main`, tell the human and ask how they want to reconcile it (pull first, or proceed anyway) rather than silently rebasing or merging.
@@ -80,5 +89,5 @@ Commit message, matching this repo's existing convention (see `git log`, e.g. "A
 
 - Never lets a PR branch accumulate more than one commit (Core Rule) — always amends, never appends.
 - Never bundles unrelated or unconfirmed changes into a PR without the human explicitly confirming scope (Step 2).
-- Never marks `questions/CANON_BACKLOG.md` status as 🟢 Complete — that remains a human call after merge and review, not something either canon Skill decides.
+- Never marks `questions/CANON_BACKLOG.md` status as 🟢 Complete on its own inference — it only ever does so after the human explicitly confirms completeness at Step 2.5. `canon-generate` itself still never sets 🟢 under any circumstances.
 - Never bare-force-pushes (`--force-with-lease` only), never merges its own PR, never bypasses the confirmation checkpoints in Steps 2 and 6 even on a repeat invocation.
