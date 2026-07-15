@@ -117,6 +117,7 @@ If you have a sample API response for the object being canonised, attach it to t
 - Use "state transition" not "status change"
 - Use "deletion guard" not "deletion protection" or "deletion lock"
 - Use fully namespace-qualified object names in cross-references: `Namespace: Object`
+- Additionally wrap the object's canonical name in `[[WikiLink]]` brackets wherever it's mentioned in prose or a table cell (plural outside the brackets: `[[Order]]s`) — this is what `.canon/`'s graph parser resolves into a cross-object edge; plain text or backticks alone create no edge. Link the object's exact `Object Name` (check for near-duplicates, e.g. `[[Item]]` vs. `[[Price List Item]]`), never your own object, never an object not yet canonised, and only the first mention per cell/paragraph. Skip Section 5/6's Description columns, the preamble, and changelogs — see `.claude/skills/canon-generate/SKILL.md`'s "Wikilinking other objects" for the full section-by-section policy.
 - Prefer system-truth language over transactional phrasing (e.g. "the platform prevents" not "you can't")
 - Never name internal source-code identifiers (class names, method names, file paths, line numbers, migration names, query-filter mechanics) — this repo is public, and those details belong to a separate, private engineering repo
 - Never write "Confirmed directly", "Confirmed by [name]", "Confirmed empirically/via live fetch", or similar attribution in canon body content

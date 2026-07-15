@@ -24,7 +24,7 @@
 **ID Prefix:** TPL
 
 **Description:**
-A Template is a vendor-authored markdown/html document associated with a Product, used to communicate contextual information to users about the current state of an Order, Agreement, Asset, or Subscription. Templates are part of the Product Definition and are scoped to the Product under which they are created. They are a vendor-agnostic capability available to all Vendors on the platform.
+A Template is a vendor-authored markdown/html document associated with a [[Product]], used to communicate contextual information to users about the current state of an [[Order]], [[Agreement]], [[Asset]], or [[Subscription]]. Templates are part of the Product Definition and are scoped to the Product under which they are created. They are a vendor-agnostic capability available to all Vendors on the platform.
 
 **Also Known As:**
 None known.
@@ -112,17 +112,17 @@ This object has no state machine. It is created and modified as a unit, with no 
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Template created | Vendor creates Template under a Product | Vendor | Template becomes available for application to eligible objects of the matching type. |
-| Default Templates auto-created | Parent Product is created | Platform | The platform automatically creates one Default Template of each Order type: `OrderProcessing`, `OrderQuerying`, and `OrderCompleted`. This ensures the one-and-only-one Default invariant for each Order Template type is satisfied from the moment the Product exists. `Asset` and `Subscription` Templates are never auto-created (BR-006). |
+| Template created | Vendor creates Template under a [[Product]] | Vendor | Template becomes available for application to eligible objects of the matching type. |
+| Default Templates auto-created | Parent [[Product]] is created | Platform | The platform automatically creates one Default Template of each [[Order]] type: `OrderProcessing`, `OrderQuerying`, and `OrderCompleted`. This ensures the one-and-only-one Default invariant for each Order Template type is satisfied from the moment the Product exists. [[Asset]] and [[Subscription]] Templates are never auto-created (BR-006). |
 | Template marked as Default | Vendor sets Is Default = true | Vendor | Any existing Default Template of the same type is automatically demoted (Is Default set to false). |
-| Template deleted | Vendor deletes Template | Vendor | Any Order, Agreement, Asset, or Subscription currently referencing this Template will fail to render it. No cascade deletion. |
+| Template deleted | Vendor deletes Template | Vendor | Any [[Order]], [[Agreement]], [[Asset]], or [[Subscription]] currently referencing this Template will fail to render it. No cascade deletion. |
 
 ### 7.2 Cross-Object State Effects
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Order reaches Completed state | Agreement | The OrderCompleted Template applied to the Order is referenced by ID on the resulting Active Agreement | Yes | Always — occurs on every Order completion | The Agreement holds a reference, not a copy. Updates to the Template under the Product definition propagate to the Agreement. |
-| Order changes state with no Template specified | Order | Default Template for the target state is applied by reference | Yes | Order Template types only. Asset and Subscription Templates are never applied automatically — always an explicit Vendor action. | — |
+| [[Order]] reaches Completed state | Agreement | The OrderCompleted Template applied to the Order is referenced by ID on the resulting Active [[Agreement]] | Yes | Always — occurs on every Order completion | The [[Agreement]] holds a reference, not a copy. Updates to the Template under the [[Product]] definition propagate to the Agreement. |
+| Order changes state with no Template specified | Order | Default Template for the target state is applied by reference | Yes | [[Order]] Template types only. [[Asset]] and [[Subscription]] Templates are never applied automatically — always an explicit Vendor action. | — |
 | Template content updated under Product definition | Order, Agreement, Asset, Subscription | All objects referencing this Template by ID will render the updated content | Yes | Any object currently referencing the Template | All four object types hold a reference by ID, not a deep copy. There is no snapshot of Template content at time of application. |
 
 ---
@@ -144,8 +144,8 @@ Template content history is captured via the Audit Trail. Templates are overwrit
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
-| Template deleted while applied to an active Order, Agreement, Asset, or Subscription | The dedicated render action for that object fails. The object's own record remains fully retrievable and otherwise unaffected. | Client (cannot see rendered content), Vendor (responsible for resolution) | Medium | Vendor should replace the Template reference on affected objects or recreate the Template. Non-Default Templates only — Default Templates cannot be deleted (BR-004). |
-| Parameter referenced in a substitution field is soft-deleted | Template renders correctly. Soft-deleted parameters are preserved and their values remain resolvable at render time. | None | Low | Parameters are soft-deleted only and remain resolvable after deletion, so substitution fields referencing them will not break. |
+| Template deleted while applied to an active [[Order]], [[Agreement]], [[Asset]], or [[Subscription]] | The dedicated render action for that object fails. The object's own record remains fully retrievable and otherwise unaffected. | Client (cannot see rendered content), Vendor (responsible for resolution) | Medium | Vendor should replace the Template reference on affected objects or recreate the Template. Non-Default Templates only — Default Templates cannot be deleted (BR-004). |
+| [[Parameter]] referenced in a substitution field is soft-deleted | Template renders correctly. Soft-deleted parameters are preserved and their values remain resolvable at render time. | None | Low | Parameters are soft-deleted only and remain resolvable after deletion, so substitution fields referencing them will not break. |
 | Vendor attempts to delete a Default Template | Action is blocked. Default Templates cannot be deleted. | Vendor | N/A | Vendor must first demote the Default by marking another Template of the same type as Default, then delete the former Default. |
 
 ---
