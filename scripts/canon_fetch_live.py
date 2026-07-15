@@ -95,6 +95,13 @@ def build_url(base_url, path, object_id, select=None):
     return url
 
 
+class FetchError(Exception):
+    """Raised for a single actor's failed fetch — caught per-actor in main()
+    so one actor's expected 404 (row-scoped visibility) doesn't abort the
+    rest of an --actor all run. Never suppresses the GET-only/safety checks
+    above, which run unconditionally before any network call."""
+
+
 def fetch_one(url, token):
     """Performs exactly one HTTP GET. Returns (status, parsed_json, raw_byte_length)."""
     req = urllib.request.Request(url, method="GET")
@@ -105,28 +112,31 @@ def fetch_one(url, token):
             raw = resp.read()
     except urllib.error.HTTPError as e:
         # Headers (incl. Authorization) are deliberately withheld from output.
-        print(f"Error: HTTP {e.code} {e.reason} fetching object.")
-        sys.exit(1)
+        raise FetchError(f"HTTP {e.code} {e.reason} fetching object.") from None
     except urllib.error.URLError as e:
-        print(f"Error: network failure reaching API host ({e.reason}).")
-        sys.exit(1)
+        raise FetchError(f"network failure reaching API host ({e.reason}).") from None
 
     try:
         body = json.loads(raw.decode("utf-8"))
     except json.JSONDecodeError:
-        print("Error: response body was not valid JSON.")
-        sys.exit(1)
+        raise FetchError("response body was not valid JSON.") from None
 
     return resp.status, body, len(raw)
 
 
 def fetch_for_actor(env, actor, url, out_dir):
+    """Returns True on success, False on a per-actor fetch failure (already printed)."""
     token = require_env(token_env_var(env, actor))
-    status, body, size = fetch_one(url, token)
+    try:
+        status, body, size = fetch_one(url, token)
+    except FetchError as e:
+        print(f"  {actor}: Error: {e}")
+        return False
     out_path = out_dir / "live" / env / f"{actor}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(body, indent=2), encoding="utf-8")
     print(f"  {actor}: HTTP {status}, {size} bytes -> {out_path}")
+    return True
 
 
 def parse_args(argv):
@@ -179,10 +189,27 @@ def main():
 
     print(f"Fetching {namespace}/{object_name} id={object_id} from {env} "
           f"for actor(s): {', '.join(actors_to_fetch)}")
-    for a in actors_to_fetch:
-        fetch_for_actor(env, a, url, out_dir)
+    results = {a: fetch_for_actor(env, a, url, out_dir) for a in actors_to_fetch}
 
-    print("Done.")
+    if actor != "all":
+        # A single explicit actor was requested — its failure is the whole
+        # invocation's failure, same as before this fix.
+        if not results[actor]:
+            sys.exit(1)
+        print("Done.")
+        return
+
+    # --actor all: a per-actor 404 is an expected, informative outcome for
+    # row-scoped objects (that's the point of fetching all three) — don't
+    # abort the run over it. Only fail if every actor failed.
+    if not any(results.values()):
+        print("Error: all actors failed — see per-actor errors above.")
+        sys.exit(1)
+    failed = [a for a, ok in results.items() if not ok]
+    if failed:
+        print(f"Done, with {len(failed)} actor(s) failing (see above): {', '.join(failed)}.")
+    else:
+        print("Done.")
 
 
 if __name__ == "__main__":
