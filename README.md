@@ -139,6 +139,8 @@ Parses the OpenAPI spec and extracts a structured checklist of all namespaces, o
 
 Used to generate or refresh the Full Object Inventory in the backlog when the spec changes.
 
+Path segments that aren't real objects (state-transition verbs like `publish`, other action verbs like `split`, non-object sub-resources like `icon`) are excluded via `config/canon_path_segment_exclusions.json` rather than a hardcoded list, scoped per-object since the same word can mean something different for a different object — the `canon-generate` Skill grows this file over time as it confirms new segments while generating each object's canon.
+
 ```
 # Print to stdout
 python scripts/extract_objects.py openapi.json

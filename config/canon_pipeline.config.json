@@ -1,23 +1,25 @@
 {
   "environments": {
     "staging": {
-      "baseUrl": null
+      "baseUrl": "https://api.s1.live",
+      "openapiUrl": "https://api.s1.live/public/v1/openapi.json"
     },
     "prod": {
-      "baseUrl": null,
+      "baseUrl": "https://api.platform.softwareone.com",
+      "openapiUrl": "https://api.platform.softwareone.com/public/v1/openapi.json",
       "writesAllowed": false
     }
   },
   "reposCacheDir": "~/.cache/mpt-canon-pipeline/repos",
   "azdo": {
-    "orgUrl": null
+    "orgUrl": "https://dev.azure.com/softwareone-pc"
   },
   "namespaceRepoMap": {
-    "catalog": null,
-    "commerce": null,
-    "billing": null,
-    "accounts": null,
-    "notifications": null,
-    "audit": null
+    "catalog": { "project": "MPT", "repos": ["swo-platform", "mpt-catalog"] },
+    "commerce": { "project": "MPT", "repos": ["swo-platform"] },
+    "billing": { "project": "MPT", "repos": ["swo-platform", "mpt-billing"] },
+    "accounts": { "project": "MPT", "repos": ["swo-platform"] },
+    "notifications": { "project": "MPT", "repos": ["swo-platform", "mpt-notifications"] },
+    "audit": { "project": "MPT", "repos": ["swo-platform", "mpt-audit"] }
   }
 }

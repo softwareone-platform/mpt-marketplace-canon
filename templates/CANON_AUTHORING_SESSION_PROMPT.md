@@ -53,6 +53,8 @@ Think carefully about the Delete column — for most objects the answer is No fo
 **Section 3 — State Machine**
 If the object has a state machine, draw it out before writing the table. Common mistakes: missing the T1 creation transition; modelling cascade deletions as transitions; treating "Deleted" as having outbound transitions; conflating soft-delete (object remains retrievable in some contexts) with permanent deletion (no longer retrievable via API). If the object has no state machine, say so explicitly and explain what controls its availability instead.
 
+Every transition's **Endpoint / Verb** column is mandatory and must name the literal API mechanism — the actual dedicated action segment (e.g. `publish`) confirmed against the OpenAPI spec or source code, or an explicit statement that the transition is a plain field/status write with no dedicated endpoint. A human-readable Action description ("Publish Product") is not a substitute for this — they answer different questions, and both are required. Never infer the literal name from another object by analogy; if it isn't confirmed, park it as an open question instead.
+
 **Section 4 — Business Rules**
 This is the heart of the document. Rules should be atomic — one constraint per rule. Number sequentially. Use sub-rules (BR-001a) for closely related constraints. The most important rules to get right are:
 - Ownership and scoping rules (who owns this, what does it belong to)
@@ -141,3 +143,4 @@ From there, I will ask clarifying questions and we will build each section toget
 |---------|------|--------|-------|
 | 1.0 | 2026-03-09 | Stu | Initial version |
 | 2.0 | 2026-03-09 | Stu | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |
+| 2.1 | 2026-07-15 | Stu | Section 3 guidance updated: the Transitions table's Endpoint / Verb column (template v0.3) is mandatory and must name the literal API mechanism, not just a human-readable Action description. |
