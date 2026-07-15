@@ -255,7 +255,7 @@ This document is the authoritative backlog and coverage tracker for platform can
 | subscribers | — | 🔴 Not Started | | |
 | templates | — | 🔴 Not Started | | |
 | variants | templates | 🔴 Not Started | | |
-| webhooks | — | 🟢 Complete | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | |
+| webhooks | — | 🟡 In Progress | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | Refresh draft generated 2026-07-15 via canon-generate — pending PM review. 0 open questions (WBH-001/002/004 resolved with PM, WBH-003 descoped), 2 spec discrepancies (SD-006, SD-007). Several corrections found vs. current canon (state mechanism, criteria structure, retry behaviour, firing semantics). See .evidence/notifications_webhook/20260715T054512Z/draft/. |
 
 ---
 
@@ -348,3 +348,5 @@ This document is the authoritative backlog and coverage tracker for platform can
 | 1.2 | 2026-03-16 | Stu | Authorization and Seller downgraded to In Progress — both have open questions. Open question IDs removed from backlog — maintained in CANON_OPEN_QUESTIONS.md only. |
 | 1.3 | 2026-03-16 | Stu | Object Backlog split into per-namespace sections with headings. Table of contents added. Namespace column removed from tables. |
 | 1.4 | 2026-03-25 | Stu | Account marked In Progress — initial canon session completed, 8 open questions logged (ACC-001 through ACC-008). |
+| 1.5 | 2026-07-15 | Stu / canon-generate | Webhook downgraded from Complete to In Progress — canon-generate refresh pilot found substantial corrections vs. current canon (state mechanism, criteria structure, retry behaviour, firing semantics). 4 open questions logged (WBH-001 through WBH-004), 1 spec discrepancy (SD-006). Draft pending PM review before promotion. |
+| 1.6 | 2026-07-15 | Stu / canon-generate | Webhook note updated — WBH-001/002/004 resolved directly with PM (never left open), WBH-003 descoped as an engineering detail, 0 open questions remain. SD-007 added (objectType enum lists two unreachable values). Still 🟡 pending PM review of the draft before promotion. |

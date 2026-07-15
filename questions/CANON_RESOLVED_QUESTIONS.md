@@ -119,6 +119,17 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 
 ---
 
+## CANON_OBJECT_Notifications_Webhook.md
+
+| # | Question | Resolution | Canon Reference |
+|---|----------|------------|-----------------|
+| WBH-001 | The public `objectType` enum includes `Account` and `Request` values, but no confirmed `type`→`objectType` mapping in source produces either. Is there an unconfirmed `type` value that maps to one of these, or are `Account`/`Request` reserved/vestigial in the public schema? | Confirmed by PM: the `Request` object has been deprecated and removed from the platform; `Account` was never a reachable value. Logged as spec discrepancy SD-007 (schema still lists both). | Webhook canon BR-003a, Section 5 |
+| WBH-002 | When a Webhook's referenced object (Product/Program) is deleted after the Webhook was created, does anything reactively invalidate, disable, or flag the Webhook — or does it silently go stale? | Confirmed by PM: Products and Programs cannot be hard-deleted — only Unpublished. The referenced-object-deleted scenario does not apply; the speculative stale-reference failure mode was removed from canon. | Webhook canon BR-004a, Section 6, Section 9 |
+| WBH-003 | Do `IDefaultWebhookHttpClient`/`IExtensionsWebhookHttpClient` implementations apply any additional resilience beyond the confirmed narrow parse-failure retry? | Descoped by PM — an internal engineering "how" detail, not a business rule for canon; BR-012's confirmed observable retry behaviour is sufficient. Not resolved with a factual answer, but explicitly out of scope rather than left open. | Webhook canon BR-012 |
+| WBH-004 | `secret`'s purpose (JWT signing key distinguishing vendor-owned vs platform-Extension-owned Webhooks) was inferred from code, not confirmed — is that framing correct? | Confirmed correct by PM. | Webhook canon BR-006a |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -130,3 +141,4 @@ Question IDs use the API identifier prefix of the object they concern. Exception
 | 0.5 | 2026-03-14 | Stu | ENV-003 added — icon upload endpoint confirmed as GET-only; upload via multipart/form-data on parent object. |
 | 0.6 | 2026-03-15 | Stu | SEL-001, SEL-003, SEL-006 added — resolved during Seller canon session and OpenAPI spec review. |
 | 0.7 | 2026-03-16 | Stu | PRP-003 added — Deleted is a soft delete confirmed from real API responses. |
+| 0.8 | 2026-07-15 | Stu / canon-generate | WBH-001, WBH-002, WBH-004 added — resolved directly with the PM during the same canon-generate session that raised them (never tracked in CANON_OPEN_QUESTIONS.md), per the updated ask-before-parking process. WBH-003 also recorded here as descoped (out of canon scope) rather than answered. |

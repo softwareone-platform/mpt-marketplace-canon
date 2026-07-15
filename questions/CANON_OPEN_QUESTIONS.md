@@ -118,6 +118,8 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.7 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 (added in 2.6, same session) resolved directly with the PM before ever being finalized as tracked open questions, per the updated canon-generate process — moved straight to CANON_RESOLVED_QUESTIONS.md (WBH-001, WBH-002, WBH-004) or descoped (WBH-003). Section removed from this file entirely — no open questions remain for Webhook. |
+| 2.6 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 added from Webhook canon refresh run (live schema + multi-Actor fetch + source-code research). Related spec discrepancy (`criteria` schema type) logged as SD-006 in CANON_SPEC_DISCREPANCIES.md instead, not tracked here. |
 | 0.1 | 2026-03-08 | Stu | Initial document. |
 | 0.2 | 2026-03-09 | Stu | Added ENV-001, ENV-002, PRI-001, ITM-001, AUT-001. |
 | 0.3 | 2026-03-09 | Stu | Added TPL-001, AUT-002, LST-001, LST-002, PRD-001, TCS-001, PAR-001, PAR-002, PAR-003. |
