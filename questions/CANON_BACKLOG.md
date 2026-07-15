@@ -124,7 +124,7 @@ This document is the authoritative backlog and coverage tracker for platform can
 | items | price-lists | 🟢 Complete | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | |
 | pricing-policies | — | 🟡 In Progress | [CANON_OBJECT_Catalog_PricingPolicy.md](../objects/CANON_OBJECT_Catalog_PricingPolicy.md) | |
 | attachments | pricing-policies | 🔴 Not Started | | |
-| products | — | 🟢 Complete | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | |
+| products | — | 🟡 In Progress | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | Refresh draft generated 2026-07-15 via canon-generate — pending PM review. 0 open questions. Major corrections found vs. current canon (deletion was wrongly documented as impossible; T5 actor scope; new T6 transition; endpoint verb corrections; settings actor restrictions; vendor field schema over-declares its shape vs. real behaviour). See .evidence/catalog_product/20260715T070201Z/draft/. |
 | documents | products | 🔴 Not Started | | |
 | item-groups | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_ItemGroup.md](../objects/CANON_OBJECT_Catalog_Product_ItemGroup.md) | |
 | items | products | 🟢 Complete | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | |
@@ -255,7 +255,7 @@ This document is the authoritative backlog and coverage tracker for platform can
 | subscribers | — | 🔴 Not Started | | |
 | templates | — | 🔴 Not Started | | |
 | variants | templates | 🔴 Not Started | | |
-| webhooks | — | 🟡 In Progress | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | Refresh draft generated 2026-07-15 via canon-generate — pending PM review. 0 open questions (WBH-001/002/004 resolved with PM, WBH-003 descoped), 2 spec discrepancies (SD-006, SD-007). Several corrections found vs. current canon (state mechanism, criteria structure, retry behaviour, firing semantics). See .evidence/notifications_webhook/20260715T054512Z/draft/. |
+| webhooks | — | 🟡 In Progress | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | Merged 2026-07-15 (PR #7); further corrected same day following the Product canon refresh (BR-004a, Section 9) and resolved via source-code research (WBH-002: Product deletion has no reactive effect on a referencing Webhook). WBH-001/004 resolved with PM, WBH-003 descoped. 0 open questions remain. Several corrections found vs. prior canon (state mechanism, criteria structure, retry behaviour, firing semantics). |
 
 ---
 
@@ -350,3 +350,4 @@ This document is the authoritative backlog and coverage tracker for platform can
 | 1.4 | 2026-03-25 | Stu | Account marked In Progress — initial canon session completed, 8 open questions logged (ACC-001 through ACC-008). |
 | 1.5 | 2026-07-15 | Stu / canon-generate | Webhook downgraded from Complete to In Progress — canon-generate refresh pilot found substantial corrections vs. current canon (state mechanism, criteria structure, retry behaviour, firing semantics). 4 open questions logged (WBH-001 through WBH-004), 1 spec discrepancy (SD-006). Draft pending PM review before promotion. |
 | 1.6 | 2026-07-15 | Stu / canon-generate | Webhook note updated — WBH-001/002/004 resolved directly with PM (never left open), WBH-003 descoped as an engineering detail, 0 open questions remain. SD-007 added (objectType enum lists two unreachable values). Still 🟡 pending PM review of the draft before promotion. |
+| 1.7 | 2026-07-15 | Stu / canon-generate | Product downgraded from Complete to In Progress — canon-generate refresh found major corrections vs. current canon, most significantly that deletion was wrongly documented as impossible in any state (it's possible, and cascades, while a Product is in Draft) — also added as a known exception to preamble Invariant 6. Draft pending PM review before promotion. |

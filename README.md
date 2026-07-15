@@ -27,7 +27,6 @@ mpt-marketplace-canon/
     ...                               # System behaviour not tied to a specific object
   questions/
     CANON_OPEN_QUESTIONS.md           # Known unknowns awaiting resolution
-    CANON_RESOLVED_QUESTIONS.md       # Closed questions with confirmed answers
   templates/
     CANON_OBJECT_TEMPLATE.md          # Standard template for object canon documents
     CANON_AUTHORING_SESSION.md        # LLM session prompt for canon authoring

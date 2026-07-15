@@ -1,6 +1,6 @@
 # Object Canon: [Object Name]
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** [PM Name]
 > **Last Updated:** 2026-07-15
 > **Status:** Draft
@@ -199,7 +199,7 @@
 > List known unknowns that are blocking or limiting the completeness of this canon.
 > Use the object's ID prefix as the question ID prefix (e.g. PAR-001 for Parameter questions, ENV-001 for platform/environment questions).
 > Track all open questions in CANON_OPEN_QUESTIONS.md.
-> When resolved, remove from CANON_OPEN_QUESTIONS.md, add to CANON_RESOLVED_QUESTIONS.md, and update the relevant section of this canon with the answer.
+> When resolved, remove from CANON_OPEN_QUESTIONS.md and update the relevant section of this canon by stating the confirmed fact plainly — no separate resolved-questions tracker, and no inline "confirmed by/on" provenance needed in the section itself (a changelog row is enough of a record).
 
 - [ ] [PRE-001]: [Question statement.]
 
@@ -214,3 +214,4 @@
 | 0.1 | [YYYY-MM-DD] | [Author] | Initial draft |
 | 0.2 | 2026-03-09 | Stu | Platform Invariants block replaced with reference to PLATFORM_CANON_PREAMBLE.md. ID Prefix field added to Section 1 with guidance note. Section 10 open questions guidance updated — question ID convention (object prefix), tracker workflow (CANON_OPEN_QUESTIONS.md → CANON_RESOLVED_QUESTIONS.md). No Example JSON section — JSON examples are not included in canon documents. |
 | 0.3 | 2026-07-15 | Stu | Section 3.2 Transitions table: added mandatory "Endpoint / Verb" column for the literal API mechanism of each transition (e.g. `publish`, or an explicit note that it's a plain field/status write) — the existing "Action" column is a human description only and was found to be insufficient on its own for confirming real API behaviour without cross-referencing the live spec. |
+| 0.4 | 2026-07-15 | Stu | Section 10 guidance updated — `CANON_RESOLVED_QUESTIONS.md` tracker removed entirely; a resolved question is now incorporated directly into the relevant canon section with an inline citation, not moved to a separate file. |
