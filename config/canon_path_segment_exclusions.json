@@ -8,9 +8,10 @@
   },
   "accounts.accounts": {
     "state_transition_verbs": {
-      "activate": "CANON_OBJECT_Accounts_Account.md §3.2 T2 \"ERP Activate Account\"",
-      "disable": "CANON_OBJECT_Accounts_Account.md §3.2 T3a/T3b \"ERP Disable Account\"",
-      "enable": "CANON_OBJECT_Accounts_Account.md §3.2 T4a/T4b \"ERP Re-enable Account\""
+      "activate": "CANON_OBJECT_Accounts_Account.md §3.2 T2 \"Activate Account\", via /activate endpoint, Client Accounts only",
+      "disable": "CANON_OBJECT_Accounts_Account.md §3.2 T3a/T3b \"Disable Account\", via /disable endpoint",
+      "enable": "CANON_OBJECT_Accounts_Account.md §3.2 T4a/T4b \"Enable Account\", via /enable endpoint",
+      "deactivate": "CANON_OBJECT_Accounts_Account.md §3.2 T5 \"Deactivate Account\", via /deactivate endpoint, Client Accounts only — previously undocumented, confirmed via source-code research during the Account canon refresh"
     },
     "action_verbs": {},
     "non_object_resources": {}

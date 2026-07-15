@@ -1,6 +1,6 @@
 # Canon Open Questions
 
-> **Version:** 3.2
+> **Version:** 3.3
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
 
@@ -73,18 +73,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
-## CANON_OBJECT_Accounts_Account.md
-
-| # | Question |
-|---|----------|
-| ACC-003 | The downstream effects of setting an Account to `Disabled` are not confirmed. Specifically: whether associated Users are locked out from logging in, whether associated API Tokens are invalidated, and whether active transactions are affected. Requires confirmation. |
-| ACC-004 | Whether the platform technically prevents creation of a second Operations Account or a second Account for the same Vendor entity is not confirmed. In PROD these are observed as 1:1 constraints but may be operational discipline rather than platform enforcement. |
-| ACC-006 | Whether `externalIds.pyraTenantId` is immutable after creation is not confirmed. Whether the platform enforces uniqueness of `pyraTenantId` across Accounts is also not confirmed. |
-| ACC-007 | The purpose and ownership of the `externalName` field is not confirmed. It is present in the spec on `AccountCreate` and `AccountUpdate` but was not observed in the production JSON samples. Whether it applies to all Account types or specific types is not confirmed. |
-| ACC-008 | The relationship between a Client Account and Buyers is not fully confirmed. Whether Buyers are directly associated with the Account, or only via ErpLinks, requires engineering input. |
-
----
-
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -121,3 +109,4 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 3.0 | 2026-07-15 | Stu / canon-generate-batch | SEL-002, SEL-004, SEL-005, SEL-007, SEL-008, SEL-009, SEL-010 resolved and removed — Seller heading removed entirely (no open questions remain). AST-001 replaced by AST-002 (audit draft/active sub-keys never populated) — AST-003 was resolved directly via a live re-check and never tracked here. ENV-005 added — Seller's related-Licensee status-change guard, PROD-parity unconfirmed. All from a canon-generate-batch dry run refreshing Accounts: Seller and Commerce: Asset concurrently. |
 | 3.1 | 2026-07-15 | Stu / canon-generate-batch | AST-002 resolved and removed — confirmed as a deliberate simplification, not an unimplemented feature. Asset heading removed entirely (no open questions remain). |
 | 3.2 | 2026-07-15 | Stu / canon-generate | AUT-001 resolved and removed — exhaustive search across swo-platform, mpt-catalog, and mpt-billing found eligibility.client/eligibility.partner are never read by any downstream platform logic; confirmed as a contractual record only. Authorization heading removed entirely (no open questions remain). |
+| 3.3 | 2026-07-15 | Stu / canon-generate | ACC-003, ACC-004, ACC-006, ACC-007, ACC-008 resolved and removed — Account heading removed entirely (no open questions remain). Resolved via live OpenAPI schema, live-fetched real objects (all three Account types, all Actors), and source-code research (swo-platform). |
