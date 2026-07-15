@@ -102,4 +102,6 @@ Still promotes nothing into `objects/` — every draft stays under `.evidence/..
 
 Summarize the whole batch: what was generated per object (new vs. refresh), where each draft lives, what changed in bookkeeping, any direct corrections made to other already-canonised objects, any new-object candidates surfaced, and every object dropped along the way (Step A dedup, Step B missing ID/token, Step C namespace sync failure, Step D agent failure) with the specific reason for each.
 
+**Call out co-promoted sibling cross-links explicitly.** A batch is the prime case for the co-promotion wikilink trap (see `canon-generate`'s "Wikilinking other objects"): when two batched objects reference each other (e.g. Buyer ↔ ErpLink), each was drafted before the other was in `objects/`, so each left the other in plain text rather than as a broken `[[Sibling]]` mention. List those pending cross-links in the summary so they aren't lost — they get bracketed in every direction at promotion, which `canon-submit-pr`'s Step 4 now handles.
+
 Tell the human to review everything, then run `/canon-submit-pr <namespace> <object>` per object or bundled, exactly as with single-object `canon-generate` output — `canon-submit-pr` already handles multi-object bundling (its own "Scoping a PR" guidance) and needs no changes to consume a batch's output.
