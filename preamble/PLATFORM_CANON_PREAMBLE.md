@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.7
+> **Version:** 1.8
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -202,6 +202,8 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | API Token | Accounts | TKN |
 | Account | Accounts | ACC |
 | Seller | Accounts | SEL |
+| Buyer | Accounts | BUY |
+| ErpLink | Accounts | ERP |
 | Order | Commerce | ORD |
 | Order Line | Commerce | ALI |
 | Agreement | Commerce | AGR |
@@ -376,3 +378,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |
 | 1.6 | 2026-07-15 | Stu / canon-generate | Invariant 6 known exception added: deleting a Catalog: Product in Draft state cascades to its child objects (Items, Item Groups, Parameters, Parameter Groups, Templates, Terms/Variants, Media, Price Lists/Items), Authorizations, and Listings, plus Documents/Media/Icon — confirmed via source-code research during the Product canon refresh. Previously undocumented; existing Product canon incorrectly stated deletion was impossible in any state. |
 | 1.7 | 2026-07-15 | Stu / canon-generate-batch | Section 7.3 updated: ENV-005 added and cross-referenced alongside ENV-001/ENV-002 — whether Accounts: Seller's related-Licensee status-change guard is enforced identically in PROD is unconfirmed (only STAGING was exercised). Invariant 7 known exceptions updated to add Accounts: Seller's soft-delete model, alongside Pricing Policy and Order. Section 9.4 updated with a confirmed Seller-specific icon-removal mechanism (narrows, doesn't resolve, ENV-004). Surfaced during a canon-generate-batch dry run refreshing Seller and Commerce: Asset concurrently. |
+| 1.8 | 2026-07-15 | Stu / canon-generate | Section 5.3 ID Prefixes: BUY (Buyer) and ERP (ErpLink) added, confirmed from live object IDs. Added while canonising Accounts: Buyer and Accounts: ErpLink together. |
