@@ -1,6 +1,6 @@
 # Canon Backlog
 
-> **Version:** 2.7
+> **Version:** 2.8
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -52,7 +52,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 |--------|--------|--------|--------------|------------|-------|
 | account-users | — | 🔴 Not Started | | | |
 | groups | account-users | 🔴 Not Started | | | |
-| accounts | — | 🟡 Known Pending Issues | 2026-04-05 | [CANON_OBJECT_Accounts_Account.md](../objects/CANON_OBJECT_Accounts_Account.md) | 5 open questions. |
+| accounts | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Account.md](../objects/CANON_OBJECT_Accounts_Account.md) | — |
 | users | accounts | 🔴 Not Started | | | |
 | groups | users | 🔴 Not Started | | | |
 | api-tokens | — | 🔴 Not Started | | | |
@@ -338,3 +338,4 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | 2.5 | 2026-07-15 | Stu / canon-submit-pr | Parameter Group marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. |
 | 2.6 | 2026-07-15 | Stu / canon-generate-batch | Sellers and Assets refresh drafts generated concurrently via canon-generate-batch's first dry run. Both marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint. Sellers: 0 open questions remaining (down from 7). Assets: AST-002 confirmed as a deliberate simplification, not a gap — 0 open questions remaining. |
 | 2.7 | 2026-07-15 | Stu / canon-submit-pr | Authorization marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. First object promoted in the Catalog completion push. 0 open questions remaining (down from 1, AUT-001 resolved). |
+| 2.8 | 2026-07-15 | Stu / canon-submit-pr | Account marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. All 5 prior open questions resolved (ACC-003, ACC-004, ACC-006, ACC-007, ACC-008). |
