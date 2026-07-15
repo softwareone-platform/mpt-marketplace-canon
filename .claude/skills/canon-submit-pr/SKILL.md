@@ -7,10 +7,15 @@ description: Promote a reviewed canon-generate draft into objects/ and open a PR
 
 The explicit, human-triggered promotion step referred to by `canon-generate`'s Step 8. `canon-generate` never writes into `objects/` and never opens a PR — this Skill is what actually does that, only after the PM has reviewed the draft. Branch creation, commits, pushes, and PR creation are shared-state and hard-to-reverse actions — **always confirm with the human before each of push and PR creation**, even if they invoked this Skill directly; do not treat the invocation itself as blanket approval for every step.
 
-## Core rules — do not relax without the human explicitly overriding
+## Core rule — do not relax without the human explicitly overriding
 
-1. **One PR = one platform object.** A PR touches exactly one object's canon file in `objects/` (plus only that object's rows in the `questions/*.md` trackers and any entries this run's own paths surfaced in `config/canon_path_segment_exclusions.json`). If evidence gathered during canon-generate revealed a dependency requiring changes to a *different* object's canon, that is out of scope for this PR — it needs its own `canon-generate` run and its own `canon-submit-pr` run, resulting in a separate PR. Never bundle two objects' changes into one commit or one PR, even if they were discovered in the same session.
-2. **One commit per PR.** A PR is always exactly one commit. If this Skill is invoked again for the same object/branch (e.g. the draft was revised after review, or bookkeeping changed), **amend** the existing commit — never add a second commit. Push the amended commit with `git push --force-with-lease` (not a bare `--force`, so a push is rejected rather than silently clobbering someone else's work if the remote branch moved unexpectedly).
+**One commit per PR.** A PR is always exactly one commit. If this Skill is invoked again for the same branch (e.g. a draft was revised after review, bookkeeping changed, or another related object's changes are being added to the same PR), **amend** the existing commit — never add a second commit. Push the amended commit with `git push --force-with-lease` (not a bare `--force`, so a push is rejected rather than silently clobbering someone else's work if the remote branch moved unexpectedly).
+
+## Scoping a PR — multi-object bundling is expected, not a special case
+
+Platform objects routinely reference and depend on one another, so a PR is **not** restricted to one object's canon file. Bundle related canon changes into the same PR whenever they belong together — e.g. a cross-object dependency surfaced while researching one object (a correction to `Notifications: Webhook` discovered while refreshing `Catalog: Product`), or several objects reviewed together in one session. Splitting purely to keep a PR "single-object" is no longer required and should not be done reflexively.
+
+That said, still use judgment and still confirm with the human (Step 2) rather than silently stacking everything in the working tree — two objects' changes that are genuinely unrelated (touched in the same session by coincidence, not because one depends on the other) are still cleaner as separate PRs. When unsure, ask.
 
 ## Invocation
 
@@ -29,27 +34,27 @@ The explicit, human-triggered promotion step referred to by `canon-generate`'s S
 ## Step 2 — Show the human what will change
 
 1. If `objects/<target filename>` already exists, diff it against the draft and show the human a summary of what's changing section by section (this mirrors the refresh-diff `canon-generate` produces, but is the actual promotion this time).
-2. Run `git status --porcelain`. The working tree will typically already carry uncommitted edits to `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, `CANON_BACKLOG.md`, and possibly `config/canon_path_segment_exclusions.json` — these are `canon-generate`'s bookkeeping edits from the same run, meant to be committed together with the promoted draft. Show the human this diff too.
-3. **Check the bookkeeping diff is scoped to this one object only.** Inspect the rows/IDs actually being added or changed in each `questions/*.md` file — they should all carry this object's ID prefix (or reference this object). Any new entries in `config/canon_path_segment_exclusions.json` should be segments that plausibly came from this object's own paths (Step 1 of `canon-generate`). If you find edits belonging to a *different* object's prefix mixed in (a sign of the cross-object dependency case in Core Rule 1), stop: tell the human this must be split into a separate `canon-generate` + `canon-submit-pr` run/PR for that other object, and do not include those rows in this commit.
-4. **If `git status` shows anything else** — changes unrelated to this object's canon/questions files, or pre-existing work you don't recognize — stop and ask the human how to proceed. Do not assume it's safe to bundle unrelated changes into this PR, and do not stash or discard anything without being told to.
-5. Ask the human to confirm they're happy with the draft content and the (single-object) bookkeeping diff before continuing. Do not proceed to Step 3 without an explicit go-ahead.
+2. Run `git status --porcelain`. The working tree will typically already carry uncommitted edits to `questions/CANON_OPEN_QUESTIONS.md`, `CANON_BACKLOG.md`, and possibly `config/canon_path_segment_exclusions.json` — these are `canon-generate`'s bookkeeping edits from the same run, meant to be committed together with the promoted draft. Show the human this diff too.
+3. **Identify everything the diff touches, object by object.** Inspect the rows/IDs actually being added or changed in each `questions/*.md` file and note which object(s) each belongs to. If other objects' canon files or rows are also sitting in the working tree (from an earlier `canon-generate`/hand-edit this session), surface them explicitly rather than silently folding them in or silently excluding them — see "Scoping a PR" above. Confirm with the human which of it belongs in this PR.
+4. **If `git status` shows anything you don't recognize** (not attributable to any canon-generate run or a change the human has already told you about) — stop and ask the human how to proceed. Do not assume it's safe to bundle unrecognized changes into this PR, and do not stash or discard anything without being told to.
+5. Ask the human to confirm they're happy with the draft content and the full bookkeeping diff (whatever objects it now spans) before continuing. Do not proceed to Step 3 without an explicit go-ahead.
 
 ## Step 3 — Branch
 
 1. `git fetch origin`. If local `main` is behind `origin/main`, tell the human and ask how they want to reconcile it (pull first, or proceed anyway) rather than silently rebasing or merging.
 2. Check whether `canon/<namespace>-<object>` already exists (locally or on the remote):
    - **If it exists and this is a re-run for the same object** (revised draft, updated bookkeeping) — check it out; you'll amend its single commit in Step 5, not add a new one.
-   - **If it doesn't exist** — create it fresh from an up-to-date `main`: `git checkout -b canon/<namespace>-<object>`.
-   - Never invent a differently-named branch for the same object to work around a naming collision — a second branch for the same object is exactly the "more than one commit/PR" problem Core Rule 2 exists to prevent. If the existing branch turns out to belong to unrelated/stale work, stop and ask the human how to proceed rather than silently branching around it.
+   - **If it doesn't exist** — ask the human whether this object's changes belong on a fresh branch, or should be bundled onto an existing open canon PR branch for a related object (per "Scoping a PR" above). If bundling onto an existing branch, check that branch out instead of creating a new one. Otherwise create fresh from an up-to-date `main`: `git checkout -b canon/<namespace>-<object>` (or a name describing the bundled scope, e.g. `canon/<namespace>-<object>-and-<other-object>`, if the human prefers).
+   - Never invent a differently-named branch to work around a naming collision without the human's input — if an existing branch turns out to belong to unrelated/stale work, stop and ask how to proceed rather than silently branching around it.
 
 ## Step 4 — Promote the draft
 
 1. Copy the draft's content into `objects/<target filename>` (new file, or overwrite if this was a refresh — the diff was already shown and confirmed in Step 2).
-2. Do not modify `questions/*.md` further here — their bookkeeping edits already sitting in the working tree (from `canon-generate`) are committed as-is, scoped to this one object per Step 2.3.
+2. Do not modify `questions/*.md` further here — their bookkeeping edits already sitting in the working tree (from `canon-generate`) are committed as-is, per what was confirmed in scope in Step 2.3.
 
 ## Step 5 — Commit (exactly one)
 
-Stage exactly: the promoted `objects/<target filename>`, and any of `questions/CANON_OPEN_QUESTIONS.md`, `CANON_RESOLVED_QUESTIONS.md`, `CANON_SPEC_DISCREPANCIES.md`, `CANON_BACKLOG.md`, `config/canon_path_segment_exclusions.json` that show pending changes **for this object only**. Do not use `git add -A`.
+Stage the promoted `objects/<target filename>`, and whichever of `questions/CANON_OPEN_QUESTIONS.md`, `CANON_BACKLOG.md`, `config/canon_path_segment_exclusions.json` show pending changes that were confirmed in scope for this PR in Step 2 — this may now include rows/edits for more than one object when bundling was confirmed. Stage explicitly named files; do not use `git add -A`.
 
 - **First promotion for this object/branch:** `git commit` with a fresh commit.
 - **Re-run on an existing branch (Step 3 reused it):** `git commit --amend` — the branch must never accumulate a second commit.
@@ -57,6 +62,7 @@ Stage exactly: the promoted `objects/<target filename>`, and any of `questions/C
 Commit message, matching this repo's existing convention (see `git log`, e.g. "Added Order canon", "Add Subscription canon"):
 - New object: `Add <Namespace>: <Object> canon`
 - Refresh: `Update <Namespace>: <Object> canon`
+- Bundled scope spanning more than one object: name all of them, e.g. `Update Catalog: Product and Notifications: Webhook canon`, or summarize if the list is long (the PR body carries the full breakdown either way).
 
 ## Step 6 — Push and open the PR (confirm before each)
 
@@ -64,15 +70,15 @@ Commit message, matching this repo's existing convention (see `git log`, e.g. "A
    - First push for this branch: `git push -u origin canon/<namespace>-<object>`.
    - Push after an amend: `git push --force-with-lease -u origin canon/<namespace>-<object>` — never a bare `--force`.
 2. **Confirm with the human before opening the PR.** Check first whether a PR already exists for this branch (`gh pr view canon/<namespace>-<object>`) — if so, the amended push already updated it; don't create a duplicate. Otherwise create it with `gh pr create`, title matching the commit message, and a body that:
-   - States the object canonised and whether this is new or a refresh.
-   - Lists the evidence sources actually used (OpenAPI spec, which environments/Actors were live-fetched, whether repo research ran).
-   - Lists open questions added and/or resolved in this run (IDs).
+   - States each object canonised and whether it's new or a refresh.
+   - Lists the evidence sources actually used (OpenAPI spec, which environments/Actors were live-fetched, whether repo research ran) — per object if they differ.
+   - Lists open questions added and/or resolved in this run (IDs), and if the PR spans multiple objects because one's evidence corrected another (e.g. a dependency finding), say so explicitly so reviewers understand why they're bundled.
    - States explicitly: *"Generated via `/canon-generate` — requires PM review before merge (per README: canon that has not been reviewed by a domain expert is not canon)."*
 3. Report the PR URL back to the human.
 
 ## What this Skill never does
 
-- Never combines changes for more than one platform object into a single commit or PR (Core Rule 1) — cross-object dependencies become separate runs/PRs, never a bundled one.
-- Never lets a PR branch accumulate more than one commit (Core Rule 2) — always amends, never appends.
+- Never lets a PR branch accumulate more than one commit (Core Rule) — always amends, never appends.
+- Never bundles unrelated or unconfirmed changes into a PR without the human explicitly confirming scope (Step 2).
 - Never marks `questions/CANON_BACKLOG.md` status as 🟢 Complete — that remains a human call after merge and review, not something either canon Skill decides.
 - Never bare-force-pushes (`--force-with-lease` only), never merges its own PR, never bypasses the confirmation checkpoints in Steps 2 and 6 even on a repeat invocation.

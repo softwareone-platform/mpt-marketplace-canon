@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 2.0
-> **Last Updated:** 2026-04-05
+> **Version:** 2.9
+> **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -10,7 +10,7 @@
 
 This document tracks unresolved questions deferred during canon development. Questions are grouped by the canon file they belong to.
 
-When a question is resolved, it is removed from this file and moved to CANON_RESOLVED_QUESTIONS.md. The relevant canon file is updated at the same time.
+When a question is resolved, it is removed from this file and the answer is stated as a plain fact directly in the relevant canon section — there is no separate resolved-questions tracker, and no need for inline "confirmed by/on" provenance in canon content itself (a changelog row is enough of a record).
 
 Question IDs use the API identifier prefix of the object they concern (e.g. PAR-001 for a Parameter question). Exception: ENV-NNN for platform/environment questions that span multiple objects.
 
@@ -118,6 +118,8 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.9 | 2026-07-15 | Stu / canon-generate | WBH-002 resolved via direct source-code research and removed — Product deletion has no reactive effect on a Webhook referencing it; see Webhook canon BR-004a and Section 9. |
+| 2.8 | 2026-07-15 | Stu / canon-generate | WBH-002 reopened: its 2.7 closure assumed Products could never be deleted at all, which the `Catalog: Product` canon refresh (same date) disproved — Draft-state deletion is possible and cascades. The real question (what happens to a Webhook whose anchor Product is deleted while in Draft) was never actually answered, only mooted on a false premise. |
 | 2.7 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 (added in 2.6, same session) resolved directly with the PM before ever being finalized as tracked open questions, per the updated canon-generate process — moved straight to CANON_RESOLVED_QUESTIONS.md (WBH-001, WBH-002, WBH-004) or descoped (WBH-003). Section removed from this file entirely — no open questions remain for Webhook. |
 | 2.6 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 added from Webhook canon refresh run (live schema + multi-Actor fetch + source-code research). Related spec discrepancy (`criteria` schema type) logged as SD-006 in CANON_SPEC_DISCREPANCIES.md instead, not tracked here. |
 | 0.1 | 2026-03-08 | Stu | Initial document. |

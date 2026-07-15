@@ -1,8 +1,8 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.5
+> **Version:** 1.6
 > **Owner:** Stu
-> **Last Updated:** 2026-04-12
+> **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -25,6 +25,8 @@ These invariants apply universally across all objects, actors, and namespaces. T
 4. **There is one API surface.** The platform API is public and unified. The UI exposes a subset. A human user can execute any action the system can, subject to their Actor permissions.
 5. **Multi-actor workflows are modelled as sequential transitions.** Each transition is executed by one Actor at a time. A transition may be permitted to more than one Actor type, but each execution instance has exactly one Actor.
 6. **The platform never cascades deletions.** Deleting an object never automatically deletes any other object as a side effect. Each object must be deleted independently. Deletion guards exist to prevent removal of objects that have dependents — see Section 3.5.
+
+   **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
    **Known exceptions:** Catalog: Pricing Policy and Commerce: Order use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
@@ -372,3 +374,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
 | 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |
 | 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |
+| 1.6 | 2026-07-15 | Stu / canon-generate | Invariant 6 known exception added: deleting a Catalog: Product in Draft state cascades to its child objects (Items, Item Groups, Parameters, Parameter Groups, Templates, Terms/Variants, Media, Price Lists/Items), Authorizations, and Listings, plus Documents/Media/Icon — confirmed via source-code research during the Product canon refresh. Previously undocumented; existing Product canon incorrectly stated deletion was impossible in any state. |

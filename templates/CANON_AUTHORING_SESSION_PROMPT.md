@@ -81,7 +81,7 @@ Use the exact language patterns in the template for deletion. "Hard delete" must
 Focus on failure modes that the platform *permits* but that cause harm — not validation errors the platform prevents. Think about: broken references after related object deletion, misconfiguration the platform allows, state combinations that produce unexpected behaviour, timing issues in multi-object workflows. Every failure mode should name the impacted Actor and a risk level.
 
 **Section 10 — Open Questions**
-Be honest about what you don't know. A canon document with open questions is better than one with confidently wrong answers. Use the ID format `PREFIX-NNN` where PREFIX matches the object's API identifier prefix (e.g. PAR-001 for a Parameter question). Use ENV-NNN for platform or environment-level questions. Track all open questions in CANON_OPEN_QUESTIONS.md. When resolved, move to CANON_RESOLVED_QUESTIONS.md and update the relevant section of the canon.
+Be honest about what you don't know. A canon document with open questions is better than one with confidently wrong answers. Use the ID format `PREFIX-NNN` where PREFIX matches the object's API identifier prefix (e.g. PAR-001 for a Parameter question). Use ENV-NNN for platform or environment-level questions. Track all open questions in CANON_OPEN_QUESTIONS.md. When resolved, remove it from that file and state the confirmed fact plainly in the relevant section of the canon — no separate resolved-questions tracker, and no inline "confirmed by/on" provenance needed in canon content itself (a changelog row is enough of a record).
 
 ---
 
@@ -119,7 +119,7 @@ When we encounter something neither of us knows with confidence:
 1. Park it explicitly — write a placeholder in Section 10 with an ID
 2. Note it in the relevant section with a cross-reference to Section 10
 3. Do not invent an answer or assume based on analogy to other objects
-4. The canon author will resolve open questions with engineering or product input after the session, then update CANON_OPEN_QUESTIONS.md and CANON_RESOLVED_QUESTIONS.md accordingly
+4. The canon author will resolve open questions with engineering or product input after the session, then remove them from CANON_OPEN_QUESTIONS.md and state the confirmed facts plainly in the canon itself
 
 ---
 
