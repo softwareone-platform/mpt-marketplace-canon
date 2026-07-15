@@ -76,11 +76,15 @@ test('apply leaves a refused patch in place', () => {
 
 // ── dry-run ────────────────────────────────────────────────────────
 
+// known-clean payload: objects/ is the source of truth and already
+// validates standalone, so a patch that just re-writes a file with its
+// own current content is guaranteed to pass validation.
+const CLEAN_REL = 'objects/CANON_OBJECT_Notifications_Webhook.md';
+const cleanContent = () => readFileSync(join(repoRoot, CLEAN_REL), 'utf8');
+
 test('apply --dry-run reports without writing', () => {
   withPatch('zz-test-dry', dir => {
-    // copy a known-clean file from align-format so validation passes
-    const src = join(repoRoot, '.patches', 'align-format', 'objects', 'CANON_OBJECT_Notifications_Webhook.md');
-    writePatchFile(dir, 'objects/CANON_OBJECT_Notifications_Webhook.md', readFileSync(src, 'utf8'));
+    writePatchFile(dir, CLEAN_REL, cleanContent());
   }, () => {
     const r = run('zz-test-dry', '--dry-run');
     assert.equal(r.status, 0);
@@ -89,8 +93,7 @@ test('apply --dry-run reports without writing', () => {
 
 test('apply --dry-run keeps the patch dir intact', () => {
   withPatch('zz-test-dry-keeps', dir => {
-    const src = join(repoRoot, '.patches', 'align-format', 'objects', 'CANON_OBJECT_Notifications_Webhook.md');
-    writePatchFile(dir, 'objects/CANON_OBJECT_Notifications_Webhook.md', readFileSync(src, 'utf8'));
+    writePatchFile(dir, CLEAN_REL, cleanContent());
   }, () => {
     run('zz-test-dry-keeps', '--dry-run');
     assert.ok(existsSync(join(repoRoot, '.patches', 'zz-test-dry-keeps', 'objects')));
@@ -99,8 +102,7 @@ test('apply --dry-run keeps the patch dir intact', () => {
 
 test('apply --dry-run lists every patch file in stdout', () => {
   withPatch('zz-test-dry-list', dir => {
-    const src = join(repoRoot, '.patches', 'align-format', 'objects', 'CANON_OBJECT_Notifications_Webhook.md');
-    writePatchFile(dir, 'objects/CANON_OBJECT_Notifications_Webhook.md', readFileSync(src, 'utf8'));
+    writePatchFile(dir, CLEAN_REL, cleanContent());
   }, () => {
     const r = run('zz-test-dry-list', '--dry-run');
     assert.match(r.stdout, /CANON_OBJECT_Notifications_Webhook\.md/);
@@ -123,22 +125,17 @@ test('apply ignores patch payload outside known base dirs', () => {
 
 // ── full apply (real write) ────────────────────────────────────────
 //
-// uses a patch that just rewrites objects/CANON_OBJECT_Notifications_
-// Webhook.md to its current content — applying is a no-op on disk
-// but exercises the write path. Snapshots the original first and
-// restores at teardown so the live tree is preserved.
+// Uses a patch that rewrites objects/CANON_OBJECT_Notifications_
+// Webhook.md with its own current content — applying is a no-op on
+// disk but exercises the write path. Snapshots the original first
+// and restores at teardown so the live tree is preserved.
 
 test('apply writes patch files into the tree and removes the patch dir', () => {
-  // patch payload comes from align-format (already known-clean);
-  // applying it overwrites objects/<file> with that content. Snapshot
-  // the original first and restore at the end so live tree is intact.
-  const targetRel = 'objects/CANON_OBJECT_Notifications_Webhook.md';
-  const target = join(repoRoot, targetRel);
-  const aligned = readFileSync(join(repoRoot, '.patches', 'align-format', targetRel), 'utf8');
+  const target = join(repoRoot, CLEAN_REL);
   const snapshot = readFileSync(target);
   try {
     withPatch('zz-test-write', dir => {
-      writePatchFile(dir, targetRel, aligned);
+      writePatchFile(dir, CLEAN_REL, snapshot);
     }, () => {
       const r = run('zz-test-write');
       assert.equal(r.status, 0);

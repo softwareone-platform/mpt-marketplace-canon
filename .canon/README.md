@@ -36,9 +36,20 @@ Implementation of the canon app. The repo root holds source-of-truth markdown (`
 
 ## How it hangs together
 
-- **MD is the source of truth.** Graph is rebuilt in memory on every run; nothing persistent is written back.
+- **MD is the source of truth.** `objects/` is canon — self-validating, no implicit overlays. Graph is rebuilt in memory on every run; nothing persistent is written back.
 - **Schema is hard-coded.** `src/schema.js` enumerates the exact node and ref types. New types mean editing the file and the code that touches them.
 - **Parsing is template-driven.** Each section has a template; the matcher extracts data with a small DSL, the consumer (graph.js) maps that data onto schema. New section formats need a new template + emitter.
-- **Editing is patch-by-replacement.** The edit MCP accepts whole-file replacements, persists them as a patch, re-parses + validates with the overlay, and reports back. No op-log, no diff format.
-- **Two MCP servers.** `canon-read` is read-only; `canon-edit` adds the patch tools. Separate processes so the edit surface can stay detached when only read access is wanted.
-- **Apply is human.** A patch under `.patches/<id>/` only becomes part of `objects/` when someone runs `bin/apply.js <id>`. The script re-parses + validates from scratch (no shared state with the edit MCP) and refuses to write if anything is unclean. `--dry-run` reports the file list without touching disk.
+- **Editing is patch-by-replacement.** The edit MCP accepts whole-file replacements, persists them under `.patches/<id>/`, re-parses + validates with **only that patch overlaid** on `objects/`, and reports back. No op-log, no diff format.
+- **Two MCP servers.** `canon-read` is read-only and sees `objects/` only (no patches). `canon-edit` adds the patch tools; after each `patch_write` its in-memory graph reflects `objects/` + the active patch (siblings ignored). Separate processes so the edit surface can stay detached when only read access is wanted.
+- **Patches are sibling overlays, never combined.** Each patch under `.patches/<id>/` is its own candidate edit, validated in isolation. The loader (`src/load.js`) overlays nothing by default; callers opt in via `{ patchIds: [id] }`. This is the same isolation model used by the edit MCP and `apply.js`.
+- **Apply is human.** A patch only becomes part of `objects/` when someone runs `bin/apply.js <id>`. The script re-parses + validates from scratch with that patch overlaid (no shared state with the edit MCP) and refuses to write if anything is unclean. `--dry-run` reports the file list without touching disk.
+
+## CLI scope
+
+`canon validate` and `canon-apply` both honour the opt-in overlay model:
+
+- `canon validate` — checks `objects/` standalone. Use to confirm the committed canon is clean. Via npm: `npm run validate`.
+- `canon validate <patch-id>` — checks `objects/ + .patches/<patch-id>/`. Use to preview a candidate patch. Via npm: `npm run validate -- <patch-id>` (the `--` is required so npm forwards the patch id to the script).
+- `canon-apply <patch-id> [--dry-run]` — validates `objects/ + .patches/<patch-id>/`, then (without `--dry-run`) copies the patch files into `objects/` and removes `.patches/<patch-id>/`.
+
+Other read-side commands (`overview`, `find`, `reveal`, etc.) always run against `objects/`. If you want to inspect a candidate state, apply the patch first.

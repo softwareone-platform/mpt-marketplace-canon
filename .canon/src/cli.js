@@ -13,8 +13,8 @@ import { renderEntity } from './render.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..');
 
-const load = () => {
-  const parsed = parseRepo(repoRoot);
+const load = (options) => {
+  const parsed = parseRepo(repoRoot, options);
   const graph = toGraph(parsed.files);
   const kb = createKb(graph);
   return { parsed, graph, kb };
@@ -23,10 +23,13 @@ const load = () => {
 const fmtNode = (n) => `${n.type.padEnd(11)} ${n.id}${n.name ? `  — ${n.name}` : ''}`;
 
 const cmds = {
-  validate: () => {
-    const { parsed, graph } = load();
+  validate: (patchId) => {
+    const options = patchId ? { patchIds: [patchId] } : {};
+    const { parsed, graph } = load(options);
     const parseErrs = parsed.files.flatMap(f => f.errors);
     const ve = validate(graph);
+    const scope = patchId ? `objects/ + .patches/${patchId}/` : 'objects/';
+    console.log(`Scope: ${scope}`);
     console.log(`Files: ${parsed.files.length}`);
     console.log(`Parse errors:    ${parseErrs.length}`);
     console.log(`Mention errors:  ${(graph.mentionErrors || []).length}`);
@@ -175,7 +178,7 @@ const help = () => {
   console.log('usage: canon <command> [args]');
   console.log('');
   console.log('Commands:');
-  console.log('  validate                  — parse + validate; report errors');
+  console.log('  validate [patch-id]       — parse + validate; without arg, objects/ only; with arg, overlays that patch');
   console.log('  overview                  — list every entity, summary line');
   console.log('  find <query>              — substring search');
   console.log('  get <id>                  — node + parent + children');

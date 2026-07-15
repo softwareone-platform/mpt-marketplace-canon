@@ -71,17 +71,18 @@ Restart Claude Desktop after installing.
 The agent never edits source files directly. Edits land under `.patches/<id>/` as whole-file replacements; you commit them deliberately:
 
 ```bash
-npm run apply <patch-id>            # validate + write into objects/
+npm run apply <patch-id>            # validate (objects/ + that patch) + write into objects/
 npm run apply <patch-id> -- --dry-run    # validate + report only
 ```
 
-`apply` re-parses + validates from scratch before writing; refuses if anything is unclean. Git flow runs in parallel — branch / commit / push patches and committed canon however your team prefers.
+`apply` re-parses + validates from scratch with the named patch overlaid on `objects/` and refuses to write if anything is unclean. Other patches in `.patches/` are not considered — every patch is validated in isolation. Git flow runs in parallel — branch / commit / push patches and committed canon however your team prefers.
 
 ### Verify the install
 
 ```bash
 npm test                            # full unit + integration suite
-npm run validate                    # parse + validate the live canon
+npm run validate                    # parse + validate objects/ (no patches)
+npm run validate -- <patch-id>      # parse + validate objects/ + that patch
 ```
 
 ### When to re-run setup

@@ -31,10 +31,12 @@ None known.
 
 ---
 
+---
+
 ## 2. Ownership & Visibility
 
 | Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
-|-------|------------|----------|------------|------------|-------|
+| --- | --- | --- | --- | --- | --- |
 | Vendor | No | Contextual | No | No | Seller is surfaced as a reference on Authorizations and Listings. Vendor cannot query Sellers directly. |
 | Operations | Yes | Yes | Yes | Yes* | *DELETE endpoint exists in the API spec. Whether a deletion guard exists in practice is not confirmed. See SEL-010. |
 | Client | No | Contextual | No | No | Seller is surfaced as a reference on Agreements and Orders. Client cannot query Sellers directly. |
@@ -45,21 +47,22 @@ None known.
 
 ### 3.1 States
 
-| State | Description |
-|-------|-------------|
-| Active | The Seller is operational. Available as the Owner on new Authorizations and as the transacting party on new Listings and Orders. |
-| Disabled | The Seller is inactive. Observed on legacy entities — typically SoftwareOne legal entities that have been superseded following an acquisition or ERP consolidation. The platform effect of `Disabled` status on downstream objects is confirmed for Listings (new Orders blocked) but not fully confirmed for all downstream objects. |
-| Offline | Status value present in the API spec. Semantics, transition mechanics, and downstream effects are not confirmed. See SEL-009. |
-| Deleted | Status value present in the API spec. Distinct from the DELETE endpoint — whether this represents a soft-delete state or is synonymous with deletion is not confirmed. See SEL-009. |
+| State | Description | Initial State? | Terminal State? |
+| --- | --- | --- | --- |
+| Active | The Seller is operational. Available as the Owner on new Authorizations and as the transacting party on new Listings and Orders. | — | — |
+| Disabled | The Seller is inactive. Observed on legacy entities — typically SoftwareOne legal entities that have been superseded following an acquisition or ERP consolidation. The platform effect of `Disabled` status on downstream objects is confirmed for Listings (new Orders blocked) but not fully confirmed for all downstream objects. | — | — |
+| Offline | Status value present in the API spec. Semantics, transition mechanics, and downstream effects are not confirmed. See SEL-009. | — | — |
+| Deleted | Status value present in the API spec. Distinct from the DELETE endpoint — whether this represents a soft-delete state or is synonymous with deletion is not confirmed. See SEL-009. | — | — |
+| Unknown | — | No | No |
 
 ### 3.2 Transitions
 
-| ID | From State | To State | Action | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-------|-------------|-------|
+| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
+| --- | --- | --- | --- | --- | --- | --- |
 | T1a | — | Active | Create | Operations | None | Sellers may be created directly into Active status. |
 | T1b | — | Disabled | Create | Operations | None | Sellers may be created directly into Disabled status. |
-| T2 | Active | Disabled | POST `/disable` | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
-| T3 | Disabled | Active | POST `/activate` | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
+| T2 | Active | Disabled | Disable Seller | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
+| T3 | Disabled | Active | Activate Seller | Operations | Not confirmed | Dedicated action endpoint in the API spec. Preconditions not confirmed. |
 | T4 | Unknown | Unknown | POST `/deactivate` | Operations | Not confirmed | Dedicated action endpoint in the API spec. How `deactivate` differs from `disable`, and which state it produces, is not confirmed. See SEL-008. |
 | T5 | Unknown | Deleted | DELETE `/{id}` | Operations | Not confirmed | DELETE endpoint exists in the API spec (returns 204). Whether a deletion guard exists in practice is not confirmed. See SEL-010. |
 
@@ -80,20 +83,20 @@ None known.
 ## 4. Business Rules
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
-|---------|---------------|---------------------|-------------|-------|
+| --- | --- | --- | --- | --- |
 | BR-001 | A `DELETE` endpoint exists for Sellers in the API spec (`DELETE /v1/accounts/sellers/{id}`, returns 204). Whether the platform enforces a deletion guard in practice — and what conditions would permit or block deletion — is not confirmed. See SEL-010. | All | Operations | This supersedes earlier canon which stated deletion was not available via the API. The endpoint exists; the guard, if any, is unknown. |
 | BR-002 | Each Seller has a 1:1 relationship with an instance of SoftwareOne's ERP system. The `externalId` field is the ERP-side identifier, synced by the ERP Sync process. Uniqueness of `externalId` is not enforced by the platform. | All | All | `externalId` may be overridden by Operations via the API. Multiple Sellers may exist for the same country where acquisition history has produced multiple ERP instances. |
 | BR-003 | A Seller's `currencies` array defines the set of currencies in which that Seller may transact. A minimum of one currency is required — enforced by the platform (`minItems: 1` on the `SellerCreate` schema). | All | Operations | Platform-enforced on creation. Whether the platform also enforces this constraint on update (preventing removal of the last currency) is not confirmed. |
 | BR-004 | A Seller's `name` is a freeform string with a minimum length of 1 and a maximum length of 500 characters. The platform enforces no naming convention beyond these constraints. | All | Operations | In practice, Operations uses country names for active Sellers and appends `(old)` or a legacy identifier to names of superseded entities. Convention only. |
 | BR-005 | The `buyers` collection is not returned in Seller API responses. It appears in `$meta.omitted` regardless of whether `select=+buyers` is included in the request — the platform suppresses it unconditionally. | All | All | This differs from the standard default-omission pattern where `select=+fieldName` successfully includes the field. Suppression is believed to be a performance constraint given the size of the Buyers collection. The mechanism for accessing Buyer data associated with a Seller is not confirmed. See SEL-002. |
-| BR-006 | Vendor and Client Actors cannot query Sellers directly via the platform API. Seller identity is surfaced contextually — to Vendors on Authorizations and Listings, and to Clients on Agreements and Orders. | All | Vendor, Client | |
+| BR-006 | Vendor and Client Actors cannot query Sellers directly via the platform API. Seller identity is surfaced contextually — to Vendors on Authorizations and Listings, and to Clients on Agreements and Orders. | All | Vendor, Client | — |
 
 ---
 
 ## 5. Key Attributes
 
 | Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
-|-----------|------|-------------|--------|------------------------|-------|
+| --- | --- | --- | --- | --- | --- |
 | id | String | Platform-assigned unique identifier. Format: `SEL-NNNN-NNNN`. | System | No | Immutable. Assigned at creation. |
 | name | String | Human-readable label for the Seller. Freeform — no naming convention enforced by the platform. | Operations | Yes | Required on creation. `minLength: 1`, `maxLength: 500`. |
 | externalId | String | The ERP-side identifier for this Seller. Represents the 1:1 relationship between a Seller and an ERP instance. | ERP Sync | Yes | Synced from the ERP by the ERP Sync process. Can be overridden by Operations via the API. Nullable. Uniqueness not enforced by the platform. |
@@ -110,13 +113,14 @@ None known.
 | buyers | Collection | The collection of Buyers associated with this Seller via ErpLinks. | System | N/A | Omitted from API responses unconditionally — appears in `$meta.omitted` even when `select=+buyers` is requested. See BR-005 and SEL-002. |
 | audit | Object | Standard platform audit block. Records `created` and `updated` timestamps and Actor references. | System | N/A | Omitted from API responses by default. Request via `select=+audit`. |
 | revision | Integer | Increments on each update. | System | N/A | Read-only. |
+| Address | object | Registered address of the Seller. Sub-fields: addressLine1, addressLine2, postCode, city, state, country — all nullable per API spec. address.country is ISO 3166-1 alpha-2; not unique across Sellers. "N/A" used where a subfield is not applicable. | operations | — | — |
 
 ---
 
 ## 6. Relationships to Other Objects
 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
-|----------------|------------------|-------------|-------------|----------------------|
+| --- | --- | --- | --- | --- |
 | Catalog: Authorization | Parent of | One:Many | A Seller acts as the Owner of Authorizations. An Authorization cannot exist without an Owner Seller. | Yes — Authorization cannot exist without an Owner Seller. Seller deletion guard not confirmed — see SEL-010. |
 | Catalog: Listing | Association | One:Many | A Seller acts as the transacting party on Listings. A Listing references a Seller as its transacting entity. | No direct lifecycle dependency — a Listing's direct parent is its Authorization. When a Seller is disabled, new Orders cannot be placed under any Listing referencing that Seller. |
 | Accounts: ErpLink | Association* | One:? | An ErpLink reference (`erpLink`) is exposed as a single field on the Seller object in the API spec. The full cardinality and nature of the Seller:ErpLink relationship is not confirmed. See SEL-007. | Not confirmed. |
@@ -129,7 +133,7 @@ None known.
 ### 7.1 Internal Events
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
-|-------|---------|-------------------|---------------------------------|
+| --- | --- | --- | --- |
 | Seller created | Operations creates a Seller | Operations | Seller becomes available as the Owner on new Authorizations and as the transacting party on new Listings. |
 | Seller disabled | Operations calls POST `/disable` | Operations | Seller is no longer available as the transacting party for new Orders under any referencing Listing. Existing Agreements and Subscriptions are unaffected. |
 | Seller activated | Operations calls POST `/activate` | Operations | Seller returns to Active status. Available again as the transacting party on Listings. |
@@ -140,8 +144,8 @@ None known.
 
 ### 7.2 Cross-Object State Effects
 
-| Triggering Event | Affected Object | Effect | Automated? | Condition | Notes |
-|-----------------|----------------|--------|------------|-----------|-------|
+| Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
+| --- | --- | --- | --- | --- | --- |
 | Seller disabled | Catalog: Listing | New Orders cannot be placed under any Listing referencing this Seller. | Yes | Seller status = Disabled | Confirmed in Listing canon BR-012. Existing Agreements and Subscriptions continue normally. |
 | Seller disabled | Accounts: ErpLink | Effect on associated ErpLinks not confirmed. | Not confirmed | — | See SEL-008, SEL-009. |
 
@@ -163,7 +167,7 @@ The audit block captures `created` and `updated` timestamps and Actor references
 ## 9. Failure Modes & Edge Cases
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
-|----------|--------------------------|---------------|------------|-------|
+| --- | --- | --- | --- | --- |
 | Seller disabled | No new Orders can be placed under any Listing referencing this Seller. Existing Agreements and Subscriptions continue normally. | Client, Operations | High | Downstream impact on active Listings is immediate. Effect on ErpLinks and other dependent objects is not confirmed. |
 | Currency removed from Seller currencies array | Effect on existing Authorizations and Listings denominated in the removed currency is not confirmed. | Operations, Vendor, Client | High | Operations should exercise caution when modifying the currencies array on an active Seller. See SEL-005. |
 | externalId overridden by Operations | ERP-side correlation is broken until the ERP Sync process reconciles or the override is reverted. | Operations | Medium | externalId is the ERP-side identifier — manual override should only be performed with full understanding of the ERP integration impact. |
@@ -188,7 +192,7 @@ The audit block captures `created` and `updated` timestamps and Actor references
 ## 11. Changelog
 
 | Version | Date | Author | Notes |
-|---------|------|--------|-------|
+| --- | --- | --- | --- |
 | 0.1 | 2026-03-15 | Stu | Initial canon. |
 | 0.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — Sections 1, 4, 6, and 7 updated. |
 | 0.3 | 2026-03-15 | Stu | OpenAPI spec review. Section 3: state machine revised — status transitions confirmed as API endpoints (/activate, /disable, /deactivate); Offline and Deleted states added. Section 2: Delete column updated — DELETE endpoint exists in spec. BR-001 rewritten — deletion endpoint confirmed, guard unknown (SEL-010). BR-003 updated — minItems: 1 confirmed. BR-004 updated — name length constraints added. Section 5: name length constraints added; address fields corrected to nullable; erpLink field added; revision added; icon upload mechanism clarified (logo field on PUT). Section 6: ErpLink relationship updated to reflect single erpLink reference on Seller object. Section 7: transition events updated to reference API endpoints. Section 8: reversibility and deletion updated. Section 9: Seller deleted failure mode added. SEL-001 closed (transitions confirmed as API endpoints). SEL-006 closed (minItems: 1 confirmed). SEL-007, SEL-008, SEL-009, SEL-010 added. |

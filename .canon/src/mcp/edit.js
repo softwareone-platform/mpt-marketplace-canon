@@ -21,8 +21,10 @@ const PATCHES = '.patches';
 
 const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 
-const reload = (repoRoot) => {
-  const parsed = parseRepo(repoRoot);
+// `options` is forwarded to parseRepo. Pass { patchIds: [id] } to
+// overlay one patch on top of objects/; omit to load objects/ alone.
+const reload = (repoRoot, options) => {
+  const parsed = parseRepo(repoRoot, options);
   const graph = toGraph(parsed.files);
   const kb = createKb(graph);
   const errors = validate(graph);
@@ -39,7 +41,7 @@ const ensurePatchDir = (repoRoot, patchId, base) => {
 
 const writeTools = (repoRoot, ctx) => ({
   patch_list: {
-    description: 'List every patch directory under .patches/ in alphabetic order — that is the order the loader applies them, last write wins.',
+    description: 'List every patch directory under .patches/. Patches are siblings — each is an independent overlay over objects/, never combined. Pick a target id (existing or new) before patch_write.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     handler: () => {
       const dir = join(repoRoot, PATCHES);
@@ -52,7 +54,7 @@ const writeTools = (repoRoot, ctx) => ({
   },
 
   patch_files: {
-    description: 'List every file inside one patch (relative paths under that patch directory).',
+    description: 'List every file inside one patch (relative paths under that patch directory). Use to see what a sibling patch already touches before reusing or forking its id.',
     inputSchema: {
       type: 'object',
       properties: { id: { type: 'string' } },
@@ -77,7 +79,7 @@ const writeTools = (repoRoot, ctx) => ({
   },
 
   patch_read: {
-    description: 'Read the effective content of a relative path under a patch — the patch override if it exists, otherwise the original file at the repo root. Use to start from current state before proposing changes.',
+    description: 'Read the effective content of a path under a patch — the patch override if the file already exists in this patch, otherwise the original at the repo root. Use to start from current state before composing a whole-file replacement. The patch under inspection is in isolation: sibling patches are never overlaid.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -97,7 +99,7 @@ const writeTools = (repoRoot, ctx) => ({
   },
 
   patch_write: {
-    description: 'Write whole-file replacements into a patch. Each entry MUST be the complete file content; partial / diff-style updates are not supported. After writing, the server reloads the graph with the patch overlaid and returns parse + validate results. Pre-existing file in the patch is overwritten.',
+    description: 'Write whole-file replacements into a patch. Each entry MUST be the complete file content; partial / diff-style updates are not supported. After writing, the server reloads the graph with ONLY this patch overlaid on objects/ (sibling patches in .patches/ are ignored — same isolation model as bin/apply.js) and returns parse + validate results so you can see whether the patch is clean. Pre-existing file in the patch is overwritten. The patch is NOT committed — a human runs bin/apply.js <id> to land it into objects/.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -139,8 +141,9 @@ const writeTools = (repoRoot, ctx) => ({
         written.push(f.path);
       }
 
-      // Reload + validate with overlay applied.
-      ctx.state = reload(repoRoot);
+      // Reload + validate with THIS patch overlaid (isolation: other
+      // patches in .patches/ are ignored — same model as apply).
+      ctx.state = reload(repoRoot, { patchIds: [id] });
       return {
         patch: id,
         written,

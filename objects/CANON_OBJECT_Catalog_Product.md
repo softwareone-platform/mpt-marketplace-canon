@@ -17,7 +17,11 @@
 
 **Object Name:** Product
 
+**Namespace:** Catalog
+
 **Parent Object:** None (primary object)
+
+**ID Prefix:** None.
 
 **Description:**
 A Product is the top-level unit of a Vendor's commercial offering on the SoftwareOne Marketplace. It is the container for everything that defines what can be sold and how — Items (orderable SKUs), Parameters (data fields), Templates (contextual communications), Terms (acceptance requirements), Media (visual assets), and pricing via Price Lists. A Product must go through a publication review before it is available to Clients. Once published, it can be made available through one or more Listings, each of which connects the Product to a SoftwareOne Seller, a currency, and an eligible Client population.
@@ -27,16 +31,18 @@ PRD (API identifier prefix)
 
 ---
 
+---
+
 ## 2. Ownership & Visibility
 
 > High-level orientation to Actor authority and visibility over this object.
 > State-specific nuances belong in Section 4 (Business Rules).
 
-| Actor      | Can Create | Can Read | Can Update | Can Delete | Notes |
-|------------|------------|----------|------------|------------|-------|
-| Vendor     | Yes        | Yes      | Yes        | No         | Primary lifecycle owner. Products cannot be deleted. |
-| Operations | No         | Yes      | No         | No         | Read across all states including Draft. Collaborates with Vendor to make Product publishable. |
-| Client     | No         | Yes      | No         | No         | Visible in Published state only. Existing-Agreement Clients retain transactional access in Unpublished state. |
+| Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Vendor | Yes | Yes | Yes | No | Primary lifecycle owner. Products cannot be deleted. |
+| Operations | No | Yes | No | No | Read across all states including Draft. Collaborates with Vendor to make Product publishable. |
+| Client | No | Yes | No | No | Visible in Published state only. Existing-Agreement Clients retain transactional access in Unpublished state. |
 
 ---
 
@@ -49,7 +55,7 @@ PRD (API identifier prefix)
 ### 3.1 States
 
 | State | Description | Initial State? | Terminal State? |
-|-------|-------------|---------------|-----------------|
+| --- | --- | --- | --- |
 | Draft | Product is being authored by the Vendor. Visible to Operations but not to Clients. | Yes | No |
 | Pending | Product has been submitted for publication review. Visible to Operations. Vendor cannot withdraw. | No | No |
 | Published | Product is live on the Marketplace. Visible and purchasable by Clients. | No | No |
@@ -58,12 +64,12 @@ PRD (API identifier prefix)
 ### 3.2 Transitions
 
 | # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-|---|------------|----------|-----------------|-------------------|---------------|----------------------|
+| --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Draft | Create Product | Vendor | Name, icon, and website are required. No other preconditions. | Product created in Draft state. |
-| T2 | Draft | Pending | Submit for publication | Vendor | None — no completeness requirements. A Product with no child objects can be submitted. | Product enters review queue. Vendor cannot reverse this transition. |
-| T3 | Pending | Published | Publish | Operations | Product meets publishability criteria | Product becomes visible and purchasable by Clients. |
-| T4 | Published | Unpublished | Unpublish | Vendor, Operations | None | Product removed from Client discovery. Existing Agreements unaffected. |
-| T5 | Unpublished | Published | Republish | Vendor, Operations | None | Product restored to Client discovery. |
+| T2 | Draft | Pending | Submit Product for Publication | Vendor | None — no completeness requirements. A Product with no child objects can be submitted. | Product enters review queue. Vendor cannot reverse this transition. |
+| T3 | Pending | Published | Publish Product | Operations | Product meets publishability criteria | Product becomes visible and purchasable by Clients. |
+| T4 | Published | Unpublished | Unpublish Product | Vendor, Operations | None | Product removed from Client discovery. Existing Agreements unaffected. |
+| T5 | Unpublished | Published | Republish Product | Vendor, Operations | None | Product restored to Client discovery. |
 
 ### 3.3 State Diagram
 
@@ -79,47 +85,42 @@ PRD (API identifier prefix)
 ## 4. Business Rules
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
-|---------|---------------|---------------------|-------------|-------|
-| BR-001 | Template creation, modification, and deletion under a Product are not restricted by the state of the Product. | All | Vendor | Confirmed in Template canon BR-021. |
+| --- | --- | --- | --- | --- |
+| BR-001 | [[Template]] creation, modification, and deletion under a Product are not restricted by the state of the Product. | All | Vendor | Confirmed in [[Template]] canon BR-021. |
 | BR-002 | Products cannot be deleted in any state. | All | All | Platform architectural invariant. |
 | BR-003 | Once a Product is submitted to Pending, the Vendor cannot withdraw it. The only exit from Pending is publication by Operations. | Pending | Vendor, Operations | Operations collaborates with the Vendor to resolve any issues rather than rejecting the Product. |
 | BR-004 | A Product in Pending state cannot be returned to Draft. | Pending | All | There is no reject or withdraw transition. |
 | BR-005 | All Product attributes are mutable in all states, including Published. | All | Vendor | No distinction between presentational and behavioral attributes. Vendor is responsible for consequences of editing a Published Product with active downstream objects. |
-| BR-006 | When a Product is Unpublished, it is no longer visible to Clients for new purchases. | Unpublished | All | |
+| BR-006 | When a Product is Unpublished, it is no longer visible to Clients for new purchases. | Unpublished | All | — |
 | BR-007 | When a Product is Unpublished, Clients with existing Agreements for that Product retain full transactional access. | Unpublished | Client | Unpublished does not break existing commercial relationships. |
-| BR-008 | A Product can cycle between Published and Unpublished states without limit. | Published, Unpublished | Vendor, Operations | |
-| BR-009 | Unpublished is not a terminal state. An Unpublished Product cannot be deleted — no Product can be deleted. | Unpublished | All | |
+| BR-008 | A Product can cycle between Published and Unpublished states without limit. | Published, Unpublished | Vendor, Operations | — |
+| BR-009 | Unpublished is not a terminal state. An Unpublished Product cannot be deleted — no Product can be deleted. | Unpublished | All | — |
 
 ---
 
 ## 5. Key Attributes
 
-| Attribute | Type | Description | Set By | Mutable After Creation? | Mutable After [State]? | Notes |
-|-----------|------|-------------|--------|------------------------|----------------------|-------|
-| Name | String | Display name of the Product | Vendor | Yes | No restrictions | Required on creation. |
-| Short Description | String | Brief summary of the Product for catalogue display | Vendor | Yes | No restrictions | Nullable. |
-| Long Description | String (html) | Full marketing description rendered on the Product page | Vendor | Yes | No restrictions | Nullable. |
-| Icon | Image | Product icon displayed in the catalogue | Vendor | Yes | No restrictions | Required on creation. Uploaded as binary. Nullable after creation. |
-| Website | URL | Vendor's product website | Vendor | Yes | No restrictions | Required on creation. |
-| Status | Enum | Current state of the Product. One of: Draft, Pending, Published, Unpublished | System | Yes — via state transitions only | N/A | |
-| Revision | Integer | Increments on every update to the Product | System | Yes — auto-incremented | N/A | Read-only. Confirms Products are versioned in place. |
-| External IDs | Object | External identifiers for the Product. Keys: `operations` (Operations-assigned ID), `defaultErpItem` (default ERP item code) | Vendor, Operations | Yes | No restrictions | Both keys are nullable strings. |
-| Vendor | Object (AccountRef) | Reference to the Account that owns this Product | System | No | N/A | Set at creation. Identifies the Vendor Account. Visible to all Actors. |
-| Settings | Object | Behavioral configuration for the Product. See settings sub-fields below. | Vendor / Operations | Yes | No restrictions | Editable in all states including Published. Some sub-fields are restricted by Actor — see notes. |
-| Statistics | Object | Computed platform metrics for this Product. Sub-fields: `itemCount`, `ordersPlacedCount`, `agreementCount`, `subscriptionCount`, `requestCount` | System | No — computed | N/A | Read-only. Computed by the platform. Visible to Vendor and Operations only — not Client. |
-
-### 5.1 Settings Sub-fields
-
-| Setting | Type | Description | Actor Visibility | Notes |
-|---------|------|-------------|-----------------|-------|
-| productOrdering | Boolean | Enables or disables ordering of this Product by Clients | All | |
-| productRequests | Object | Configures the Product Request feature. Sub-fields: `enabled` (boolean), `name` (string, nullable), `label` (string, nullable) | All | |
-| itemSelection | Boolean | Controls whether Clients can select individual Items when placing an Order | All | |
-| orderQueueChanges | Boolean | Enables queuing of Order changes | All | |
-| preValidation | Object | Configures pre-validation webhook triggers per Order type. Sub-fields: `purchaseOrderDraft`, `purchaseOrderQuerying`, `changeOrderDraft`, `configurationOrderDraft`, `terminationOrder`, `productRequest` (all boolean) | All | Each sub-field enables or disables pre-validation for that Order context. |
-| splitBilling | Object | Configures split billing. Sub-fields: `enabled` (boolean), `type` (string, nullable) | Client, Operations only — not Vendor | When enabled, allows Clients to allocate percentages of subscription quantities to different Buyers, resulting in split invoicing — one invoice per Buyer for its share of the total quantity. |
-| sendCostToErp | Boolean, nullable | Controls whether the billing module sends the real cost price to the SoftwareOne ERP | Operations only | When disabled, the billing module sends charges to the ERP with a zero cost price. Used when the Vendor is SoftwareOne itself and there is no external vendor cost to attribute. |
-| subscriptionCessation | Object | Configures how subscription cessation is handled. Sub-fields: `enabled` (boolean), `mode` (enum: Termination, Auto-renewal, Termination or auto-renewal; nullable) | All | |
+| Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Name | String | Display name of the Product | Vendor | Yes | Mutable After [State]?: No restrictions. Required on creation. |
+| Short Description | String | Brief summary of the Product for catalogue display | Vendor | Yes | Mutable After [State]?: No restrictions. Nullable. |
+| Long Description | String (html) | Full marketing description rendered on the Product page | Vendor | Yes | Mutable After [State]?: No restrictions. Nullable. |
+| Icon | Image | Product icon displayed in the catalogue | Vendor | Yes | Mutable After [State]?: No restrictions. Required on creation. Uploaded as binary. Nullable after creation. |
+| Website | URL | Vendor's product website | Vendor | Yes | Mutable After [State]?: No restrictions. Required on creation. |
+| Status | Enum | Current state of the Product. One of: Draft, Pending, Published, Unpublished | System | Yes — via state transitions only | — |
+| Revision | Integer | Increments on every update to the Product | System | Yes — auto-incremented | Read-only. Confirms Products are versioned in place. |
+| External IDs | Object | External identifiers for the Product. Keys: `operations` (Operations-assigned ID), `defaultErpItem` (default ERP item code) | Vendor, Operations | Yes | Mutable After [State]?: No restrictions. Both keys are nullable strings. |
+| Vendor | Object (AccountRef) | Reference to the Account that owns this Product | System | No | Set at creation. Identifies the Vendor Account. Visible to all Actors. |
+| Settings | Object | Behavioral configuration for the Product. See settings sub-fields below. | Vendor / Operations | Yes | Mutable After [State]?: No restrictions. Editable in all states including Published. Some sub-fields are restricted by Actor — see notes. |
+| Statistics | Object | Computed platform metrics for this Product. Sub-fields: `itemCount`, `ordersPlacedCount`, `agreementCount`, `subscriptionCount`, `requestCount` | System | No — computed | Read-only. Computed by the platform. Visible to Vendor and Operations only — not Client. |
+| settings.productOrdering | Boolean | Enables or disables ordering of this Product by Clients | — | — | Actor Visibility: All |
+| settings.productRequests | Object | Configures the Product Request feature. Sub-fields: `enabled` (boolean), `name` (string, nullable), `label` (string, nullable) | — | — | Actor Visibility: All |
+| settings.itemSelection | Boolean | Controls whether Clients can select individual Items when placing an Order | — | — | Actor Visibility: All |
+| settings.orderQueueChanges | Boolean | Enables queuing of Order changes | — | — | Actor Visibility: All |
+| settings.preValidation | Object | Configures pre-validation webhook triggers per Order type. Sub-fields: `purchaseOrderDraft`, `purchaseOrderQuerying`, `changeOrderDraft`, `configurationOrderDraft`, `terminationOrder`, `productRequest` (all boolean) | — | — | Actor Visibility: All. Each sub-field enables or disables pre-validation for that Order context. |
+| settings.splitBilling | Object | Configures split billing. Sub-fields: `enabled` (boolean), `type` (string, nullable) | — | — | Actor Visibility: Client, Operations only — not Vendor. When enabled, allows Clients to allocate percentages of subscription quantities to different Buyers, resulting in split invoicing — one invoice per Buyer for its share of the total quantity. |
+| settings.sendCostToErp | Boolean, nullable | Controls whether the billing module sends the real cost price to the SoftwareOne ERP | — | — | Actor Visibility: Operations only. When disabled, the billing module sends charges to the ERP with a zero cost price. Used when the Vendor is SoftwareOne itself and there is no external vendor cost to attribute. |
+| settings.subscriptionCessation | Object | Configures how subscription cessation is handled. Sub-fields: `enabled` (boolean), `mode` (enum: Termination, Auto-renewal, Termination or auto-renewal; nullable) | — | — | Actor Visibility: All |
 
 ---
 
@@ -135,7 +136,7 @@ PRD (API identifier prefix)
 > - **Dependency** — this object depends on the related object but is not a child of it
 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
-|----------------|------------------|-------------|-------------|----------------------|
+| --- | --- | --- | --- | --- |
 | Catalog: Product Template | Child | 1:Many | A Product owns a collection of Templates. | Yes — Templates cannot exist without a parent Product. Products cannot be deleted, so this dependency never triggers. |
 | Catalog: Product Parameter | Child | 1:Many | A Product owns a collection of Parameters. | Yes — Parameters cannot exist without a parent Product. Products cannot be deleted, so this dependency never triggers. |
 | Catalog: Product Parameter Group | Child | 1:Many | A Product owns a collection of Parameter Groups. | Yes — Parameter Groups cannot exist without a parent Product. Products cannot be deleted, so this dependency never triggers. |
@@ -156,7 +157,7 @@ PRD (API identifier prefix)
 ### 7.1 Internal Events
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
-|-------|---------|-------------------|---------------------------------|
+| --- | --- | --- | --- |
 | Product created | Vendor creates Product | Vendor | Product enters Draft state. Revision counter initialised. Platform automatically creates the following default child objects: (1) one Item Group (Name: "Items", Label: "Items", Display order: 100, Description: "Default item group", Optional: false, Allow multiple: true, Default: true); (2) one Parameter Group (Name: "Parameters", Label: "Parameters", Display order: 100, Description: "Default parameter group", Default: true); (3) one Default Template of each Order type: OrderProcessing, OrderQuerying, OrderCompleted, and RequestProcessing (deprecated — created today, pending removal in v5). This ensures the one-and-only-one Default invariant is satisfied from the moment of creation. |
 | Product submitted | T2 — Draft to Pending | Vendor | Product enters Operations review queue. |
 | Product published | T3 — Pending to Published | Operations | Product becomes visible and purchasable by Clients. |
@@ -167,7 +168,7 @@ PRD (API identifier prefix)
 ### 7.2 Cross-Object State Effects
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
-|-----------------|----------------|--------------------------|------------|-----------|-------|
+| --- | --- | --- | --- | --- | --- |
 | Product unpublished | Order, Agreement, Asset, Subscription | No direct state effect. Existing transactional objects continue normally. | Yes | Always | Unpublishing does not interrupt in-flight or active downstream objects. |
 
 ---
@@ -189,7 +190,7 @@ The Product audit object records timestamps and Actor attribution for five event
 ## 9. Failure Modes & Edge Cases
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
-|----------|--------------------------|---------------|------------|-------|
+| --- | --- | --- | --- | --- |
 | Vendor edits behavioral settings on a Published Product with active downstream objects | Settings update is applied immediately. No warning or guard. | Client, Vendor | High | BR-005 permits this. Vendor takes full responsibility. Settings such as preValidation and subscriptionCessation could affect in-flight Orders or active Subscriptions. |
 | Product remains in Pending indefinitely (Operations never acts) | Product stays in Pending. Vendor has no exit mechanism. | Vendor | Medium | Operational process dependency. No system-level resolution path. |
 
@@ -204,7 +205,7 @@ No open questions at this time.
 ## 11. Changelog
 
 | Version | Date | Author | Notes |
-|---------|------|--------|-------|
+| --- | --- | --- | --- |
 | 0.1 | 2026-03-07 | Stu | Stub created from known cross-references in Template canon |
 | 0.2 | 2026-03-07 | Stu | State machine, business rules, attributes, relationships, and lifecycle events populated from conversation and Product JSON |
 | 0.3 | 2026-03-09 | Stu | Description and Also Known As filled in. Section 6 expanded to all confirmed child objects with namespace qualification. Section 7 cascade on delete updated to cover all child types. Price List cascade on Product deletion flagged as open. |

@@ -23,6 +23,7 @@ const NODE_DEFAULT_COLORS: Record<TNodeType, string> = {
   term: '#94a3b8',
   constraint: '#fbbf24',
   risk: '#ef4444',
+  rule: '#fbbf24',  // same warm tone constraints used — BRs are still "constraint-shaped" satellites
 };
 
 // Severity variation for risks: same red hue everywhere — intensity controlled by size and
@@ -51,12 +52,14 @@ const NODE_SIZE: Record<TNodeType, number> = {
   term: 1,
   constraint: 2.2,
   risk: 2.2,
+  rule: 1.5,   // 1.5× term — small enough to read as satellites, not as primary structure
 };
 
 const PARENT_ORBIT_R: Partial<Record<TNodeType, number>> = {
   term: 32,
   risk: 175,
   constraint: 200,
+  rule: 200,
 };
 const STATE_ORBIT_R = 140; // radius of state orbit around its parent entity
 const CONSTRAINT_SHUFFLE = 0; // clean circular orbit — no radial wobble
@@ -79,8 +82,11 @@ interface ISimEdge extends d3.SimulationLinkDatum<ISimNode> {
   type: IFlatEdge['type'];
 }
 
-const VISIBLE_NODE_TYPES = new Set<TNodeType>(['domain', 'entity', 'state', 'term', 'constraint', 'risk']);
-const HIDDEN_EDGE_TYPES = new Set(['constraint', 'note', 'risk', 'action-binding', 'mention']);
+const VISIBLE_NODE_TYPES = new Set<TNodeType>(['domain', 'entity', 'state', 'term', 'constraint', 'risk', 'rule']);
+// `mention` edges left visible: they are the BR ↔ entity cross-object links emitted from
+// [[mention]] tokens in rule statements. Other ref types stay hidden because their owner-to-target
+// fan-out blows up the picture.
+const HIDDEN_EDGE_TYPES = new Set(['constraint', 'note', 'risk', 'action-binding']);
 
 export const renderGraph = (
   container: HTMLElement,
@@ -258,6 +264,10 @@ export const renderGraph = (
     // Constraints inherit the parent entity's module color (resolveNamespace walks parent chain).
     if (n.type === 'entity' || n.type === 'state' || n.type === 'constraint') {
       return d3.color(moduleColor)?.brighter(0.7).formatHex() ?? moduleColor;
+    }
+    // Rules: brighter still so the BR satellites pop against their parent's halo.
+    if (n.type === 'rule') {
+      return d3.color(moduleColor)?.brighter(1.4).formatHex() ?? moduleColor;
     }
 
     return moduleColor;
@@ -788,6 +798,7 @@ export const renderGraph = (
       if (d.type === 'term') return 4;
       if (d.type === 'constraint') return 4;
       if (d.type === 'risk') return 4;
+      if (d.type === 'rule') return 4;
       // Entities use a custom entity-entity repulsion (below), not the global collide,
       // so terms aren't pushed outside their parent entity's cluster.
       if (d.type === 'entity') return 0;
@@ -829,13 +840,18 @@ export const renderGraph = (
     g.append('stop').attr('offset', '0%').attr('stop-color', ownedColor).attr('stop-opacity', 0.55);
     g.append('stop').attr('offset', '100%').attr('stop-color', ownedColor).attr('stop-opacity', 1);
   });
+  // All ref edges — ownership tethers and mention pointers alike — render in the same delicate
+  // tier as the term-tether threads (0.35 width, 0.25 opacity). Their job is to suggest
+  // connectivity, not to claim structural weight; the latter belongs to parent / transition
+  // lines and the constraint fence.
   const linkSel = root.append('g')
     .attr('class', 'links')
     .selectAll<SVGLineElement, ISimEdge>('line')
     .data(edges)
     .join('line')
     .attr('stroke', (_, i) => `url(#${ownershipGradId(i)})`)
-    .attr('stroke-width', 1.4);
+    .attr('stroke-width', 0.35)
+    .attr('stroke-opacity', 0.4);
 
   // Dependency arcs — inter-entity wormholes with a "depends on" pill at the midpoint.
   const DEPENDENCY_STROKE = '#22d3ee';
@@ -894,8 +910,8 @@ export const renderGraph = (
     .data(fenceData)
     .join('polyline')
     .attr('stroke', d => simNodeById.get(d[0])?.color ?? NODE_DEFAULT_COLORS.constraint)
-    .attr('stroke-width', 0.3)
-    .attr('stroke-opacity', 0.4)
+    .attr('stroke-width', 0.5)
+    .attr('stroke-opacity', 0.75)
     .attr('fill', 'none');
 
   // Faint thread from each term to its parent entity, with a fading gradient — gives a
@@ -1028,7 +1044,7 @@ export const renderGraph = (
       if (d.type === 'domain' || d.type === 'entity' || d.type === 'state' || d.type === 'transition') {
         return 'url(#glow)';
       }
-      if (d.type === 'term' || d.type === 'constraint' || d.type === 'risk') return 'url(#term-glow)';
+      if (d.type === 'term' || d.type === 'constraint' || d.type === 'risk' || d.type === 'rule') return 'url(#term-glow)';
 
       return null;
     })
@@ -1143,7 +1159,10 @@ export const renderGraph = (
 
     return lines;
   };
-  const constraintLabelNodes = nodes.filter(n => n.type === 'constraint' && n.parentId);
+  // Rules (BR satellites) get the same label treatment as constraints: id on top, two
+  // wrapped lines of statement text below. Both live on the outer orbit so they share the
+  // same visual grammar.
+  const constraintLabelNodes = nodes.filter(n => (n.type === 'constraint' || n.type === 'rule') && n.parentId);
   const constraintLabelSel = root.append('g')
     .attr('class', 'constraint-labels')
     .selectAll<SVGTextElement, ISimNode>('text')
@@ -1437,7 +1456,7 @@ export const renderGraph = (
       if (desc2) desc2.setAttribute('x', String(lx));
     };
     constraintLabelSel.each(function (d) {
-      positionSatLabel(this as SVGTextElement, d, NODE_SIZE.constraint);
+      positionSatLabel(this as SVGTextElement, d, NODE_SIZE[d.type]);
     });
     riskLabelSel.each(function (d) {
       const dotR = RISK_LEVEL_SIZE[d.label] ?? NODE_SIZE.risk;

@@ -270,25 +270,40 @@ const emitOwnership = (entityId, parsed) => {
   return { refs };
 };
 
+// Business rules → rule nodes (one per row). The rule's `description`
+// is the statement; the row id (e.g. "BR-001") is the rule `name`.
+// Parent ref attaches the rule to its owning entity. `[[mentions]]`
+// inside the statement / notes resolve against the rule node — not
+// the entity — so impact/paths can target a single rule.
 const emitBusinessRules = (entityId, parsed) => {
   const rows = parsed.business_rules?.rules || [];
+  const nodes = [];
   const refs = [];
   for (const row of rows) {
     if (!row.statement) continue;
-    refs.push({
-      type: 'constraint',
-      owner: entityId,
+    const canonId = String(row.id || '').trim();
+    if (!canonId) continue;
+    // Defensive against multi-table authoring inside one Business
+    // Rules section: repeated header / separator rows leak through as
+    // `{ id: 'Rule ID', statement: 'Rule Statement' }` etc.
+    if (!/^[A-Z]+-\d+[a-z]?$/.test(canonId)) continue;
+    const id = childId(entityId, canonId);
+    nodes.push({
+      id,
+      type: 'rule',
+      name: canonId,
       description: row.statement,
-      pointers: { subject: entityId },
       meta: {
-        canonId: row.id,
+        canonId,
+        statement: row.statement,
         states: row.states || '',
         actorScope: row.actor_scope || '',
-        notes: row.notes || '',
+        notes: String(row.notes || '').trim(),
       },
     });
+    refs.push({ type: 'parent', owner: id, pointers: { parent: entityId } });
   }
-  return { refs };
+  return { nodes, refs };
 };
 
 // section 6: Parent/Child/Dependency/Reference/Composition → dependency
@@ -535,8 +550,18 @@ const findMentionsInText = (text, mentionIndex) => {
   return { found, errors };
 };
 
-// scan descriptions, emit one mention ref per owner-entity with the
-// deduped target list; broken `[[key]]` → caller-facing parse error
+// scan descriptions, emit one mention ref per owner with the deduped
+// target list; broken `[[key]]` → caller-facing parse error.
+//
+// Owner granularity:
+//   - node mentions   → owner = node id (e.g. order:br-001). Rules,
+//                       states, transitions, terms each carry their
+//                       own mention ref, so paths/impact can target
+//                       them individually.
+//   - ref mentions    → owner = owning entity. Refs are anonymous in
+//                       the schema, so there is no finer-grained anchor.
+// Self-target check uses the owning entity in both cases — a rule
+// mentioning its own parent entity is not a useful edge.
 const extractMentions = (nodes, refs) => {
   const mentionIndex = buildMentionIndex(nodes);
   const entityIdsByPrefix = new Map();
@@ -554,30 +579,37 @@ const extractMentions = (nodes, refs) => {
     return entityIdsByPrefix.get(prefix) || null;
   };
 
-  const mentions = new Map();   // entity id → Set of target ids (excluding self)
+  const mentions = new Map();   // owner id → Set of target ids (excluding self-entity)
   const errors = [];
 
-  const scan = (text, ownerEntity, ctx) => {
-    if (!text || !ownerEntity) return;
+  const scan = (text, owner, ownerEntity, ctx) => {
+    if (!text || !owner) return;
     const { found, errors: broken } = findMentionsInText(text, mentionIndex);
     for (const target of found) {
-      if (target === ownerEntity) continue;   // self-mention is a no-op
-      if (!mentions.has(ownerEntity)) mentions.set(ownerEntity, new Set());
-      mentions.get(ownerEntity).add(target);
+      if (target === ownerEntity) continue;   // skip pointing at own entity
+      if (!mentions.has(owner)) mentions.set(owner, new Set());
+      mentions.get(owner).add(target);
     }
     for (const key of broken) {
-      errors.push({ owner: ownerEntity, key, ...ctx });
+      errors.push({ owner, key, ...ctx });
     }
   };
 
   for (const n of nodes) {
-    const owner = owningEntity(n.id);
-    scan(n.description, owner, { kind: 'node', id: n.id, field: 'description' });
-    scan(n.name, owner, { kind: 'node', id: n.id, field: 'name' });
+    const ownerEntity = owningEntity(n.id);
+    const owner = n.type === 'entity' ? ownerEntity : n.id;
+    if (!owner) continue;
+    scan(n.description, owner, ownerEntity, { kind: 'node', id: n.id, field: 'description' });
+    scan(n.name, owner, ownerEntity, { kind: 'node', id: n.id, field: 'name' });
+    // Rule notes live in meta but carry the same `[[mention]]` weight
+    // as the statement; scan them too.
+    if (n.type === 'rule' && n.meta?.notes) {
+      scan(n.meta.notes, owner, ownerEntity, { kind: 'node', id: n.id, field: 'meta.notes' });
+    }
   }
   for (const r of refs) {
-    const owner = owningEntity(r.owner);
-    scan(r.description, owner, { kind: 'ref', refType: r.type, ownerNode: r.owner, field: 'description' });
+    const ownerEntity = owningEntity(r.owner);
+    scan(r.description, ownerEntity, ownerEntity, { kind: 'ref', refType: r.type, ownerNode: r.owner, field: 'description' });
   }
 
   const mentionRefs = [];

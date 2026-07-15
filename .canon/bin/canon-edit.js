@@ -11,7 +11,8 @@
  */
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { dirname, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createEditServer } from '../src/mcp/edit.js';
@@ -21,8 +22,10 @@ process.chdir(repoRoot);
 
 process.env.CANON_MODEL_CACHE ??= resolve(repoRoot, '.canon', 'model-cache');
 
+const pkgVersion = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')).version;
+
 process.stderr.write(`canon-edit: serving from ${repoRoot}\n`);
 
-const server = createEditServer(repoRoot);
+const server = createEditServer(repoRoot, { version: pkgVersion });
 const transport = new StdioServerTransport();
 await server.connect(transport);

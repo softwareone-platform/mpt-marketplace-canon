@@ -70,6 +70,7 @@ export const buildFlatGraph = (data: IGraphData): {
       parentId: parentOf.get(n.id),
       isInitial,
       isTerminal,
+      tooltip: n.type === 'rule' ? n.description : undefined,
     };
   });
 
