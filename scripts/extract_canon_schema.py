@@ -20,11 +20,21 @@ Examples:
     python extract_canon_schema.py openapi.json notifications webhook
 
 Without --exact, any path containing both the namespace and object keyword is matched.
-With --exact, only paths where the object is the final resource (before an optional
-{id} segment) are matched. For example:
-    /public/v1/catalog/products          MATCHED
-    /public/v1/catalog/products/{id}     MATCHED
-    /public/v1/catalog/products/{id}/templates   NOT MATCHED
+With --exact, matching is anchored on the object segment: the object's own collection
+and by-id paths, plus its instance action endpoints (a single trailing verb segment,
+e.g. /publish, /activate, /block), are matched — but child-object sub-collections are
+not. For example:
+    /public/v1/catalog/products                  MATCHED (collection)
+    /public/v1/catalog/products/{id}             MATCHED (by id)
+    /public/v1/catalog/products/{id}/publish     MATCHED (action endpoint on the object)
+    /public/v1/catalog/products/{id}/media       NOT MATCHED (child sub-collection — has deeper paths)
+    /public/v1/catalog/products/{id}/media/{id}  NOT MATCHED (child object)
+
+An action endpoint is distinguished from a child sub-collection structurally: an action
+is a single literal segment that terminates the path (nothing extends it), whereas a
+child sub-collection has deeper paths beneath it (e.g. its own {id}). This is what makes
+the object's own §3.2 transition endpoints available to the drafter without pulling in
+every child object's paths.
 
 The output is saved as a trimmed JSON file you can upload to your LLM session.
 """
@@ -40,6 +50,11 @@ def normalise(s):
     return s.lower().replace(" ", "-")
 
 
+def _is_param(segment):
+    """True if a path segment is an {id}-style parameter placeholder."""
+    return segment.startswith("{") and segment.endswith("}")
+
+
 def find_matching_paths(spec, namespace, object_name, exact=False):
     """
     Find all API paths containing both the namespace and object as whole
@@ -48,13 +63,26 @@ def find_matching_paths(spec, namespace, object_name, exact=False):
     because a raw substring search on "item" would also match inside
     "item-groups", silently pulling in a different object's paths.
 
-    If exact=True, only match paths where the object is the terminal resource
-    segment (optionally followed by a single {id} parameter segment).
+    If exact=True, matching is anchored on the object segment and includes:
+      - the object's collection path            (.../<object>)
+      - its by-id path                          (.../<object>/{id})
+      - its instance action endpoints           (.../<object>/{id}/<verb>)
+    but excludes child-object sub-collections   (.../<object>/{id}/<child>/...).
+
+    An action endpoint and a child sub-collection are the same shape
+    (<object>/{id}/<segment>), so they are told apart structurally: an action
+    verb is a single literal segment that terminates the path (no other path
+    extends it), whereas a child sub-collection has deeper paths beneath it
+    (e.g. its own {id}). Including action endpoints is what makes the object's
+    own Section 3.2 transition endpoints available to the drafter; excluding
+    child sub-collections is the original purpose of --exact.
     """
     ns = normalise(namespace)
     obj = normalise(object_name)
     # Also match plural form (append 's' if not already ending in 's')
     obj_plural = obj if obj.endswith("s") else obj + "s"
+
+    all_paths = list(spec.get("paths", {}).keys())
 
     matched = {}
     for path, definition in spec.get("paths", {}).items():
@@ -69,19 +97,33 @@ def find_matching_paths(spec, namespace, object_name, exact=False):
         ns_pos = segments_lower.index(ns)
 
         if exact:
-            # Remove {id}-style parameter segments to find the terminal resource,
-            # scanning from the end so a repeated segment name elsewhere in the
-            # path can't be mistaken for the terminal one.
-            terminal_pos = None
-            for i in range(len(segments) - 1, -1, -1):
-                if not (segments[i].startswith("{") and segments[i].endswith("}")):
-                    terminal_pos = i
+            # Anchor on the first object-named segment appearing after the
+            # namespace (so a repeat of the namespace word can't be mistaken
+            # for the object, and vice versa).
+            obj_pos = None
+            for i in range(ns_pos + 1, len(segments)):
+                if segments_lower[i] in (obj, obj_plural):
+                    obj_pos = i
                     break
-            if terminal_pos is None:
+            if obj_pos is None:
                 continue
-            terminal = segments_lower[terminal_pos]
-            if terminal in (obj, obj_plural) and ns_pos < terminal_pos:
+
+            tail = segments[obj_pos + 1:]
+            literal_tail = [s for s in tail if not _is_param(s)]
+
+            if not literal_tail:
+                # .../<object> or .../<object>/{id} — collection or by-id.
                 matched[path] = definition
+            elif len(literal_tail) == 1 and not _is_param(tail[-1]):
+                # .../<object>/{id}/<verb> — a single literal that ends the path.
+                # Include only if nothing extends it (an action endpoint); if a
+                # deeper path exists beneath it, it's a child sub-collection root.
+                prefix = path.rstrip("/") + "/"
+                has_deeper = any(p != path and p.startswith(prefix) for p in all_paths)
+                if not has_deeper:
+                    matched[path] = definition
+            # else: two or more literal segments after the object, or the trailing
+            # literal is itself parameterised further — a child object's path. Skip.
         else:
             obj_positions = [i for i, s in enumerate(segments_lower) if s in (obj, obj_plural)]
             if any(pos > ns_pos for pos in obj_positions):

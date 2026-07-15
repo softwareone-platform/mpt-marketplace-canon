@@ -18,7 +18,7 @@
     "catalog": { "project": "MPT", "repos": ["swo-platform", "mpt-catalog"] },
     "commerce": { "project": "MPT", "repos": ["swo-platform"] },
     "billing": { "project": "MPT", "repos": ["swo-platform", "mpt-billing"] },
-    "accounts": { "project": "MPT", "repos": ["swo-platform"] },
+    "accounts": { "project": "MPT", "repos": ["swo-platform", "swo-extension-nav"] },
     "notifications": { "project": "MPT", "repos": ["swo-platform", "mpt-notifications"] },
     "audit": { "project": "MPT", "repos": ["swo-platform", "mpt-audit"] }
   }
