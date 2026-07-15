@@ -41,10 +41,10 @@ That said, still use judgment and still confirm with the human (Step 2) rather t
 
 ## Step 2.5 — Completion checkpoint
 
-`canon-generate` always leaves `questions/CANON_BACKLOG.md`'s status at 🟡 In Progress — it never marks 🟢 Complete itself, since that's a PM judgment call. This is the point where that call actually gets made, so it doesn't get silently skipped: for each object being promoted in this PR, ask the human directly — "is `<Object>`'s canon coverage complete now, or are there known gaps (deferred sections, follow-ups flagged for another object, etc.)?"
+`canon-generate` always leaves `questions/CANON_BACKLOG.md`'s status at 🟡 Known Pending Issues — it never marks 🟢 Up to Date itself, since that's a PM judgment call. This is the point where that call actually gets made, so it doesn't get silently skipped: for each object being promoted in this PR, ask the human directly — "is `<Object>`'s canon coverage complete now, or are there known gaps (deferred sections, follow-ups flagged for another object, etc.)?"
 
-- **Complete** — update its `CANON_BACKLOG.md` row: status → 🟢 Complete, fill in the `Canon File` column if not already set, and clear/finalize the Notes column (remove the "pending PM review" language). This edit is staged and committed as part of this same PR (Step 5) — no separate follow-up PR needed.
-- **Known gaps remain** — leave the row at 🟡 In Progress, and update its Notes column to describe what's still outstanding (not just "pending PM review" — the actual gap, e.g. "Split Billing deferred to a future session").
+- **Complete** — update its `CANON_BACKLOG.md` row: status → 🟢 Up to Date, set **Last Updated** to today's date, fill in the `Canon File` column if not already set, and clear/finalize the Notes column (remove the "pending PM review" language). This edit is staged and committed as part of this same PR (Step 5) — no separate follow-up PR needed. Remember 🟢 means "accurate as of Last Updated," not a permanent guarantee — the platform keeps evolving, so this object will need re-verifying again eventually.
+- **Known gaps remain** — leave the row at 🟡 Known Pending Issues, and update its Notes column to describe what's still outstanding (not just "pending PM review" — the actual gap, e.g. "Split Billing deferred to a future session").
 
 Never infer completeness yourself from the absence of Section 10 open questions — a clean Section 10 means no *known unknowns*, not that coverage is exhaustive. Always ask.
 
@@ -89,5 +89,5 @@ Commit message, matching this repo's existing convention (see `git log`, e.g. "A
 
 - Never lets a PR branch accumulate more than one commit (Core Rule) — always amends, never appends.
 - Never bundles unrelated or unconfirmed changes into a PR without the human explicitly confirming scope (Step 2).
-- Never marks `questions/CANON_BACKLOG.md` status as 🟢 Complete on its own inference — it only ever does so after the human explicitly confirms completeness at Step 2.5. `canon-generate` itself still never sets 🟢 under any circumstances.
+- Never marks `questions/CANON_BACKLOG.md` status as 🟢 Up to Date on its own inference — it only ever does so after the human explicitly confirms completeness at Step 2.5. `canon-generate` itself still never sets 🟢 under any circumstances.
 - Never bare-force-pushes (`--force-with-lease` only), never merges its own PR, never bypasses the confirmation checkpoints in Steps 2 and 6 even on a repeat invocation.
