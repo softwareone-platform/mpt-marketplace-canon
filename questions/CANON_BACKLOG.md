@@ -1,6 +1,6 @@
 # Canon Backlog
 
-> **Version:** 2.8
+> **Version:** 2.9
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -56,9 +56,9 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | users | accounts | 🔴 Not Started | | | |
 | groups | users | 🔴 Not Started | | | |
 | api-tokens | — | 🔴 Not Started | | | |
-| buyers | — | 🔴 Not Started | | | Referenced on Agreement JSON. |
+| buyers | — | 🟡 Known Pending Issues | 2026-07-15 | [CANON_OBJECT_Accounts_Buyer.md](../objects/CANON_OBJECT_Accounts_Buyer.md) | Draft generated 2026-07-15 via canon-generate — pending PM review. 0 open questions. See .evidence/accounts_buyer/20260715T163448Z/draft/. |
 | cloud-tenants | — | 🔴 Not Started | | | |
-| erp-links | — | 🔴 Not Started | | | |
+| erp-links | — | 🟡 Known Pending Issues | 2026-07-15 | [CANON_OBJECT_Accounts_ErpLink.md](../objects/CANON_OBJECT_Accounts_ErpLink.md) | Draft generated 2026-07-15 via canon-generate — pending PM review. 0 open questions. Join object between Buyer and Seller. See .evidence/accounts_erp-link/20260715T163954Z/draft/. |
 | licensees | — | 🔴 Not Started | | | Referenced on Agreement JSON. |
 | modules | — | 🔴 Not Started | | | |
 | sellers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | — |
@@ -339,3 +339,4 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | 2.6 | 2026-07-15 | Stu / canon-generate-batch | Sellers and Assets refresh drafts generated concurrently via canon-generate-batch's first dry run. Both marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint. Sellers: 0 open questions remaining (down from 7). Assets: AST-002 confirmed as a deliberate simplification, not a gap — 0 open questions remaining. |
 | 2.7 | 2026-07-15 | Stu / canon-submit-pr | Authorization marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. First object promoted in the Catalog completion push. 0 open questions remaining (down from 1, AUT-001 resolved). |
 | 2.8 | 2026-07-15 | Stu / canon-submit-pr | Account marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. All 5 prior open questions resolved (ACC-003, ACC-004, ACC-006, ACC-007, ACC-008). |
+| 2.9 | 2026-07-15 | Stu / canon-generate | Buyer and ErpLink drafts generated together (fresh canon; both promoted from 🔴 Not Started). 0 open questions each. ErpLink is the Buyer↔Seller join object. Drafts pending PM review before promotion. |

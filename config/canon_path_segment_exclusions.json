@@ -16,6 +16,28 @@
     "action_verbs": {},
     "non_object_resources": {}
   },
+  "accounts.buyers": {
+    "state_transition_verbs": {
+      "activate": "CANON_OBJECT_Accounts_Buyer.md §3.2 T4 \"Activate Buyer\", via /activate endpoint (Enabled→Active)",
+      "disable": "CANON_OBJECT_Accounts_Buyer.md §3.2 T2 \"Disable Buyer\", via /disable endpoint",
+      "enable": "CANON_OBJECT_Accounts_Buyer.md §3.2 T3 \"Enable Buyer\", via /enable endpoint"
+    },
+    "action_verbs": {
+      "deactivate": "CANON_OBJECT_Accounts_Buyer.md §8 \"deactivate\" — strips ERP identifiers from an already-Deleted Buyer; does not change status",
+      "transfer": "CANON_OBJECT_Accounts_Buyer.md §4 BR-012 \"transfer\" (ChangeAccount) — reassigns the Buyer's Account; does not change status",
+      "validate": "CANON_OBJECT_Accounts_Buyer.md — validates the Buyer against the ERP; not a status change",
+      "synchronize": "CANON_OBJECT_Accounts_Buyer.md — triggers an ERP re-sync of the Buyer; not a status change"
+    },
+    "non_object_resources": {}
+  },
+  "accounts.erp-links": {
+    "state_transition_verbs": {
+      "block": "CANON_OBJECT_Accounts_ErpLink.md §3.2 T2 \"Block link\", via /block endpoint (Active→Blocked)",
+      "unblock": "CANON_OBJECT_Accounts_ErpLink.md §3.2 T3 \"Unblock link\", via /unblock endpoint (Blocked→Active)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
   "accounts.sellers": {
     "state_transition_verbs": {
       "activate": "CANON_OBJECT_Accounts_Seller.md §3.2 T3 \"Activate Seller\" (dedicated action endpoint)",
