@@ -26,7 +26,8 @@
 **Description:**
 A Webhook is an Account-owned integration hook that causes the platform to call an external HTTP endpoint when a specific platform event occurs. For the event types currently confirmed (see BR-003), this is a **synchronous validation/mutation callout**, not a fire-and-forget notification — the platform waits for the endpoint's response and applies it as a mutation (`Delta`) back onto the triggering object (e.g. `Commerce: Order`, Enrollment). Webhooks belong to an Account, not to a specific Product or other object — the object reference in a Webhook is a scoping filter that determines which single object instance's events it listens for, not a parent relationship.
 
-**Also Known As:** None known.
+**Also Known As:**
+None known.
 
 ---
 
@@ -62,7 +63,7 @@ A Webhook is an Account-owned integration hook that causes the platform to call 
 ### 3.2 Transitions
 
 | ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
-|----|-----------|---------|--------|-----------------|-------|-------------|-------|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Enabled | Create Webhook | `POST` (base collection endpoint) | Vendor, Operations | The `criteria` block must include the mandatory anchor key for the given `type` (see BR-005a) | Webhook created in Enabled state by default (BR-002). |
 | T2 | Enabled | Disabled | Disable Webhook | `disable` (`POST .../{id}/disable`) | Vendor, Operations | None found — `ChangeWebhookStatusCommandHandler` applies no guard beyond "exists, belongs to this account, not deleted" | Webhook stops intercepting events. No queuing of missed events. |
 | T3 | Disabled | Enabled | Enable Webhook | `enable` (`POST .../{id}/enable`) | Vendor, Operations | Same as T2 — no additional guard confirmed | Webhook resumes intercepting matching events. |

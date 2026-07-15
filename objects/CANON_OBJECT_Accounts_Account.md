@@ -55,15 +55,15 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1a | — | Active | Create | Operations | None | Vendor Accounts are created directly into `Active` status. No ERP validation required. |
-| T1b | — | Enabled | Create | Operations | None | Client and Operations Accounts are created directly into `Enabled` status. |
-| T2 | Enabled | Active | ERP Activate Account | Operations | CDG present in `externalId` and validated against ERP | Client Accounts only. Driven by ERP sync, not by a direct platform UI action. |
-| T3a | Active | Disabled | ERP Disable Account | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
-| T3b | Enabled | Disabled | ERP Disable Account | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
-| T4a | Disabled | Active | ERP Re-enable Account | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
-| T4b | Disabled | Enabled | ERP Re-enable Account | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1a | — | Active | Create | Unconfirmed — pending refresh | Operations | None | Vendor Accounts are created directly into `Active` status. No ERP validation required. |
+| T1b | — | Enabled | Create | Unconfirmed — pending refresh | Operations | None | Client and Operations Accounts are created directly into `Enabled` status. |
+| T2 | Enabled | Active | ERP Activate Account | Unconfirmed — pending refresh | Operations | CDG present in `externalId` and validated against ERP | Client Accounts only. Driven by ERP sync, not by a direct platform UI action. |
+| T3a | Active | Disabled | ERP Disable Account | Unconfirmed — pending refresh | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
+| T3b | Enabled | Disabled | ERP Disable Account | Unconfirmed — pending refresh | Operations | Not confirmed | Applies to Vendor and Client Accounts only. Driven by ERP sync, not by the platform UI. |
+| T4a | Disabled | Active | ERP Re-enable Account | Unconfirmed — pending refresh | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
+| T4b | Disabled | Enabled | ERP Re-enable Account | Unconfirmed — pending refresh | Operations | Not confirmed | Reversal of T3. Driven by ERP sync. |
 
 ### 3.3 State Diagram
 

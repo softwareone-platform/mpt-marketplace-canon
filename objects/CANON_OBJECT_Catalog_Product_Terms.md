@@ -57,14 +57,14 @@ TCS (API identifier prefix); "Terms and Conditions"
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Terms | Vendor | None | Terms created under Product. |
-| T2 | Draft | Pending | Submit for Publishing | Vendor | None | Terms awaiting Operations review. |
-| T3 | Pending | Published | Approve and Publish | Operations | None | Terms visible to Client during Order creation. |
-| T4 | Published | Unpublished | Unpublish | Operations | None | Terms withdrawn from Client visibility. |
-| T5 | Unpublished | Published | Republish | Operations | None | Terms restored to Client visibility. |
-| T6 | Draft | Deleted | Delete Terms | Vendor | Terms must be in Draft state. All child Variants must be deleted first. | Permanently removed — no longer retrievable via the API. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Terms | Unconfirmed — pending refresh | Vendor | None | Terms created under Product. |
+| T2 | Draft | Pending | Submit for Publishing | Unconfirmed — pending refresh | Vendor | None | Terms awaiting Operations review. |
+| T3 | Pending | Published | Approve and Publish | Unconfirmed — pending refresh | Operations | None | Terms visible to Client during Order creation. |
+| T4 | Published | Unpublished | Unpublish | Unconfirmed — pending refresh | Operations | None | Terms withdrawn from Client visibility. |
+| T5 | Unpublished | Published | Republish | Unconfirmed — pending refresh | Operations | None | Terms restored to Client visibility. |
+| T6 | Draft | Deleted | Delete Terms | Unconfirmed — pending refresh | Vendor | Terms must be in Draft state. All child Variants must be deleted first. | Permanently removed — no longer retrievable via the API. |
 
 ### 3.3 State Diagram
 

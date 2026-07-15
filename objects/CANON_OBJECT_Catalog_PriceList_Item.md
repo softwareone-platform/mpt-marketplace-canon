@@ -55,13 +55,13 @@ PRI (API identifier prefix)
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Price List created, or new Product Item added to Product | System | None | Created automatically. Never manually. |
-| T2 | Draft | ForSale | Set ForSale | Vendor, Operations | None | Pricing not required. |
-| T3 | Draft | Private | Set Private | Vendor, Operations | None | For migrating existing business onto platform. |
-| T4 | ForSale | Private | Set Private | Vendor, Operations | None | Withdraws Item from new purchases. |
-| T5 | Private | ForSale | Set ForSale | Vendor, Operations | None | Restores full availability. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Price List created, or new Product Item added to Product | Unconfirmed — pending refresh | System | None | Created automatically. Never manually. |
+| T2 | Draft | ForSale | Set ForSale | Unconfirmed — pending refresh | Vendor, Operations | None | Pricing not required. |
+| T3 | Draft | Private | Set Private | Unconfirmed — pending refresh | Vendor, Operations | None | For migrating existing business onto platform. |
+| T4 | ForSale | Private | Set Private | Unconfirmed — pending refresh | Vendor, Operations | None | Withdraws Item from new purchases. |
+| T5 | Private | ForSale | Set ForSale | Unconfirmed — pending refresh | Vendor, Operations | None | Restores full availability. |
 
 > **Note:** Transitions out of Draft are irreversible. A Price List Item cannot return to Draft once it has moved to ForSale or Private.
 

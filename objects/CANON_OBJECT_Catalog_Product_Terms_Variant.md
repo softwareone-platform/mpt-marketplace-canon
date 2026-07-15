@@ -57,14 +57,14 @@ TCV (API identifier prefix)
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Variant | Vendor | None | Variant created under Terms. |
-| T2 | Draft | Pending | Submit for Publishing | Vendor | None | Variant awaiting Operations review. |
-| T3 | Pending | Published | Approve and Publish | Operations | None | Variant visible to Client when parent Terms are presented. |
-| T4 | Published | Unpublished | Unpublish | Operations | None | Variant withdrawn from Client visibility. Parent Terms state unaffected. |
-| T5 | Unpublished | Published | Republish | Operations | None | Variant restored to Client visibility. |
-| T6 | Draft | Deleted | Delete Variant | Vendor | Variant must be in Draft state | Permanently removed — no longer retrievable via the API. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Variant | Unconfirmed — pending refresh | Vendor | None | Variant created under Terms. |
+| T2 | Draft | Pending | Submit for Publishing | Unconfirmed — pending refresh | Vendor | None | Variant awaiting Operations review. |
+| T3 | Pending | Published | Approve and Publish | Unconfirmed — pending refresh | Operations | None | Variant visible to Client when parent Terms are presented. |
+| T4 | Published | Unpublished | Unpublish | Unconfirmed — pending refresh | Operations | None | Variant withdrawn from Client visibility. Parent Terms state unaffected. |
+| T5 | Unpublished | Published | Republish | Unconfirmed — pending refresh | Operations | None | Variant restored to Client visibility. |
+| T6 | Draft | Deleted | Delete Variant | Unconfirmed — pending refresh | Vendor | Variant must be in Draft state | Permanently removed — no longer retrievable via the API. |
 
 ### 3.3 State Diagram
 

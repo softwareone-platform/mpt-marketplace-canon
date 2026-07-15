@@ -62,11 +62,11 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Active | Order completed — promoted from OrderAsset | Platform | Purchase or Change Order transitions to Completed | Platform promotes the OrderAsset to a live Asset under Vendor token context. Same ID retained. Asset linked to Agreement simultaneously. |
-| T2 | — | Active | Vendor creates directly | Vendor | None — Vendor discretion | Used for migration scenarios or direct vendor sync. Asset created directly in Active status without an Order. |
-| T3 | Active | Terminated | Terminate Asset | Vendor | Asset must be Active | Via `/terminate` endpoint. No effect on parent Agreement status. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Active | Order completed — promoted from OrderAsset | Unconfirmed — pending refresh | Platform | Purchase or Change Order transitions to Completed | Platform promotes the OrderAsset to a live Asset under Vendor token context. Same ID retained. Asset linked to Agreement simultaneously. |
+| T2 | — | Active | Vendor creates directly | Unconfirmed — pending refresh | Vendor | None — Vendor discretion | Used for migration scenarios or direct vendor sync. Asset created directly in Active status without an Order. |
+| T3 | Active | Terminated | Terminate Asset | Unconfirmed — pending refresh | Vendor | Asset must be Active | Via `/terminate` endpoint. No effect on parent Agreement status. |
 
 ### 3.3 State Diagram
 

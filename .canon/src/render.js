@@ -159,6 +159,7 @@ const buildTransitionsData = (kb, entityId) => {
         from,
         to,
         action: orDash(t.name),
+        endpoint: orDash(t.meta?.endpoint),
         actors: joinList(t.meta?.actors) || '—',
         preconditions: orDash(t.meta?.preconditions),
         outcome: orDash(t.meta?.outcome),

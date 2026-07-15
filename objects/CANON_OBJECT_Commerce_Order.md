@@ -62,22 +62,22 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Order | Client | Listing must be Active. Seller of Listing must match Seller of Licensee. Parameter values must be valid. | Platform simultaneously creates a corresponding Draft Agreement for Purchase Orders. For Change, Configuration, and Termination Orders, the Order is created against an existing Active Agreement. |
-| T2 | — | Quoted | Create Order as Quoted | Client | Same as T1. | Order created directly in Quoted status without passing through Draft. |
-| T3 | — | Processing | Create and place Order | Client | Same as T1. | Order created and placed in a single API call without persisting as Draft or Quoted. Agreement → Provisioning (Purchase) or Updating (Change, Configuration, Termination). Affected pre-existing Subscriptions → Updating (Change only). All other Draft/Quoted Orders on the same Agreement → Deleted. |
-| T4 | Draft | Draft | Update Order | Client, Operations | Order must be in Draft. | Client can update `parameters.ordering`. Operations can update the Order. |
-| T5 | Draft | Quoted | Quote Order | Client | Order must be in Draft. | Signals to the Client that the Order is ready to be placed. No parameter edits permitted after this transition. Draft → Quoted is a one-way transition. |
-| T6 | Draft | Processing | Place Order | Client | Parameter values must be valid. | Agreement → Provisioning (Purchase) or Updating (Change, Configuration, Termination). Affected pre-existing Subscriptions → Updating (Change only). All other Draft/Quoted Orders on the same Agreement → Deleted — executed under the placing Client's token context. |
-| T7 | Draft | Deleted | Delete Order | Client, Vendor, Operations | — | Soft-deleted — moves to Deleted status, remains retrievable via the API. For Purchase Orders, the corresponding Draft Agreement is also moved to Deleted status. |
-| T8 | Quoted | Processing | Place Order | Client | Parameter values must be valid. | Same coupled transitions as T6. All other Draft/Quoted Orders on the same Agreement → Deleted. |
-| T9 | Quoted | Deleted | Delete Order | Client, Vendor, Operations | — | Same soft-delete behaviour as T7. For Purchase Orders, corresponding Draft Agreement also → Deleted. |
-| T10 | Processing | Completed | Complete Order | Vendor | All Lines must be mapped to a Subscription or Asset. For Configuration Orders, no precondition — Vendor completes at their discretion. | Order → Completed. Agreement → Active. Draft Subscriptions and Assets created during Processing → Active and linked to Agreement. For Termination Orders, terminated Subscriptions → Terminated. If all Subscriptions on the Agreement are Terminated, Agreement → Terminated. |
-| T11 | Processing | Failed | Fail Order | Vendor, Operations | — | `statusNotes` may optionally be set by the failing Actor. Purchase: Agreement → Failed. Change, Configuration, Termination: Agreement → Active, Subscriptions and Assets unchanged. |
-| T12 | Processing | Querying | Move to Querying | Vendor | — | See ORD-001: whether Operations can also make this transition is unconfirmed. |
-| T13 | Querying | Processing | Return to Processing | Client, Vendor, Operations | — | Client may have updated `parameters.ordering` before returning to Processing. |
-| T14 | Querying | Failed | Fail Order | — | — | See ORD-002: whether this transition is possible is unconfirmed. Parked pending confirmation. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Order | Unconfirmed — pending refresh | Client | Listing must be Active. Seller of Listing must match Seller of Licensee. Parameter values must be valid. | Platform simultaneously creates a corresponding Draft Agreement for Purchase Orders. For Change, Configuration, and Termination Orders, the Order is created against an existing Active Agreement. |
+| T2 | — | Quoted | Create Order as Quoted | Unconfirmed — pending refresh | Client | Same as T1. | Order created directly in Quoted status without passing through Draft. |
+| T3 | — | Processing | Create and place Order | Unconfirmed — pending refresh | Client | Same as T1. | Order created and placed in a single API call without persisting as Draft or Quoted. Agreement → Provisioning (Purchase) or Updating (Change, Configuration, Termination). Affected pre-existing Subscriptions → Updating (Change only). All other Draft/Quoted Orders on the same Agreement → Deleted. |
+| T4 | Draft | Draft | Update Order | Unconfirmed — pending refresh | Client, Operations | Order must be in Draft. | Client can update `parameters.ordering`. Operations can update the Order. |
+| T5 | Draft | Quoted | Quote Order | Unconfirmed — pending refresh | Client | Order must be in Draft. | Signals to the Client that the Order is ready to be placed. No parameter edits permitted after this transition. Draft → Quoted is a one-way transition. |
+| T6 | Draft | Processing | Place Order | Unconfirmed — pending refresh | Client | Parameter values must be valid. | Agreement → Provisioning (Purchase) or Updating (Change, Configuration, Termination). Affected pre-existing Subscriptions → Updating (Change only). All other Draft/Quoted Orders on the same Agreement → Deleted — executed under the placing Client's token context. |
+| T7 | Draft | Deleted | Delete Order | Unconfirmed — pending refresh | Client, Vendor, Operations | — | Soft-deleted — moves to Deleted status, remains retrievable via the API. For Purchase Orders, the corresponding Draft Agreement is also moved to Deleted status. |
+| T8 | Quoted | Processing | Place Order | Unconfirmed — pending refresh | Client | Parameter values must be valid. | Same coupled transitions as T6. All other Draft/Quoted Orders on the same Agreement → Deleted. |
+| T9 | Quoted | Deleted | Delete Order | Unconfirmed — pending refresh | Client, Vendor, Operations | — | Same soft-delete behaviour as T7. For Purchase Orders, corresponding Draft Agreement also → Deleted. |
+| T10 | Processing | Completed | Complete Order | Unconfirmed — pending refresh | Vendor | All Lines must be mapped to a Subscription or Asset. For Configuration Orders, no precondition — Vendor completes at their discretion. | Order → Completed. Agreement → Active. Draft Subscriptions and Assets created during Processing → Active and linked to Agreement. For Termination Orders, terminated Subscriptions → Terminated. If all Subscriptions on the Agreement are Terminated, Agreement → Terminated. |
+| T11 | Processing | Failed | Fail Order | Unconfirmed — pending refresh | Vendor, Operations | — | `statusNotes` may optionally be set by the failing Actor. Purchase: Agreement → Failed. Change, Configuration, Termination: Agreement → Active, Subscriptions and Assets unchanged. |
+| T12 | Processing | Querying | Move to Querying | Unconfirmed — pending refresh | Vendor | — | See ORD-001: whether Operations can also make this transition is unconfirmed. |
+| T13 | Querying | Processing | Return to Processing | Unconfirmed — pending refresh | Client, Vendor, Operations | — | Client may have updated `parameters.ordering` before returning to Processing. |
+| T14 | Querying | Failed | Fail Order | Unconfirmed — pending refresh | — | — | See ORD-002: whether this transition is possible is unconfirmed. Parked pending confirmation. |
 
 ### 3.3 State Diagram
 

@@ -63,13 +63,13 @@ PRD (API identifier prefix)
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Product | Vendor | Name, icon, and website are required. No other preconditions. | Product created in Draft state. |
-| T2 | Draft | Pending | Submit Product for Publication | Vendor | None — no completeness requirements. A Product with no child objects can be submitted. | Product enters review queue. Vendor cannot reverse this transition. |
-| T3 | Pending | Published | Publish Product | Operations | Product meets publishability criteria | Product becomes visible and purchasable by Clients. |
-| T4 | Published | Unpublished | Unpublish Product | Vendor, Operations | None | Product removed from Client discovery. Existing Agreements unaffected. |
-| T5 | Unpublished | Published | Republish Product | Vendor, Operations | None | Product restored to Client discovery. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Create Product | Unconfirmed — pending refresh | Vendor | Name, icon, and website are required. No other preconditions. | Product created in Draft state. |
+| T2 | Draft | Pending | Submit Product for Publication | Unconfirmed — pending refresh | Vendor | None — no completeness requirements. A Product with no child objects can be submitted. | Product enters review queue. Vendor cannot reverse this transition. |
+| T3 | Pending | Published | Publish Product | Unconfirmed — pending refresh | Operations | Product meets publishability criteria | Product becomes visible and purchasable by Clients. |
+| T4 | Published | Unpublished | Unpublish Product | Unconfirmed — pending refresh | Vendor, Operations | None | Product removed from Client discovery. Existing Agreements unaffected. |
+| T5 | Unpublished | Published | Republish Product | Unconfirmed — pending refresh | Vendor, Operations | None | Product restored to Client discovery. |
 
 ### 3.3 State Diagram
 

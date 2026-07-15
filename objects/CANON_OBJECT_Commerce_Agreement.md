@@ -62,17 +62,17 @@ None known.
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Co-created with Purchase Order | Platform | Purchase Order created by Client | Automated — executed by the platform under the Client's token context. Cannot be created independently. |
-| T2 | — | Provisioning | Co-created with Purchase Order (direct to Processing) | Platform | Purchase Order created and placed in a single call by Client | Agreement is created directly in Provisioning when a Client creates and places a Purchase Order without saving as Draft. Automated under Client's token context. |
-| T3 | Draft | Provisioning | Purchase Order placed | Platform | Purchase Order transitions to Processing | Automated — executed under Client's token context. |
-| T4 | Draft | Deleted | Purchase Order deleted | Platform | Draft or Quoted Purchase Order deleted by any Actor | Soft-deleted — remains retrievable via the API. Automated under the deleting Actor's token context. |
-| T5 | Provisioning | Active | Purchase Order completed | Platform | Purchase Order transitions to Completed | Automated under Vendor token context. All Draft Subscriptions and Assets → Active simultaneously. |
-| T6 | Provisioning | Failed | Purchase Order failed | Platform | Purchase Order transitions to Failed | Automated under Vendor or Operations token context. Terminal — cannot be recovered. |
-| T7 | Active | Updating | Change, Configuration, or Termination Order placed | Platform | Order transitions to Processing | Automated under Client's token context. |
-| T8 | Updating | Active | Order completed or failed | Platform | Change, Configuration, or Termination Order transitions to Completed or Failed | Automated under Vendor or Operations token context. For failed Orders, Agreement and Subscriptions revert to Active unchanged. |
-| T9 | Active | Terminated | Final Subscription terminated | Platform | All Subscriptions on the Agreement reach Terminated status | Automated. Triggered when the last Subscription terminates — whether via a Termination Order or direct Vendor action. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Draft | Co-created with Purchase Order | Unconfirmed — pending refresh | Platform | Purchase Order created by Client | Automated — executed by the platform under the Client's token context. Cannot be created independently. |
+| T2 | — | Provisioning | Co-created with Purchase Order (direct to Processing) | Unconfirmed — pending refresh | Platform | Purchase Order created and placed in a single call by Client | Agreement is created directly in Provisioning when a Client creates and places a Purchase Order without saving as Draft. Automated under Client's token context. |
+| T3 | Draft | Provisioning | Purchase Order placed | Unconfirmed — pending refresh | Platform | Purchase Order transitions to Processing | Automated — executed under Client's token context. |
+| T4 | Draft | Deleted | Purchase Order deleted | Unconfirmed — pending refresh | Platform | Draft or Quoted Purchase Order deleted by any Actor | Soft-deleted — remains retrievable via the API. Automated under the deleting Actor's token context. |
+| T5 | Provisioning | Active | Purchase Order completed | Unconfirmed — pending refresh | Platform | Purchase Order transitions to Completed | Automated under Vendor token context. All Draft Subscriptions and Assets → Active simultaneously. |
+| T6 | Provisioning | Failed | Purchase Order failed | Unconfirmed — pending refresh | Platform | Purchase Order transitions to Failed | Automated under Vendor or Operations token context. Terminal — cannot be recovered. |
+| T7 | Active | Updating | Change, Configuration, or Termination Order placed | Unconfirmed — pending refresh | Platform | Order transitions to Processing | Automated under Client's token context. |
+| T8 | Updating | Active | Order completed or failed | Unconfirmed — pending refresh | Platform | Change, Configuration, or Termination Order transitions to Completed or Failed | Automated under Vendor or Operations token context. For failed Orders, Agreement and Subscriptions revert to Active unchanged. |
+| T9 | Active | Terminated | Final Subscription terminated | Unconfirmed — pending refresh | Platform | All Subscriptions on the Agreement reach Terminated status | Automated. Triggered when the last Subscription terminates — whether via a Termination Order or direct Vendor action. |
 
 ### 3.3 State Diagram
 

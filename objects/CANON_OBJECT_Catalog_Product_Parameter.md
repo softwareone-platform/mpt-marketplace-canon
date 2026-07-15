@@ -58,10 +58,10 @@ PAR (API identifier prefix)
 
 ### 3.2 Transitions
 
-| # | From State | To State | Action / Trigger | Permitted Actor(s) | Preconditions | Outcome / Side Effects |
-| --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Active | Create Parameter | Vendor | None | Parameter available for use on eligible objects of the matching scope. If no group specified, auto-assigned to Default Parameter Group. |
-| T2 | Active | Deleted | Delete Parameter | Vendor | None | Soft delete. Parameter values on live objects preserved and remain resolvable. Templates referencing this Parameter via substitution tokens continue to render correctly. |
+| ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | — | Active | Create Parameter | Unconfirmed — pending refresh | Vendor | None | Parameter available for use on eligible objects of the matching scope. If no group specified, auto-assigned to Default Parameter Group. |
+| T2 | Active | Deleted | Delete Parameter | Unconfirmed — pending refresh | Vendor | None | Soft delete. Parameter values on live objects preserved and remain resolvable. Templates referencing this Parameter via substitution tokens continue to render correctly. |
 
 ### 3.3 State Diagram
 
