@@ -48,7 +48,7 @@ npm install
 npm run setup
 ```
 
-`setup` installs optional ML deps, warms up the local embedding model into `.canon/model-cache/`, builds the runtime bundles into `.canon/dist/`, and emits the user-facing extensions into `dist/` at the repo root with absolute paths baked in for THIS clone.
+`setup` installs optional ML deps, warms up the local embedding model into `.canon/model-cache/`, builds the runtime bundles into `.canon/dist/`, and emits user-facing install artifacts into `dist/` at the repo root with absolute paths baked in for THIS clone.
 
 ### Install into Claude Desktop
 
@@ -64,6 +64,26 @@ cat dist/claude_desktop_config.snippet.json
 ```
 
 Restart Claude Desktop after installing.
+
+### Install into Cursor
+
+Paste the generated snippet into either project-level `.cursor/mcp.json` or global `~/.cursor/mcp.json`:
+
+```bash
+cat dist/cursor_mcp.snippet.json
+```
+
+Cursor can usually pick up MCP config changes automatically. If the servers do not appear, reload Cursor or toggle them under Settings > Tools & MCP.
+
+### Install into Codex
+
+Paste the generated TOML snippet into either global `~/.codex/config.toml` or project-level `.codex/config.toml`:
+
+```bash
+cat dist/codex_config.snippet.toml
+```
+
+Restart Codex after installing if the servers do not appear.
 
 ### Patch flow
 
@@ -88,7 +108,7 @@ npm run validate -- <patch-id>      # parse + validate objects/ + that patch
 
 - After cloning fresh
 - After moving / renaming the workdir (the absolute paths in `.mcpb` go stale)
-- After major dist changes (`npm run build` alone updates bundles, but the `.mcpb` manifests are emitted only by `setup`)
+- After major dist changes (`npm run build` alone updates bundles, but the `.mcpb` manifests and install snippets are emitted only by `setup`)
 
 ---
 

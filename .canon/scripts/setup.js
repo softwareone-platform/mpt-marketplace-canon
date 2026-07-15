@@ -8,6 +8,8 @@
 // 4. emit dist/canon-read.mcpb / dist/canon-edit.mcpb at repo root
 //    with absolute paths baked in for THIS workdir
 // 5. emit dist/claude_desktop_config.snippet.json — manual-install fallback
+// 6. emit dist/cursor_mcp.snippet.json — Cursor MCP config
+// 7. emit dist/codex_config.snippet.toml — Codex MCP config
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -25,7 +27,7 @@ const rel = (abs) => relative(repoRoot, abs);
 
 process.env.CANON_MODEL_CACHE = modelCacheDir;
 
-const step = (n, label) => console.log(`\n[${n}/5] ${label}`);
+const step = (n, label) => console.log(`\n[${n}/7] ${label}`);
 
 // ── 1. optional deps ───────────────────────────────────────────────
 
@@ -84,6 +86,12 @@ const KINDS = [
   ['edit', 'Edit', 'Read access plus patch_write / patch_read / patch_render against .patches/.'],
 ];
 
+const serverName = (kind) => `canon-${kind}-${workdirName}`;
+const serverEntry = (kind) => join(internalDist, `canon-${kind}.js`);
+const serverEnv = () => ({ CANON_MODEL_CACHE: modelCacheDir });
+const tomlString = (value) => JSON.stringify(value);
+const tomlArray = (values) => `[${values.map(tomlString).join(', ')}]`;
+
 mkdirSync(userDist, { recursive: true });
 
 for (const [kind, label, description] of KINDS) {
@@ -127,14 +135,51 @@ step(5, 'emit claude_desktop_config snippet');
 const snippetPath = join(userDist, 'claude_desktop_config.snippet.json');
 const snippet = { mcpServers: {} };
 for (const [kind] of KINDS) {
-  snippet.mcpServers[`canon-${kind}-${workdirName}`] = {
+  snippet.mcpServers[serverName(kind)] = {
     command: 'node',
-    args: [join(internalDist, `canon-${kind}.js`)],
-    env: { CANON_MODEL_CACHE: modelCacheDir },
+    args: [serverEntry(kind)],
+    env: serverEnv(),
   };
 }
 writeFileSync(snippetPath, JSON.stringify(snippet, null, 2) + '\n');
 console.log(`  ${rel(snippetPath)}`);
+
+// ── 6. cursor mcp snippet ───────────────────────────────────────────
+
+step(6, 'emit Cursor mcp.json snippet');
+
+const cursorSnippetPath = join(userDist, 'cursor_mcp.snippet.json');
+const cursorSnippet = { mcpServers: {} };
+for (const [kind] of KINDS) {
+  cursorSnippet.mcpServers[serverName(kind)] = {
+    type: 'stdio',
+    command: 'node',
+    args: [serverEntry(kind)],
+    env: serverEnv(),
+  };
+}
+writeFileSync(cursorSnippetPath, JSON.stringify(cursorSnippet, null, 2) + '\n');
+console.log(`  ${rel(cursorSnippetPath)}`);
+
+// ── 7. codex config snippet ─────────────────────────────────────────
+
+step(7, 'emit Codex config.toml snippet');
+
+const codexSnippetPath = join(userDist, 'codex_config.snippet.toml');
+const codexLines = [];
+for (const [kind] of KINDS) {
+  codexLines.push(
+    `[mcp_servers.${tomlString(serverName(kind))}]`,
+    'command = "node"',
+    `args = ${tomlArray([serverEntry(kind)])}`,
+    '',
+    `[mcp_servers.${tomlString(serverName(kind))}.env]`,
+    `CANON_MODEL_CACHE = ${tomlString(modelCacheDir)}`,
+    '',
+  );
+}
+writeFileSync(codexSnippetPath, codexLines.join('\n'));
+console.log(`  ${rel(codexSnippetPath)}`);
 
 // ── done ───────────────────────────────────────────────────────────
 
@@ -143,7 +188,13 @@ console.log('install in Claude Desktop:');
 console.log(`  open ${rel(join(userDist, 'canon-read.mcpb'))}`);
 console.log(`  open ${rel(join(userDist, 'canon-edit.mcpb'))}`);
 console.log('');
-console.log('or paste the snippet manually:');
+console.log('or paste the Claude snippet manually:');
 console.log(`  cat ${rel(snippetPath)}`);
 console.log('');
-console.log('then restart Claude Desktop.');
+console.log('install in Cursor:');
+console.log(`  paste ${rel(cursorSnippetPath)} into .cursor/mcp.json or ~/.cursor/mcp.json`);
+console.log('');
+console.log('install in Codex:');
+console.log(`  paste ${rel(codexSnippetPath)} into ~/.codex/config.toml or .codex/config.toml`);
+console.log('');
+console.log('then restart or reload the client.');
