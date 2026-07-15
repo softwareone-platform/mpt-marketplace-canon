@@ -1,6 +1,6 @@
 # Canon Open Questions
 
-> **Version:** 2.9
+> **Version:** 3.1
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
 
@@ -40,21 +40,8 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 |---|----------|
 | ENV-001 | Which platform constraints are relaxed in non-PROD environments due to external system dependencies (e.g. ERP, vendor provisioning systems, payment processors)? Is there a complete list maintained anywhere, or is this tribal knowledge? This should be documented centrally and referenced from the preamble. |
 | ENV-002 | Beyond the ERP-linked Licensee status constraint, are there other external system dependencies that cause constraint relaxation in non-PROD environments (e.g. vendor provisioning systems, payment processors)? |
-| ENV-004 | Icon removal mechanism: how is a custom icon removed from an object with jdenticon behaviour? The `/icon` endpoint exposes GET only — the removal mechanism is not confirmed from the spec. |
-
----
-
-## CANON_OBJECT_Accounts_Seller.md
-
-| # | Question |
-|---|----------|
-| SEL-002 | The mechanism for accessing Buyer data associated with a Seller is not confirmed. The `buyers` field appears in `$meta.omitted` on Seller responses unconditionally — even when `select=+buyers` is explicitly requested. It is unclear whether Buyers can be queried via the Seller endpoint at all, or whether Buyer access is always via a dedicated Buyer endpoint. |
-| SEL-004 | One Seller in production (`BG_CPX`, `SEL-9696-0728`, Disabled) has no `icon` field in its API response, where all other Sellers return a jdenticon URL. Cause unknown — may be a data anomaly from migration or an edge case in icon behaviour for early-created or Disabled records. |
-| SEL-005 | The effect of removing a currency from a Seller's `currencies` array on existing Authorizations and Listings denominated in that currency is not confirmed. Whether the platform permits the removal of a currency that is actively referenced downstream is also unconfirmed. |
-| SEL-007 | The `erpLink` field on the Seller object is a single `ErpLinkRef` reference, not a collection. The relationship between this field and the broader Seller:Buyer association model is not confirmed. Suspected to represent the Seller's relationship to its ERP instance rather than to a specific Buyer. Requires engineering input. |
-| SEL-008 | The `/deactivate` action endpoint exists in the API spec alongside `/disable`. How `deactivate` differs from `disable`, which state it produces, and what its downstream effects are, is not confirmed. |
-| SEL-009 | The `SellerStatus` enum includes `Offline` and `Deleted` in addition to `Active` and `Disabled`. The semantics, transition mechanics, and downstream effects of `Offline` and `Deleted` status values are not confirmed. `Deleted` may represent a soft-delete state distinct from the DELETE endpoint. |
-| SEL-010 | A `DELETE /v1/accounts/sellers/{id}` endpoint exists in the API spec (returns 204). Whether the platform enforces a deletion guard in practice — and what conditions permit or block deletion — is not confirmed. The downstream impact on Authorizations, Listings, and ErpLinks if a Seller is deleted is not confirmed. |
+| ENV-004 | Icon removal mechanism: how is a custom icon removed from an object with jdenticon behaviour? Confirmed for `Accounts: Seller` (a multipart `PUT` omitting the `logo` file part removes the custom icon) — whether this same mechanism holds for every jdenticon-capable object is not confirmed, since icon behaviour is implemented per object type. |
+| ENV-005 | Accounts: Seller's related-Licensee guard (blocking Activate/Disable/Deactivate/Delete while a related Licensee is Active/Enabled) was confirmed via STAGING only. Whether it is enforced identically in PROD, or is one of the non-PROD relaxations already noted in Section 7.3, is not confirmed. |
 
 ---
 
@@ -69,14 +56,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | ORD-005 | Whether the platform handles simultaneous Order placement attempts against the same Agreement atomically — preventing race conditions where two Orders could both reach Processing status simultaneously — is not confirmed. |
 | ORD-006 | Split Billing is enabled at the Agreement level and has implications for Order behaviour. This section requires updating once Split Billing has been canonised in the Agreement canon. |
 | ORD-007 | The `certificates` array on the Order is always empty in observed samples where no Program is assigned to the Product. The full structure of a populated `certificates` entry, which Actors can read it, and whether it is suppressed for any Actor type is not confirmed. See Programs and Certificates canon — pending canonisation. |
-
----
-
-## CANON_OBJECT_Commerce_Asset.md
-
-| # | Question |
-|---|----------|
-| AST-001 | There is no `terminationDate` field on the Asset schema, unlike Subscription which has an explicit `terminationDate` set by the platform on termination. Whether this is an intentional design decision or a spec gap is not confirmed. The `audit.updated` timestamp is the current proxy for termination time. |
 
 ---
 
@@ -147,3 +126,5 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | 2.3 | 2026-04-13 | Stu | AGR-004, AGR-005, AGR-006 resolved and removed — parameters model confirmed, icon confirmed as not applicable, writable fields confirmed. AGR-008 added: failed audit sub-key presence unconfirmed in schema. |
 | 2.4 | 2026-04-13 | Stu | SUB-001 through SUB-003 added from Subscription canon session. |
 | 2.5 | 2026-04-14 | Stu | AST-001 added from Asset canon session. |
+| 3.0 | 2026-07-15 | Stu / canon-generate-batch | SEL-002, SEL-004, SEL-005, SEL-007, SEL-008, SEL-009, SEL-010 resolved and removed — Seller heading removed entirely (no open questions remain). AST-001 replaced by AST-002 (audit draft/active sub-keys never populated) — AST-003 was resolved directly via a live re-check and never tracked here. ENV-005 added — Seller's related-Licensee status-change guard, PROD-parity unconfirmed. All from a canon-generate-batch dry run refreshing Accounts: Seller and Commerce: Asset concurrently. |
+| 3.1 | 2026-07-15 | Stu / canon-generate-batch | AST-002 resolved and removed — confirmed as a deliberate simplification, not an unimplemented feature. Asset heading removed entirely (no open questions remain). |

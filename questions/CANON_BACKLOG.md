@@ -1,6 +1,6 @@
 # Canon Backlog
 
-> **Version:** 2.0
+> **Version:** 2.6
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -61,7 +61,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | erp-links | — | 🔴 Not Started | | | |
 | licensees | — | 🔴 Not Started | | | Referenced on Agreement JSON. |
 | modules | — | 🔴 Not Started | | | |
-| sellers | — | 🟡 Known Pending Issues | 2026-03-15 | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | 7 open questions. |
+| sellers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | — |
 | services | — | 🔴 Not Started | | | |
 | user-groups | — | 🔴 Not Started | | | |
 | users | — | 🔴 Not Started | | | |
@@ -137,7 +137,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | attachments | agreements | 🔴 Not Started | | | |
 | lines | agreements | 🔴 Not Started | | | |
 | split | agreements | 🔴 Not Started | | | Split Billing — confirmed a real object with its own endpoints (`/split`: GET/POST/PUT), not just a field. See AGR-007. |
-| assets | — | 🟡 Known Pending Issues | 2026-04-14 | [CANON_OBJECT_Commerce_Asset.md](../objects/CANON_OBJECT_Commerce_Asset.md) | 1 open question. |
+| assets | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Commerce_Asset.md](../objects/CANON_OBJECT_Commerce_Asset.md) | — |
 | lines | assets | 🔴 Not Started | | | |
 | lines | — | 🔴 Not Started | | | |
 | orders | — | 🟡 Known Pending Issues | 2026-04-12 | [CANON_OBJECT_Commerce_Order.md](../objects/CANON_OBJECT_Commerce_Order.md) | 7 open questions. |
@@ -336,3 +336,4 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | 2.3 | 2026-07-15 | Stu / canon-submit-pr | Parameter marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint. Parameter Group's Last Updated bumped (one error corrected) but stays Known Pending Issues — PM confirmed it's not a full re-verification. |
 | 2.4 | 2026-07-15 | Stu / canon-generate | Parameter Group (Product child) full refresh draft generated — resolved the long-standing soft-delete-vs-hard-delete ambiguity, plus new Display Order uniqueness and creation-required-field corrections. Draft pending PM review before promotion. |
 | 2.5 | 2026-07-15 | Stu / canon-submit-pr | Parameter Group marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. |
+| 2.6 | 2026-07-15 | Stu / canon-generate-batch | Sellers and Assets refresh drafts generated concurrently via canon-generate-batch's first dry run. Both marked Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint. Sellers: 0 open questions remaining (down from 7). Assets: AST-002 confirmed as a deliberate simplification, not a gap — 0 open questions remaining. |

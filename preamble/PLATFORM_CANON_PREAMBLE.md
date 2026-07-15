@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.6
+> **Version:** 1.7
 > **Owner:** Stu
 > **Last Updated:** 2026-07-15
 > **Status:** Living Document — updated continuously as canon is developed
@@ -29,7 +29,7 @@ These invariants apply universally across all objects, actors, and namespaces. T
    **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
-   **Known exceptions:** Catalog: Pricing Policy and Commerce: Order use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
+   **Known exceptions:** Catalog: Pricing Policy, Commerce: Order, and Accounts: Seller use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
 
 ---
 
@@ -296,7 +296,7 @@ While the API surface is identical across all environments, certain business log
 **Known example:**
 - In PROD, an `Accounts: Licensee` must have `Active` status to place an Order. This status reflects that the Licensee's linked `Accounts: Buyer` is correctly linked to a customer record in SoftwareOne's ERP. In STAGING, this constraint is not enforced, allowing Order placement without a valid ERP link.
 
-> ⚠️ The full set of constraint relaxations across non-PROD environments is not comprehensively documented. Some relaxations are known only through tribal knowledge. See ENV-001 and ENV-002 in the Open Questions tracker. Do not assume that behaviour observed in STAGING is fully representative of PROD behaviour — verify constraints that involve external system dependencies against PROD documentation or engineering input.
+> ⚠️ The full set of constraint relaxations across non-PROD environments is not comprehensively documented. Some relaxations are known only through tribal knowledge. See ENV-001, ENV-002, and ENV-005 in the Open Questions tracker. Do not assume that behaviour observed in STAGING is fully representative of PROD behaviour — verify constraints that involve external system dependencies against PROD documentation or engineering input.
 
 ---
 
@@ -347,7 +347,7 @@ A custom icon is uploaded as a binary via a `multipart/form-data` request to the
 
 ### 9.4 Icon Removal
 
-For objects with jdenticon behaviour, a custom icon can be removed to revert to the jdenticon. The mechanism for removal is not yet confirmed — see ENV-004 in the Open Questions tracker.
+For objects with jdenticon behaviour, a custom icon can be removed to revert to the jdenticon. One confirmed mechanism, for `Accounts: Seller`: submitting the same multipart `PUT` used for upload, but omitting the `logo` file part, removes any existing custom icon and reverts to the jdenticon — this happens regardless of whether icon removal was the caller's intent, since the platform derives "remove icon" from the simple absence of a `logo` file on that request. Icon behaviour is implemented per object type, so whether this same mechanism holds for every jdenticon-capable object is not yet confirmed — see ENV-004 in the Open Questions tracker.
 
 For objects with required icon behaviour, the icon cannot be removed. A replacement icon may be uploaded via the parent object endpoint, but removal is not permitted.
 
@@ -375,3 +375,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |
 | 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |
 | 1.6 | 2026-07-15 | Stu / canon-generate | Invariant 6 known exception added: deleting a Catalog: Product in Draft state cascades to its child objects (Items, Item Groups, Parameters, Parameter Groups, Templates, Terms/Variants, Media, Price Lists/Items), Authorizations, and Listings, plus Documents/Media/Icon — confirmed via source-code research during the Product canon refresh. Previously undocumented; existing Product canon incorrectly stated deletion was impossible in any state. |
+| 1.7 | 2026-07-15 | Stu / canon-generate-batch | Section 7.3 updated: ENV-005 added and cross-referenced alongside ENV-001/ENV-002 — whether Accounts: Seller's related-Licensee status-change guard is enforced identically in PROD is unconfirmed (only STAGING was exercised). Invariant 7 known exceptions updated to add Accounts: Seller's soft-delete model, alongside Pricing Policy and Order. Section 9.4 updated with a confirmed Seller-specific icon-removal mechanism (narrows, doesn't resolve, ENV-004). Surfaced during a canon-generate-batch dry run refreshing Seller and Commerce: Asset concurrently. |
