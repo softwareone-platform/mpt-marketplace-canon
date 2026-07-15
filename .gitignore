@@ -7,3 +7,9 @@ dist/
 .playwright-mcp
 *.log
 .DS_Store
+
+# canon-generate pipeline — secrets and fetched evidence, never committed
+.env
+.evidence/
+__pycache__/
+*.pyc
