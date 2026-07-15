@@ -1,6 +1,6 @@
 # Object Canon: Parameter Group
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** Stu
 > **Last Updated:** 2026-03-14
 > **Status:** Draft
@@ -58,7 +58,7 @@ This object has no state machine. It is created and modified as a unit, with no 
 | --- | --- | --- | --- | --- |
 | BR-001 | A [[Parameter]] Group belongs to exactly one [[Product]] and cannot be shared across Products. | N/A | All | — |
 | BR-002 | Exactly one [[Parameter]] Group per [[Product]] must be marked as Default. | N/A | All | — |
-| BR-003 | If a new [[Parameter]] is created without specifying a [[Parameter]] Group, it is automatically assigned to the Default [[Parameter]] Group. | N/A | All | — |
+| BR-003 | A [[Parameter]] Group is optional on most Parameters — a Parameter can be created, and remain, with no Group at all. The platform requires a Group at creation only for Agreement-scoped, Order-phase Parameters and Order-scoped Parameters; creation fails without one for those. | N/A | All | There is no automatic assignment to the Default Group. |
 | BR-004 | The `displayOrder` attribute controls the sequence in which [[Parameter]] Groups are presented during the ordering and configuration process. | N/A | All | — |
 | BR-005 | [[Parameter]] Group creation, modification, and deletion are not restricted by the state of the parent [[Product]]. | N/A | Vendor | Consistent with [[Product]] canon BR-001 and [[Item Group]] canon BR-007. |
 | BR-006 | The Default [[Parameter]] Group cannot be deleted. To delete a Default [[Parameter]] Group, the Vendor must first designate another [[Parameter]] Group as Default. | N/A | Vendor | Consistent with Default protection pattern in [[Template]] canon BR-004 and [[Item Group]] canon BR-008. |
@@ -74,7 +74,7 @@ This object has no state machine. It is created and modified as a unit, with no 
 | Label | String | Display label shown to users during ordering and configuration | Vendor | Yes | — |
 | Description | String | Descriptive text shown to users during ordering and configuration | Vendor | Yes | — |
 | Display Order | Integer | Controls the sequence in which this group is presented | Vendor | Yes | — |
-| Default | Boolean | Marks this Parameter Group as the Default for the Product | Vendor | Yes | Exactly one Parameter Group per Product must be Default. New Parameters without an assigned group are automatically added here. |
+| Default | Boolean | Marks this Parameter Group as the Default for the Product | Vendor | Yes | Exactly one Parameter Group per Product must be Default. Not automatically assigned to new Parameters — see BR-003. |
 | Parameter Count | Integer | Number of Parameters currently assigned to this group | System | N/A | Read-only. Reflects current membership. |
 | Revision | Integer | Increments when the Parameter Group's own attributes change | System | N/A | Does not increment when child Parameters are added, modified, or removed. |
 
@@ -102,9 +102,7 @@ This object has no state machine. It is created and modified as a unit, with no 
 
 ### 7.2 Cross-Object State Effects
 
-| Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
-| --- | --- | --- | --- | --- | --- |
-| Parameter created without assigned group | Parameter Group (Default) | Parameter is automatically assigned to the Default Parameter Group | Yes | Always — when no group is specified on Parameter creation | — |
+No cross-object state effects flow from Parameter Group events to other platform objects. Parameter creation without a Group does not touch or affect the Default Parameter Group in any way — see [[Parameter]] canon BR-003.
 
 ---
 
@@ -145,3 +143,4 @@ No open questions at this time.
 | 0.1 | 2026-03-07 | Stu | Initial canon. Derived from JSON and conversation. |
 | 0.2 | 2026-03-09 | Stu | Namespace qualification applied to Parent Object and Section 6 relationship references. |
 | 0.3 | 2026-03-14 | Stu | Section 7.1: auto-creation event added — platform creates one Default Parameter Group on Product creation with known default values. |
+| 0.4 | 2026-07-15 | Stu / canon-generate | Corrected BR-003, the Default attribute, and Section 7.2 — a Parameter created without a Group is not automatically assigned to the Default Group; it may remain groupless. A Group is only required at creation for Agreement-scoped Order-phase and Order-scoped Parameters. Surfaced during the Catalog: Product Parameter canon refresh. |
