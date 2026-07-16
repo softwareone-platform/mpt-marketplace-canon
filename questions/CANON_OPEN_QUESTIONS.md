@@ -47,19 +47,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 |---|----------|
 | SUB-001 | What fields are meaningful in the request body of the `/terminate` endpoint? Specifically whether `terminationDate` or other Subscription fields can be set by the Vendor at termination time, or whether the body is unused. |
 | SUB-002 | Whether `commitmentDate` is set by the Vendor Extension at Subscription creation, computed by the platform from `startDate + terms.commitment`, or both, is not confirmed. |
-| SUB-003 | Split Billing on Subscription — full semantics, write rules, and `splitStatus` lifecycle — to be canonised separately. See AGR-007. |
-
----
-
-## CANON_OBJECT_Commerce_Agreement.md
-
-| # | Question |
-|---|----------|
-| AGR-001 | `startDate` and `endDate` fields appear in the Agreement OpenAPI schema as nullable date-time fields with no `x-rql` annotations. Neither field is observed in any API sample. Purpose, ownership, and whether these fields are actively used is not confirmed. |
-| AGR-002 | `error` field appears in the Agreement OpenAPI schema as a nullable `ParametrisedMessage` (`id`, `message`, `parameters`). Not observed in any API sample — suspected to be a Failed-state-only field analogous to Order `statusNotes`. Confirmation required. |
-| AGR-003 | Whether Attachments created via the Order `/attachments` endpoint are automatically visible via the Agreement `/attachments` endpoint, or whether they must be created against the Agreement separately, is not confirmed. |
-| AGR-007 | Split Billing configuration on the Agreement — full semantics, write rules, and relationship to Order and Subscription Split Billing — to be canonised separately. See ORD-006. |
-| AGR-008 | The `AgreementAudit` schema does not include a `failed` sub-key, but a Failed Agreement is expected to have a failure timestamp. Whether `failed` is a valid audit sub-key missing from the spec, or whether failure is recorded differently, is not confirmed. |
+| SUB-003 | Split Billing on Subscription — full semantics, write rules, and `splitStatus` lifecycle — to be canonised separately. See Commerce: Agreement canon BR-018 for the Agreement-side model. |
 
 ---
 
@@ -75,6 +63,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.2 | 2026-07-16 | Stu / canon-generate | AGR-001, AGR-002, AGR-003, AGR-007, AGR-008 all resolved via live schema + multi-Actor fetch + source-code research and removed (Agreement section retired) — `startDate`/`endDate`/`error` are vestigial contract fields; Order and Agreement attachments are one shared collection; the audit block genuinely has no `failed` sub-key; Split Billing documented in the Agreement canon (BR-018). SUB-003's stale "See AGR-007" reference repointed to Agreement BR-018. Incorporated into the Commerce: Agreement canon refresh. |
 | 3.1 | 2026-07-16 | Stu / canon-generate | PRP-001, PRP-002, PRP-004 resolved via source-code research and removed (section retired) — `None` status is defined-but-unused (policies are created Active); multiple-match resolution is deterministic (Product-level over Client-level, lowest markup). Incorporated into Pricing Policy canon. |
 | 3.0 | 2026-07-16 | Stu / canon-generate | PRI-002 added from Price List Item canon-generate run — retrievability of Price List Items after a direct Price List deletion (not via Product deletion) is unconfirmed for Operations/Client and needs a live test. |
 | 2.9 | 2026-07-15 | Stu / canon-generate | WBH-002 resolved via direct source-code research and removed — Product deletion has no reactive effect on a Webhook referencing it; see Webhook canon BR-004a and Section 9. |
