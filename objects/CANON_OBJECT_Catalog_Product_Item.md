@@ -1,8 +1,8 @@
 # Object Canon: Item
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** Stu
-> **Last Updated:** 2026-03-14
+> **Last Updated:** 2026-07-16
 > **Status:** Draft
 
 ---
@@ -59,7 +59,7 @@ ITM (API identifier prefix); SKU
 
 | ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Draft | Create Item | Unconfirmed — pending refresh | Vendor | None | Item created under Product. Auto-assigned to Default Item Group if no group specified. |
+| T1 | — | Draft | Create Item | Unconfirmed — pending refresh | Vendor | None | Item created under Product. A valid [[Item Group]] must be specified. |
 | T2 | Draft | Pending | Submit Item for Publishing | Unconfirmed — pending refresh | Vendor | None | Item awaiting Operations review. |
 | T3 | Pending | Published | Approve and Publish Item | Unconfirmed — pending refresh | Operations | None | Item available for inclusion in Price Lists and ordering by Clients. |
 | T4 | Published | Unpublished | Unpublish Item | Unconfirmed — pending refresh | Vendor, Operations | None | Item withdrawn from Client visibility. |
@@ -84,8 +84,8 @@ ITM (API identifier prefix); SKU
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
 | BR-001 | An Item belongs to exactly one [[Product]] and cannot be shared across Products. | All | All | — |
-| BR-002 | An Item belongs to an [[Item Group]]. If no group is specified on creation, the Item is automatically assigned to the Default [[Item Group]]. | All | All | Consistent with [[Item Group]] canon. |
-| BR-003 | [[Item Group]] flags (multiple, required) are enforced by the platform at [[Order]] submission. This is one of the few places where the platform itself enforces constraints rather than delegating to the Vendor Extension. | All | All | See [[Item Group]] canon for full detail. |
+| BR-002 | An Item belongs to exactly one [[Item Group]], specified explicitly when the Item is created. The platform does not assign a group automatically. | All | All | A creation request omitting a valid Item Group is rejected. See [[Item Group]] canon BR-003. |
+| BR-003 | An [[Item Group]]'s `multiple` and `required` flags express intended selection semantics for the ordering experience; the platform core does not enforce them at [[Order]] submission. | All | All | Advisory metadata consumed by the ordering UI / Vendor Extension. See [[Item Group]] canon BR-004/BR-005. |
 | BR-004 | [[Product]] Items represent the full union of all orderable SKUs across all regions and currencies. Availability of an Item for sale in a given currency is controlled by the [[Price List]], not by the Item itself. | All | All | — |
 | BR-005 | Items are ordered with an integer quantity. Fractional quantities are not supported. | All | All | — |
 | BR-006 | Item quantity constraints (min, max) are not enforced by the platform. Quantity validation is the responsibility of the Vendor Extension, typically during Draft [[Order]] validation. | All | All | The platform has no opinion on whether a given quantity is commercially valid. |
@@ -109,7 +109,7 @@ ITM (API identifier prefix); SKU
 | Description | String | Description of the Item | Vendor | Yes | Optional on creation. |
 | externalIds.vendor | String | Vendor's own SKU identifier for this Item | Vendor | Yes | Required on creation. |
 | externalIds.operations | String | SoftwareOne ERP part number for this Item | Operations | Yes | Optional — set by Operations independently of Vendor. |
-| Group | Reference | The Item Group this Item belongs to | Vendor | Yes | Required on creation. Auto-assigned to Default group if not specified at creation. |
+| Group | Reference | The Item Group this Item belongs to | Vendor | Yes | Required on creation — a valid Item Group must be specified. |
 | Unit of Measure | Reference | Platform-defined unit describing what is being counted or measured (e.g. User, Licenses, Gigabytes) | Vendor | No | Required on creation. Immutable after creation. References a platform-level Catalog: Unit of Measure object. |
 | terms.model | Enum | One of: quantity, usage, one-time | Vendor | No | Required on creation. Immutable after creation. |
 | terms.period | Enum | One of: 1m, 1y, one-time | Vendor | No | Required on creation. Immutable after creation. Note: 3y is not a valid period value. |
@@ -126,7 +126,7 @@ ITM (API identifier prefix); SKU
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
 | --- | --- | --- | --- | --- |
 | Catalog: Product | Parent | Many:1 | An Item belongs to exactly one Product. | Yes — Item cannot exist without a parent Product. |
-| Catalog: Product Item Group | Parent | Many:1 | An Item belongs to an Item Group. Auto-assigned to Default group if none specified. | Yes — deletion of an Item Group is blocked while it contains Items. |
+| Catalog: Product Item Group | Parent | Many:1 | An Item belongs to an Item Group, specified explicitly on creation. | Yes — deletion of an Item Group is blocked while it contains Items. |
 | Catalog: Price List | Association | Many:Many | Price Lists reference Items to define which Items are available in a given currency and at what price. | No — Item state changes do not cascade to Price Lists. |
 | Commerce: Order | Association | Many:Many | Orders contain lines referencing Items with integer quantities. Change Orders carry both old and new quantities per line. Configuration Orders reference Items linked to existing Subscriptions. | No |
 | Catalog: Product Parameter | Association | Many:Many | Item-scoped Parameters may be associated with Items. | No |
@@ -140,7 +140,7 @@ ITM (API identifier prefix); SKU
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Item created | Vendor creates Item under a Product | Vendor | Item enters Draft state. Auto-assigned to Default Item Group if no group specified. |
+| Item created | Vendor creates Item under a Product | Vendor | Item enters Draft state under its explicitly specified [[Item Group]]. |
 | Item submitted | T2 — Draft to Pending | Vendor | Item awaiting Operations review. |
 | Item published | T3 — Pending to Published | Operations | Item becomes available for inclusion in Price Lists and for ordering by Clients via appropriate Listing. |
 | Item unpublished | T4 — Published to Unpublished | Vendor, Operations | Item withdrawn from Client visibility. Existing Order lines referencing this Item are unaffected. |
@@ -186,3 +186,4 @@ No open questions at this time.
 | 0.1 | 2026-03-08 | Stu | Initial canon. Derived from Items JSON and conversation. |
 | 0.2 | 2026-03-09 | Stu | BR-008 updated to reflect I-001 resolution (usage model → quantityNotApplicable = true, coupled). Section 10 updated. Unit of Measure references updated from earlier review. |
 | 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-009 corrected: 3y removed from terms.period (valid for commitment only). BR-010 corrected: one-time removed from terms.commitment (valid for period only), nullable documented. Section 5: required fields on creation noted, terms enums corrected. Section 8: unpublished audit event added, history retention confirmed. Section 10 cleaned up. SD-001 raised in spec discrepancy tracker (name not in required array). |
+| 0.4 | 2026-07-16 | Stu / canon-generate | Targeted correction of two claims disproven during the `Catalog: Product Item Group` refresh (source-code research): (1) BR-002 — an Item requires an explicit Item Group on creation; the platform does not auto-assign a group-less Item to the Default group (former auto-assignment claim removed from BR-002, T1, Section 5 Group, Section 6, Section 7.1); (2) BR-003 — Item Group `multiple`/`required` are advisory ordering semantics consumed by the UI/Vendor Extension, not enforced by the platform core at Order submission (prior "platform-enforced" claim corrected). This is a scoped cross-object fix; a full evidence-based Item refresh (state-machine endpoints, ID Prefix, etc.) is still pending. |
