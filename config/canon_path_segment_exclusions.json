@@ -24,7 +24,7 @@
     },
     "action_verbs": {
       "deactivate": "CANON_OBJECT_Accounts_Buyer.md §8 \"deactivate\" — strips ERP identifiers from an already-Deleted Buyer; does not change status",
-      "transfer": "CANON_OBJECT_Accounts_Buyer.md §4 BR-012 \"transfer\" (ChangeAccount) — reassigns the Buyer's Account; does not change status",
+      "transfer": "CANON_OBJECT_Accounts_Buyer.md §4 BR-012 \"transfer\" — reassigns the Buyer's Account; does not change status",
       "validate": "CANON_OBJECT_Accounts_Buyer.md — validates the Buyer against the ERP; not a status change",
       "synchronize": "CANON_OBJECT_Accounts_Buyer.md — triggers an ERP re-sync of the Buyer; not a status change"
     },
@@ -57,9 +57,9 @@
   },
   "catalog.products": {
     "state_transition_verbs": {
-      "review": "Confirmed directly in swo-platform: Product.Review() domain method, POST .../review route (ProductsController.cs), Vendor-only. Handles both Draft->Pending (canon T2, 'Submit Product for Publication') and Unpublished->Pending (canon T6, new). Corrects an earlier mistaken 'submit' entry that was inferred from the Action-column text alone, not confirmed against a real endpoint — canon-generate refresh, 2026-07-15.",
-      "publish": "CANON_OBJECT_Catalog_Product.md §3.2 T3 \"Publish Product\"; confirmed directly in swo-platform: Product.Publish() domain method, POST .../publish route, also reused for T5 Republish (Unpublished->Published), Operations-only for both",
-      "unpublish": "CANON_OBJECT_Catalog_Product.md §3.2 T4 \"Unpublish Product\"; confirmed directly in swo-platform: Product.Unpublish() domain method, POST .../unpublish route"
+      "review": "CANON_OBJECT_Catalog_Product.md §3.2 T2/T6 \"Submit Product for Publication\", via /review endpoint, Vendor-only. Handles both Draft->Pending (T2) and Unpublished->Pending (T6). Corrects an earlier mistaken 'submit' entry that was inferred from the Action-column text alone, not confirmed against a real endpoint — canon-generate refresh, 2026-07-15.",
+      "publish": "CANON_OBJECT_Catalog_Product.md §3.2 T3 \"Publish Product\", via /publish endpoint — also reused for T5 Republish (Unpublished->Published), Operations-only for both",
+      "unpublish": "CANON_OBJECT_Catalog_Product.md §3.2 T4 \"Unpublish Product\", via /unpublish endpoint"
     },
     "action_verbs": {},
     "non_object_resources": {}
@@ -75,12 +75,14 @@
   },
   "catalog.products.media": {
     "state_transition_verbs": {
-      "submit": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T2 \"Submit for Publication\"",
-      "publish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T3 \"Publish\"",
-      "unpublish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T4 \"Unpublish\""
+      "review": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T2/T6 \"Submit for Publication\", via /review endpoint — handles both Draft->Pending and Unpublished->Pending, Vendor-only. Corrects an earlier mistaken \"submit\" entry that was inferred from the Action-column text, not confirmed against a real endpoint — same class of error corrected on the parent Product. canon-generate refresh, 2026-07-16.",
+      "publish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T3/T5 \"Publish\"/\"Republish\", via /publish endpoint — handles both Pending->Published and Unpublished->Published, Operations-only.",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Media.md §3.2 T4 \"Unpublish\", via /unpublish endpoint (Published->Unpublished), Vendor or Operations."
     },
     "action_verbs": {},
-    "non_object_resources": {}
+    "non_object_resources": {
+      "image": "GET /{id}/image binary-retrieval endpoint (307 redirect to the stored asset; unauthenticated) — not a standalone object, analogous to icon. Confirmed via source research during the canon-generate refresh, 2026-07-16."
+    }
   },
   "catalog.products.terms": {
     "state_transition_verbs": {
