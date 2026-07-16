@@ -73,10 +73,19 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Catalog_PriceList_Item.md
+
+| # | Question |
+|---|----------|
+| PRI-002 | After a Price List is deleted directly (not via a parent Product deletion), are its Price List Items still retrievable via the API? The Items are not cascade-deleted and their records persist, but the owning Price List no longer resolves. A Vendor is expected to no longer retrieve them; the behaviour for Operations and Client is unconfirmed and requires a live create-then-delete test. |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.0 | 2026-07-16 | Stu / canon-generate | PRI-002 added from Price List Item canon-generate run — retrievability of Price List Items after a direct Price List deletion (not via Product deletion) is unconfirmed for Operations/Client and needs a live test. |
 | 2.9 | 2026-07-15 | Stu / canon-generate | WBH-002 resolved via direct source-code research and removed — Product deletion has no reactive effect on a Webhook referencing it; see Webhook canon BR-004a and Section 9. |
 | 2.8 | 2026-07-15 | Stu / canon-generate | WBH-002 reopened: its 2.7 closure assumed Products could never be deleted at all, which the `Catalog: Product` canon refresh (same date) disproved — Draft-state deletion is possible and cascades. The real question (what happens to a Webhook whose anchor Product is deleted while in Draft) was never actually answered, only mooted on a false premise. |
 | 2.7 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 (added in 2.6, same session) resolved directly with the PM before ever being finalized as tracked open questions, per the updated canon-generate process — moved straight to CANON_RESOLVED_QUESTIONS.md (WBH-001, WBH-002, WBH-004) or descoped (WBH-003). Section removed from this file entirely — no open questions remain for Webhook. |
