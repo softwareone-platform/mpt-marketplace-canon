@@ -244,6 +244,6 @@ Audit Records are generated for Agreement state transitions. Prior versions of p
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.1-stub | 2026-04-12 | Stu | Initial stub from Order canon session. State machine, core identity, and known business rules captured. Sections 4–9 incomplete. |
-| 0.2 | 2026-04-13 | Stu | Full canon session completed. All sections authored. Parameters model documented — Agreement-scoped vs Order-scoped parameter distinction, Vendor write rules, Client read suppression. billingCurrency field documented including Seller currency constraint and forex model. Agreement price manual override model documented for usage-based Entitlements. Split Billing deferred to separate canon session. AGR-004, AGR-005, AGR-006 resolved and removed from open questions. AGR-008 added. |
 | 0.3 | 2026-07-15 | Stu / canon-generate | BR-005a added — Template rendering is permitted in Terminated status too, not just Active; only reassigning the Template is Active-only. Surfaced during the Catalog: Product Template canon refresh. |
+| 0.2 | 2026-04-13 | Stu | Full canon session completed. All sections authored. Parameters model documented — Agreement-scoped vs Order-scoped parameter distinction, Vendor write rules, Client read suppression. billingCurrency field documented including Seller currency constraint and forex model. Agreement price manual override model documented for usage-based Entitlements. Split Billing deferred to separate canon session. AGR-004, AGR-005, AGR-006 resolved and removed from open questions. AGR-008 added. |
+| 0.1-stub | 2026-04-12 | Stu | Initial stub from Order canon session. State machine, core identity, and known business rules captured. Sections 4–9 incomplete. |

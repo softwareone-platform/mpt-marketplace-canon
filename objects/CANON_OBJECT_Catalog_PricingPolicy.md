@@ -182,6 +182,6 @@ Audit block captures `created` and `updated` timestamps and Actors. The spec als
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.1 | 2026-03-16 | Stu | Initial canon. Derived from OpenAPI spec and conversation. Four open questions raised (PRP-001 through PRP-004). |
-| 0.2 | 2026-03-16 | Stu | JSON examples reviewed. PRP prefix confirmed. PRP-003 resolved — Deleted is a soft delete, confirmed from real API responses. None status not observed in any real records — PRP-001/PRP-002 updated with observation. Section 3.1 Deleted state updated. Section 8 deletion and audit notes updated. Platform Invariant 7 exception noted. |
 | 0.3 | 2026-03-16 | Stu | Accounts namespace used consistently throughout (replacing Administration). |
+| 0.2 | 2026-03-16 | Stu | JSON examples reviewed. PRP prefix confirmed. PRP-003 resolved — Deleted is a soft delete, confirmed from real API responses. None status not observed in any real records — PRP-001/PRP-002 updated with observation. Section 3.1 Deleted state updated. Section 8 deletion and audit notes updated. Platform Invariant 7 exception noted. |
+| 0.1 | 2026-03-16 | Stu | Initial canon. Derived from OpenAPI spec and conversation. Four open questions raised (PRP-001 through PRP-004). |

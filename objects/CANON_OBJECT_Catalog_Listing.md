@@ -153,7 +153,7 @@ Audit block captures `created` and `updated` timestamps and Actors, consistent w
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.1 | 2026-03-09 | Stu | Initial canon. |
-| 0.2 | 2026-03-09 | Stu | LST-001 and LST-002 resolved. Section 6 Price List and Seller lifecycle dependencies updated. Seller disabled failure mode added to Section 9. Open questions closed. |
-| 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 5: eligibility fields marked required on creation; primary noted as optional (null = false); vendor convenience field added with rationale; statistics fields marked read-only and restricted from Clients with rationale; revision marked read-only. Section 8: audit note corrected — both created and updated recorded. Section 10: cleaned up. |
 | 0.4 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — Section 6 updated. |
+| 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 5: eligibility fields marked required on creation; primary noted as optional (null = false); vendor convenience field added with rationale; statistics fields marked read-only and restricted from Clients with rationale; revision marked read-only. Section 8: audit note corrected — both created and updated recorded. Section 10: cleaned up. |
+| 0.2 | 2026-03-09 | Stu | LST-001 and LST-002 resolved. Section 6 Price List and Seller lifecycle dependencies updated. Seller disabled failure mode added to Section 9. Open questions closed. |
+| 0.1 | 2026-03-09 | Stu | Initial canon. |
