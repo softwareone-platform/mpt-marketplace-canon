@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 2.0
+> **Version:** 2.1
 > **Owner:** Stu
 > **Last Updated:** 2026-07-16
 > **Status:** Living Document — updated continuously as canon is developed
@@ -26,7 +26,7 @@ These invariants apply universally across all objects, actors, and namespaces. T
 5. **Multi-actor workflows are modelled as sequential transitions.** Each transition is executed by one Actor at a time. A transition may be permitted to more than one Actor type, but each execution instance has exactly one Actor.
 6. **The platform never cascades deletions.** Deleting an object never automatically deletes any other object as a side effect. Each object must be deleted independently. Deletion guards exist to prevent removal of objects that have dependents — see Section 3.5.
 
-   **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. `Catalog: Product` Items are the exception: they are independent records and are not removed by Product deletion. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations.
+   **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
    **Known exceptions:** Catalog: Pricing Policy, Commerce: Order, and Accounts: Seller use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
@@ -382,3 +382,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.8 | 2026-07-15 | Stu / canon-generate | Section 5.3 ID Prefixes: BUY (Buyer) and ERP (ErpLink) added, confirmed from live object IDs. Added while canonising Accounts: Buyer and Accounts: ErpLink together. |
 | 1.9 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list corrected: Catalog: Product Items removed from the Draft-deletion cascade — source research during the Catalog: Product Item refresh confirmed Items are independent records that Product deletion does not remove. The other listed children are unchanged (not re-examined this run). |
 | 2.0 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: UNT (Unit of Measure) added, confirmed from live object IDs. Added while refreshing Catalog: Unit of Measure. |
+| 2.1 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list: Items restored to the Product Draft-deletion cascade, reverting v1.9. Source research during the Catalog: Product Terms refresh found that the delete-Product API path removes the Product's Items via a cleanup step (v1.9 had inspected only the domain Product.Delete() method, which leaves Items untouched). A full re-verification of the delete-Product cascade was then completed and confirmed every listed child is removed on Draft-Product deletion. |
