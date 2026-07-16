@@ -16,16 +16,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
-## CANON_OBJECT_Catalog_PricingPolicy.md
-
-| # | Question |
-|---|----------|
-| PRP-001 | What is the full behaviour of the `None` status? Not observed in real API responses — may be purely transitional immediately after creation. Needs testing to confirm. |
-| PRP-002 | What is the difference between `None` and `Inactive`? Can a policy go from `None` directly to `Inactive` without ever being activated? |
-| PRP-004 | When multiple active Pricing Policies exist for the same Client and eligibility, how does the platform resolve which cap to apply? |
-
----
-
 ## PLATFORM_CANON_PREAMBLE.md
 
 | # | Question |
@@ -85,6 +75,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.1 | 2026-07-16 | Stu / canon-generate | PRP-001, PRP-002, PRP-004 resolved via source-code research and removed (section retired) — `None` status is defined-but-unused (policies are created Active); multiple-match resolution is deterministic (Product-level over Client-level, lowest markup). Incorporated into Pricing Policy canon. |
 | 3.0 | 2026-07-16 | Stu / canon-generate | PRI-002 added from Price List Item canon-generate run — retrievability of Price List Items after a direct Price List deletion (not via Product deletion) is unconfirmed for Operations/Client and needs a live test. |
 | 2.9 | 2026-07-15 | Stu / canon-generate | WBH-002 resolved via direct source-code research and removed — Product deletion has no reactive effect on a Webhook referencing it; see Webhook canon BR-004a and Section 9. |
 | 2.8 | 2026-07-15 | Stu / canon-generate | WBH-002 reopened: its 2.7 closure assumed Products could never be deleted at all, which the `Catalog: Product` canon refresh (same date) disproved — Draft-state deletion is possible and cascades. The real question (what happens to a Webhook whose anchor Product is deleted while in Draft) was never actually answered, only mooted on a false premise. |
