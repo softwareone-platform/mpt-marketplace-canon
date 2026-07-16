@@ -1,8 +1,8 @@
 # Object Canon: ErpLink
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-15
+> **Last Updated:** 2026-07-16
 > **Status:** Draft
 
 ---
@@ -65,7 +65,7 @@ Five fields are visible to Operations only — `note`, `externalIds`, `address`,
 | ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Active | Create (ERP-sync reconciliation) | (no endpoint — created during [[Buyer]] synchronisation) | Platform | — | ErpLinks are minted by the platform when a Buyer's Seller set is reconciled. Cannot be created Blocked. |
-| T2 | Active | Blocked | Block link | `POST /v1/accounts/erp-links/{id}/block` | Operations | Link not Disabled; [[Buyer]] is ERP-activated; no active Accounts: Licensee on the (Buyer, Seller) pair; linked [[Seller]] not Disabled or Deleted | See BR-005. In practice driven by the ERP-sync integration reflecting an ERP-side customer block. |
+| T2 | Active | Blocked | Block link | `POST /v1/accounts/erp-links/{id}/block` | Operations | Link not Disabled; [[Buyer]] is ERP-activated; no Accounts: Licensee in Active or Enabled status on the (Buyer, Seller) pair; linked [[Seller]] not Disabled or Deleted | See BR-005. In practice driven by the ERP-sync integration reflecting an ERP-side customer block. |
 | T3 | Blocked | Active | Unblock link | `POST /v1/accounts/erp-links/{id}/unblock` | Operations | Link not Disabled; [[Buyer]] is ERP-activated | — |
 | T4a | Active | Disabled | Disable link (Seller Disabled) | (no endpoint — system, at [[Buyer]] synchronisation) | Platform | Linked [[Seller]] became Disabled | Records the prior status for later restore. |
 | T4b | Blocked | Disabled | Disable link (Seller Disabled) | (no endpoint — system, at [[Buyer]] synchronisation) | Platform | Linked [[Seller]] became Disabled | Records the prior status for later restore. |
@@ -96,11 +96,11 @@ Five fields are visible to Operations only — `note`, `externalIds`, `address`,
 | BR-002 | ErpLinks are created and removed only by the platform's ERP-sync reconciliation of a [[Buyer]]'s Seller set — there is no create or delete endpoint. | All | Platform | Reconciliation runs when a Buyer is created, updated, or synchronised: links are added for new Sellers and permanently removed for Sellers no longer in the Buyer's ERP-side set. |
 | BR-003 | The public API exposes reading, a `note`/icon update, and the Block / Unblock actions. Of the writable business fields, only `note` is persisted via update — `externalIds`, `address`, `shipTo`, and `billTo` are maintained by the ERP-sync integration and are effectively read-only over the API. | All | Operations | A submitted value for the ERP-owned fields is ignored. |
 | BR-004 | An ErpLink is created in `Active` and can never be created in `Blocked`. | — (creation) | Platform | — |
-| BR-005 | Blocking a link is permitted only when the link is not Disabled, its [[Buyer]] is ERP-activated, no active Accounts: Licensee exists on the (Buyer, Seller) pair, and the linked [[Seller]] is neither Disabled nor Deleted. Unblocking requires the link not to be Disabled and the Buyer to be ERP-activated. | Active, Blocked | Operations | A Disabled link cannot be blocked or unblocked by any user action (BR-006). |
+| BR-005 | Blocking a link is permitted only when the link is not Disabled, its [[Buyer]] is ERP-activated, no [[Licensee]] in Active or Enabled status exists on the (Buyer, Seller) pair, and the linked [[Seller]] is neither Disabled nor Deleted. Unblocking requires the link not to be Disabled and the Buyer to be ERP-activated. | Active, Blocked | Operations | A Disabled link cannot be blocked or unblocked by any user action (BR-006). A [[Licensee]] in Disabled or Deleted status does not block a block — this is narrower than the removal guard (BR-009). |
 | BR-006 | The `Disabled` status is system-controlled: the platform sets it when the linked [[Seller]] is Disabled and restores the prior status when the Seller is no longer Disabled. A user cannot change the status of a Disabled link. | All | Platform | Disabled links are retained (not removed) so historical data stays addressable. |
 | BR-007 | An ErpLink carries the ERP identifiers for its (Buyer, Seller) instance in `externalIds`: `erpCompanyContact`, `erpCustomer`, and `accountExternalId` (the CDG). | All | Operations | These mirror the [[Buyer]]'s ERP identifiers as scoped to this Seller instance. Operations-only. |
 | BR-008 | `note` is an internal free-text field. The ERP-sync integration stamps it with the reason when it blocks a link; it is otherwise Operations-editable. | All | Operations | Operations-only. Maximum length platform-enforced. |
-| BR-009 | Removal of an ErpLink during reconciliation is blocked while a non-deleted Accounts: Licensee references the (Buyer, Seller) pair; the platform records a reconciliation error on the [[Buyer]] instead. | All | Platform | Accounts: Licensee is not yet canonised. |
+| BR-009 | Removal of an ErpLink during reconciliation is blocked while a non-deleted [[Licensee]] references the (Buyer, Seller) pair; the platform records a reconciliation error on the [[Buyer]] instead. | All | Platform | — |
 | BR-010 | `shipTo` and `billTo` hold the customer's delivery and invoice addresses respectively, as they exist in this Seller's ERP instance, synchronised from the ERP. Each address carries its ERP-side code as `externalId`. | All | Operations | These addresses are held on the ErpLink rather than the [[Buyer]] because a Buyer spans multiple ERP instances while these addresses are specific to one. Operations-only — not surfaced in the platform UI, available only via the API. Empty when the ERP record has none. |
 
 ---
@@ -134,7 +134,7 @@ Five fields are visible to Operations only — `note`, `externalIds`, `address`,
 | --- | --- | --- | --- | --- |
 | Accounts: Buyer | Parent | Many ErpLinks to one Buyer | The Buyer whose ERP integration this link represents in scope of one Seller. | Yes — an ErpLink exists only as part of a Buyer's reconciled Seller set; it is created and removed by that reconciliation. Blocking/unblocking a link re-synchronises the Buyer. |
 | Accounts: Seller | Parent | Many ErpLinks to one Seller | The Seller in whose scope this link exists. | Yes — the Seller becoming Disabled forces the link to Disabled (and reversal on re-enable), evaluated at the next Buyer synchronisation. |
-| Accounts: Licensee | Association | — | A Licensee on the (Buyer, Seller) pair blocks both blocking the link and removing it. | Yes — a non-deleted Licensee guards Block (BR-005) and removal (BR-009). Accounts: Licensee is not yet canonised. |
+| Accounts: Licensee | Association | — | A Licensee on the (Buyer, Seller) pair blocks both blocking the link and removing it. | Yes — a Licensee in Active or Enabled status guards Block (BR-005); any non-Deleted Licensee (including Disabled) guards removal (BR-009). |
 
 ---
 
@@ -145,7 +145,7 @@ Five fields are visible to Operations only — `note`, `externalIds`, `address`,
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
 | ErpLink created | A [[Buyer]]'s Seller set is reconciled and a new (Buyer, Seller) pairing appears | Platform | Link created in Active. Emits a buyer-erp-link-added event scoped to the Buyer. |
-| ErpLink removed | Reconciliation finds a Seller no longer in the Buyer's ERP-side set | Platform | Link permanently removed — unless guarded by a Licensee (BR-009). Emits a buyer-erp-link-removed event. |
+| ErpLink removed | Reconciliation finds a Seller no longer in the Buyer's ERP-side set | Platform | Link permanently removed — unless guarded by a [[Licensee]] (BR-009). Emits a buyer-erp-link-removed event. |
 | Link blocked | Block action | Operations | Status → Blocked; `note` stamped with the block reason. Re-synchronises the parent [[Buyer]]. |
 | Link unblocked | Unblock action | Operations | Status → Active. Re-synchronises the parent [[Buyer]]. |
 | Link disabled / enabled | Linked [[Seller]] Disabled / no longer Disabled, at Buyer sync | Platform | Status → Disabled (prior status recorded), or restored on re-enable. |
@@ -165,7 +165,7 @@ Five fields are visible to Operations only — `note`, `externalIds`, `address`,
 The Active ↔ Blocked cycle (Block / Unblock) is reversible with no confirmed limit on cycles. The system-driven Active/Blocked ↔ Disabled cycle is reversible — the prior status is restored when the linked [[Seller]] is no longer Disabled.
 
 **Deletion:**
-ErpLink has no delete endpoint and no `Deleted` status. A link is permanently removed — no longer retrievable via the API — only as a side effect of ERP-sync reconciliation, when its [[Seller]] drops off the parent [[Buyer]]'s ERP-side set. Removal is blocked while a non-deleted Accounts: Licensee references the (Buyer, Seller) pair (BR-009). A link whose Seller is Disabled is retained (moved to Disabled), not removed, so historical data stays addressable.
+ErpLink has no delete endpoint and no `Deleted` status. A link is permanently removed — no longer retrievable via the API — only as a side effect of ERP-sync reconciliation, when its [[Seller]] drops off the parent [[Buyer]]'s ERP-side set. Removal is blocked while a non-deleted [[Licensee]] references the (Buyer, Seller) pair (BR-009). A link whose Seller is Disabled is retained (moved to Disabled), not removed, so historical data stays addressable.
 
 **Audit & history requirements:**
 The audit block records `created` and `updated`, plus the state-specific timestamps `blocked`, `unblocked`, and `disabled`, each written only when its transition occurs. Audit is omitted from responses by default (request via `select=+audit`). Prior values are not retained beyond the audit trail.
@@ -179,8 +179,8 @@ The audit block records `created` and `updated`, plus the state-specific timesta
 | Block attempted while the linked Seller is Disabled or Deleted | Rejected — a link cannot be blocked when its [[Seller]] is Disabled or Deleted. | Operations | Low | See BR-005. |
 | Block or unblock attempted on a Disabled link | Rejected — a Disabled link's status cannot be changed by user actions. | Operations | Low | The Disabled state is system-controlled by Seller status (BR-006). |
 | Block or unblock attempted while the Buyer is not ERP-activated | Rejected — the parent [[Buyer]] must be ERP-activated. | Operations | Low | — |
-| Block attempted while a Licensee exists on the pair | Rejected. | Operations | Low | A non-deleted Accounts: Licensee guards the block (BR-005). |
-| Seller removed in the ERP while a Licensee references the pair | The link is not removed; the platform records a reconciliation error on the parent [[Buyer]] instead. | Operations | Medium | See BR-009 and Accounts: [[Buyer]]. |
+| Block attempted while an Active or Enabled [[Licensee]] exists on the pair | Rejected. | Operations | Low | An Accounts: [[Licensee]] in Active or Enabled status guards the block (BR-005); a Disabled Licensee does not. |
+| Seller removed in the ERP while a [[Licensee]] references the pair | The link is not removed; the platform records a reconciliation error on the parent [[Buyer]] instead. | Operations | Medium | See BR-009 and Accounts: [[Buyer]]. |
 | Client attempts to update the ERP-owned fields via API | Ignored — `externalIds`, `address`, `shipTo`, and `billTo` are maintained by ERP sync; only `note`/icon are persisted, and only for Operations. | Operations | Low | See BR-003. |
 
 ---
@@ -195,4 +195,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-16 | Stu / canon-generate | Block guard (BR-005, §3.2 T2, §6, §9) corrected: a link's block is guarded by a Licensee in Active or Enabled status on the (Buyer, Seller) pair, not by any non-Deleted Licensee — a Disabled Licensee does not block a block. Distinguished from the removal guard (BR-009), which remains any non-Deleted Licensee. Also bracketed the now-canonised `[[Licensee]]` cross-links and removed the stale "not yet canonised" note. Surfaced during the Accounts: Licensee canon-generate run. |
 | 0.1 | 2026-07-15 | Stu / canon-generate | Initial canon. Generated via live OpenAPI schema, live-fetched real objects (STAGING, all Actors, including Active and Blocked samples), source-code research across the core platform and the ERP-sync extension, and the Cloud-iQ integration design documentation for the ship-to/bill-to model. Documents the Buyer–Seller join model with its unique pairing, the create/remove-only-via-Buyer-sync mechanism, the three-status model (Operations-driven Block/Unblock plus system-driven Disabled tied to Seller status) and its guards, the five Operations-only ERP-detail fields (including the newly added, per-ERP-instance ship-to/bill-to address collections), the note/icon-only update surface, and the removal-with-Licensee-guard behavior. |
