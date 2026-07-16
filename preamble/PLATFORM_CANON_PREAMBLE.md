@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 2.1
+> **Version:** 2.2
 > **Owner:** Stu
 > **Last Updated:** 2026-07-16
 > **Status:** Living Document — updated continuously as canon is developed
@@ -192,6 +192,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Parameter Group | Catalog | PGR |
 | Media | Catalog | MED |
 | Terms | Catalog | TCS |
+| Terms Variant | Catalog | TCV |
 | Price List | Catalog | PRC |
 | Price List Item | Catalog | PRI |
 | Authorization | Catalog | AUT |
@@ -383,3 +384,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.9 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list corrected: Catalog: Product Items removed from the Draft-deletion cascade — source research during the Catalog: Product Item refresh confirmed Items are independent records that Product deletion does not remove. The other listed children are unchanged (not re-examined this run). |
 | 2.0 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: UNT (Unit of Measure) added, confirmed from live object IDs. Added while refreshing Catalog: Unit of Measure. |
 | 2.1 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list: Items restored to the Product Draft-deletion cascade, reverting v1.9. Source research during the Catalog: Product Terms refresh found that the delete-Product API path removes the Product's Items via a cleanup step (v1.9 had inspected only the domain Product.Delete() method, which leaves Items untouched). A full re-verification of the delete-Product cascade was then completed and confirmed every listed child is removed on Draft-Product deletion. |
+| 2.2 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: TCV (Terms Variant) added, confirmed from live object IDs. Added while refreshing Catalog: Product Terms Variant. |
