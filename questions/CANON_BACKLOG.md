@@ -111,7 +111,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | authorizations | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | — |
 | listings | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Listing.md](../objects/CANON_OBJECT_Catalog_Listing.md) | — |
 | price-lists | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_PriceList.md](../objects/CANON_OBJECT_Catalog_PriceList.md) | — |
-| items | price-lists | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | 1 open question (PRI-002). |
+| items | price-lists | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | — |
 | pricing-policies | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_PricingPolicy.md](../objects/CANON_OBJECT_Catalog_PricingPolicy.md) | — |
 | attachments | pricing-policies | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_PricingPolicy_Attachment.md](../objects/CANON_OBJECT_Catalog_PricingPolicy_Attachment.md) | — |
 | products | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | — |
@@ -134,7 +134,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 |--------|--------|--------|--------------|------------|-------|
 | agreements | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Commerce_Agreement.md](../objects/CANON_OBJECT_Commerce_Agreement.md) | — |
 | attachments | agreements | 🔴 Not Started | | | |
-| lines | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Commerce_Entitlement.md](../objects/CANON_OBJECT_Commerce_Entitlement.md) | Object Name: Entitlement; prefix ALI; parent Commerce: Agreement (top-level filename, like Subscription/Asset). Listed at `/commerce/lines` and per parent via `/agreements|subscriptions|assets/{id}/lines`. |
+| lines | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Commerce_Entitlement.md](../objects/CANON_OBJECT_Commerce_Entitlement.md) | — |
 | split | agreements | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Commerce_Agreement_Split.md](../objects/CANON_OBJECT_Commerce_Agreement_Split.md) | — |
 | assets | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Commerce_Asset.md](../objects/CANON_OBJECT_Commerce_Asset.md) | — |
 | orders | — | 🟡 Known Pending Issues | 2026-04-12 | [CANON_OBJECT_Commerce_Order.md](../objects/CANON_OBJECT_Commerce_Order.md) | 7 open questions. |
