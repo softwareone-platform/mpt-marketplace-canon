@@ -75,3 +75,46 @@ def load_config(config_path=None):
 def token_env_var(env, actor):
     """CANON_TOKEN_<ENV>_<ACTOR> — e.g. token_env_var('staging', 'vendor') -> CANON_TOKEN_STAGING_VENDOR."""
     return f"CANON_TOKEN_{env.upper()}_{actor.upper()}"
+
+
+def repo_map_env_var(namespace):
+    """CANON_REPOMAP_<NAMESPACE> — namespace uppercased, hyphens to underscores."""
+    return "CANON_REPOMAP_" + namespace.upper().replace("-", "_")
+
+
+def azdo_org_url():
+    """
+    Azure DevOps org URL from the CANON_AZDO_ORG_URL environment variable.
+    Kept in .env (gitignored) rather than the committed config so the private
+    org URL is never published in this public repo. See .env.example.
+    """
+    return require_env("CANON_AZDO_ORG_URL")
+
+
+def namespace_repo_map(namespace):
+    """
+    Resolve the Azure DevOps project + repo list for a namespace from the
+    CANON_REPOMAP_<NAMESPACE> environment variable (see .env.example).
+
+    Format: "<project>:<repo>[,<repo>...]" — e.g. "ProjectName:core-repo,extension-repo".
+    Returns (project, [repos]). Kept in .env (gitignored) rather than the
+    committed config so private project/repo names are never published in
+    this public repo. Exits(1) with a namespace-specific message if the
+    variable is unset or malformed.
+    """
+    var = repo_map_env_var(namespace)
+    raw = os.environ.get(var)
+    if not raw:
+        print(f"Error: required environment variable '{var}' is not set.")
+        print(f"Add it to .env (see .env.example) with the Azure DevOps project "
+              f"and repo name(s) for the '{namespace}' namespace, in the form "
+              f"<project>:<repo>[,<repo>...].")
+        sys.exit(1)
+    project, sep, repos_raw = raw.partition(":")
+    project = project.strip()
+    repos = [r.strip() for r in repos_raw.split(",") if r.strip()]
+    if not sep or not project or not repos:
+        print(f"Error: {var} must be in the form <project>:<repo>[,<repo>...] "
+              f"(got '{raw}').")
+        sys.exit(1)
+    return project, repos
