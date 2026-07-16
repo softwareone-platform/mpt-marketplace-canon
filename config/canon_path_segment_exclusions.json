@@ -95,9 +95,9 @@
   },
   "catalog.products.terms.variants": {
     "state_transition_verbs": {
-      "submit": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T2 \"Submit for Publishing\"",
-      "publish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T3 \"Approve and Publish\"",
-      "unpublish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T4 \"Unpublish\""
+      "review": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T2/T6 \"Submit for Publishing\", via /review endpoint — handles both Draft->Pending and Unpublished->Pending, Vendor-only.",
+      "publish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T3/T5 \"Approve and Publish\"/\"Republish\", via /publish endpoint — handles both Pending->Published and Unpublished->Published, Operations-only.",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Terms_Variant.md §3.2 T4 \"Unpublish\", via /unpublish endpoint (Published->Unpublished), Vendor or Operations."
     },
     "action_verbs": {},
     "non_object_resources": {}
