@@ -119,6 +119,14 @@
     "action_verbs": {},
     "non_object_resources": {}
   },
+  "commerce.agreements": {
+    "state_transition_verbs": {},
+    "action_verbs": {
+      "template": "CANON_OBJECT_Commerce_Agreement.md §3.2/BR-005a \"render\" — GET /template renders the Agreement's assigned template; not a Section 3.2 state transition (maps to the same render action as /render).",
+      "render": "CANON_OBJECT_Commerce_Agreement.md §3.2/BR-005a \"render\" — GET /render renders the Agreement template; same action as /template, not a state transition."
+    },
+    "non_object_resources": {}
+  },
   "commerce.assets": {
     "state_transition_verbs": {
       "terminate": "CANON_OBJECT_Commerce_Asset.md §3.2 T3 \"Terminate Asset\", via /terminate endpoint (BR-003, BR-009)"
