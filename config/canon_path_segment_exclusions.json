@@ -66,9 +66,9 @@
   },
   "catalog.items": {
     "state_transition_verbs": {
-      "submit": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T2 \"Submit Item for Publishing\"",
-      "publish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T3 \"Approve and Publish Item\"",
-      "unpublish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T4 \"Unpublish Item\""
+      "review": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T2/T6 \"Submit Item for Publishing\", via /review endpoint — handles both Draft->Pending and Unpublished->Pending, Vendor-only. Corrects an earlier mistaken \"submit\" entry inferred from the Action-column text, not confirmed against a real endpoint — same class of error corrected on the parent Product. canon-generate refresh, 2026-07-16.",
+      "publish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T3/T5 \"Approve and Publish\"/\"Republish\", via /publish endpoint — handles both Pending->Published and Unpublished->Published, Operations-only.",
+      "unpublish": "CANON_OBJECT_Catalog_Product_Item.md §3.2 T4 \"Unpublish Item\", via /unpublish endpoint (Published->Unpublished), Vendor or Operations."
     },
     "action_verbs": {},
     "non_object_resources": {}

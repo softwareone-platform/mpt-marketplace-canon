@@ -58,7 +58,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | api-tokens | — | 🔴 Not Started | | | |
 | buyers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Buyer.md](../objects/CANON_OBJECT_Accounts_Buyer.md) | — |
 | cloud-tenants | — | 🔴 Not Started | | | |
-| erp-links | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_ErpLink.md](../objects/CANON_OBJECT_Accounts_ErpLink.md) | Join object between Buyer and Seller. |
+| erp-links | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_ErpLink.md](../objects/CANON_OBJECT_Accounts_ErpLink.md) | — |
 | licensees | — | 🔴 Not Started | | | Referenced on Agreement JSON. |
 | modules | — | 🔴 Not Started | | | |
 | sellers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | — |
@@ -109,20 +109,19 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | Object | Parent | Status | Last Updated | Canon File | Notes |
 |--------|--------|--------|--------------|------------|-------|
 | authorizations | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Authorization.md](../objects/CANON_OBJECT_Catalog_Authorization.md) | — |
-| items | — | 🟡 Known Pending Issues | 2026-07-16 | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | Top-level Item collection (cross-product). Two claims (auto-assignment, Order-time flag enforcement) corrected 2026-07-16 via the Item Group refresh; full canon-generate re-verification still pending. |
 | listings | — | 🟡 Known Pending Issues | 2026-03-15 | [CANON_OBJECT_Catalog_Listing.md](../objects/CANON_OBJECT_Catalog_Listing.md) | Not yet re-verified via canon-generate. |
 | price-lists | — | 🟡 Known Pending Issues | 2026-03-14 | [CANON_OBJECT_Catalog_PriceList.md](../objects/CANON_OBJECT_Catalog_PriceList.md) | Not yet re-verified via canon-generate. |
 | items | price-lists | 🟡 Known Pending Issues | 2026-03-09 | [CANON_OBJECT_Catalog_PriceList_Item.md](../objects/CANON_OBJECT_Catalog_PriceList_Item.md) | Not yet re-verified via canon-generate. |
 | pricing-policies | — | 🟡 Known Pending Issues | 2026-03-16 | [CANON_OBJECT_Catalog_PricingPolicy.md](../objects/CANON_OBJECT_Catalog_PricingPolicy.md) | 6 open questions. |
 | attachments | pricing-policies | 🟡 Known Pending Issues | 2026-03-16 | [CANON_OBJECT_Catalog_PricingPolicy_Attachment.md](../objects/CANON_OBJECT_Catalog_PricingPolicy_Attachment.md) | Not yet re-verified via canon-generate. |
-| products | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | |
+| products | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product.md](../objects/CANON_OBJECT_Catalog_Product.md) | — |
 | documents | products | 🔴 Not Started | | | |
 | item-groups | products | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product_ItemGroup.md](../objects/CANON_OBJECT_Catalog_Product_ItemGroup.md) | — |
-| items | products | 🟡 Known Pending Issues | 2026-07-16 | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | Two claims (auto-assignment, Order-time flag enforcement) corrected 2026-07-16 via the Item Group refresh; full canon-generate re-verification still pending. |
+| items | products | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product_Item.md](../objects/CANON_OBJECT_Catalog_Product_Item.md) | — |
 | media | products | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Catalog_Product_Media.md](../objects/CANON_OBJECT_Catalog_Product_Media.md) | — |
-| parameter-groups | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_ParameterGroup.md](../objects/CANON_OBJECT_Catalog_Product_ParameterGroup.md) | |
-| parameters | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_Parameter.md](../objects/CANON_OBJECT_Catalog_Product_Parameter.md) | |
-| templates | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_Template.md](../objects/CANON_OBJECT_Catalog_Product_Template.md) | |
+| parameter-groups | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_ParameterGroup.md](../objects/CANON_OBJECT_Catalog_Product_ParameterGroup.md) | — |
+| parameters | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_Parameter.md](../objects/CANON_OBJECT_Catalog_Product_Parameter.md) | — |
+| templates | products | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Catalog_Product_Template.md](../objects/CANON_OBJECT_Catalog_Product_Template.md) | — |
 | terms | products | 🟡 Known Pending Issues | 2026-03-14 | [CANON_OBJECT_Catalog_Product_Terms.md](../objects/CANON_OBJECT_Catalog_Product_Terms.md) | Not yet re-verified via canon-generate. |
 | variants | terms | 🟡 Known Pending Issues | 2026-03-14 | [CANON_OBJECT_Catalog_Product_Terms_Variant.md](../objects/CANON_OBJECT_Catalog_Product_Terms_Variant.md) | Not yet re-verified via canon-generate. |
 | units-of-measure | — | 🟡 Known Pending Issues | 2026-03-09 | [CANON_OBJECT_Catalog_UnitOfMeasure.md](../objects/CANON_OBJECT_Catalog_UnitOfMeasure.md) | Platform-level reference object. 13 units in PROD as of 2026-03-09. Not yet re-verified via canon-generate. |
@@ -234,7 +233,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | subscribers | — | 🔴 Not Started | | | |
 | templates | — | 🔴 Not Started | | | |
 | variants | templates | 🔴 Not Started | | | |
-| webhooks | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | |
+| webhooks | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Notifications_Webhook.md](../objects/CANON_OBJECT_Notifications_Webhook.md) | — |
 
 ---
 
@@ -347,3 +346,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 | 3.4 | 2026-07-16 | Stu / canon-generate | Item Group (Product child) refresh draft generated via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. Corrections found vs. current canon: ID Prefix IGR (was "None"); auto-assignment of group-less Items to the Default group is not platform behaviour (an explicit group is required); `multiple`/`required` are advisory, not platform-enforced at Order submission; delete is Vendor or Operations (was Vendor-only). 0 open questions. Draft pending PM review. |
 | 3.5 | 2026-07-16 | Stu / canon-generate | Item — two claims corrected directly (BR-002 auto-assignment, BR-003 Order-time flag enforcement) as a scoped cross-object fix surfaced by the Item Group refresh; Last Updated bumped, stays 🟡 (full evidence-based Item refresh still pending). |
 | 3.6 | 2026-07-16 | Stu / canon-submit-pr | Item Group marked 🟢 Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps. 0 open questions. Promoted alongside the scoped Item correction in the same PR (Item stays 🟡, full refresh pending). |
+| 3.7 | 2026-07-16 | Stu / canon-generate | Item full-refresh draft generated via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. Corrections: ID Prefix ITM; §3.2 endpoints filled + new Unpublished→Pending transition; terms.period adds 3y and terms.commitment adds 2y/4y/5y (with period↔commitment combination rules); Unit of Measure is mutable; qNA/usage coupling reframed as intended-but-unenforced; publishing without externalIds.operations confirmed intended. 0 open questions. Draft pending PM review. Also removed the parentless `items | —` duplicate backlog row (same object/file as `items | products`). |
+| 3.8 | 2026-07-16 | Stu / canon-generate | Product and preamble corrected directly: Catalog: Product Items removed from the Draft-deletion cascade (Product BR-002/§6/§7/§8/§9 and preamble Invariant 6) — source research confirmed Items are independent records Product deletion does not remove. Product Last Updated already 2026-07-16; stays 🟢. Only the Items cascade claim was re-verified; the other listed children were not re-examined (follow-up recommended). |
+| 3.9 | 2026-07-16 | Stu / canon-submit-pr | Item marked 🟢 Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps (the outstanding cascade re-verification is a Product-side follow-up). 0 open questions. Promoted alongside the Product-canon and preamble cascade corrections in the same PR. |
+| 4.0 | 2026-07-16 | Stu | Normalised the Notes column to `—` for all 🟢 Up to Date rows (filled the empty Product/Parameter Group/Parameter/Template/Webhook cells; cleared the erp-links descriptive note). Cosmetic consistency only. |
