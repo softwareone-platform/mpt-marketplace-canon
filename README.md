@@ -123,7 +123,7 @@ npm run validate -- <patch-id>      # parse + validate objects/ + that patch
 - **Be precise with language.** Avoid "usually", "typically", or "in most cases". If a rule has exceptions, document them explicitly.
 - **Respect the invariants.** Platform invariants apply to every object without exception. Do not contradict or restate them per object.
 - **One source of truth.** Reference rules documented elsewhere rather than restating them. Duplication leads to drift.
-- **Version everything.** Every change must be reflected in the document's changelog. Canon is only trustworthy if its history is traceable.
+- **Version everything.** Every change must be reflected in the document's changelog, which is ordered newest-first — the most recent entry at the top, the oldest at the bottom. Canon is only trustworthy if its history is traceable.
 - **Canon describes the platform, not a vendor's use of it.** Vendor-specific behaviour belongs in vendor canon.
 
 ---

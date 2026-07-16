@@ -292,5 +292,5 @@ Audit Records are generated for all Order state transitions. Prior versions of p
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.1 | 2026-04-12 | Stu | Initial canon. Commerce namespace — first object canonised. Covers all four Order types, full state machine, coupled Agreement/Subscription/Asset state transitions, parameter write rules, pre-validation webhook mechanism, pricing field visibility, soft-delete model, Attachment and Line child objects identified as pending canonisation. |
 | 0.2 | 2026-04-13 | Stu | BR-012a added: parameter scope semantics — Agreement-scoped vs Order-scoped distinction, carry-over behaviour on Purchase Order completion, Order type constraints. Section 7.2 updated: Purchase Order completion parameter carry-over to Agreement added as a cross-object side effect. |
+| 0.1 | 2026-04-12 | Stu | Initial canon. Commerce namespace — first object canonised. Covers all four Order types, full state machine, coupled Agreement/Subscription/Asset state transitions, parameter write rules, pre-validation webhook mechanism, pricing field visibility, soft-delete model, Attachment and Line child objects identified as pending canonisation. |

@@ -156,7 +156,7 @@ No open questions specific to this object at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.1 | 2026-03-09 | Stu | Initial canon. |
-| 0.2 | 2026-03-09 | Stu | BR-006 updated — defaultMarkup documented as serving dual role: billing fallback and item-level markup default when unitLP unsupported. |
-| 0.3 | 2026-03-09 | Stu | LST-001 resolved — Price Lists can be deleted by Operations when not referenced by any Listings. BR-005 corrected from absolute prohibition to deletion guard. Ownership table, Section 6 lifecycle dependency, Section 8 deletion, and Section 9 failure mode all updated accordingly. |
 | 0.4 | 2026-03-14 | Stu | Section 5: `precision` corrected — Vendor-set on creation, not system-derived from currency; marked as required on creation. `notes` added — optional Vendor-authored free-text, absent when null. `audit` block added — omitted by default, retrievable via `select=+audit`. Section 8: deletion updated to document hard delete as confirmed exception to platform norm; audit events corrected to `created` and `updated` only — `deleted` removed (no audit record generated on deletion). |
+| 0.3 | 2026-03-09 | Stu | LST-001 resolved — Price Lists can be deleted by Operations when not referenced by any Listings. BR-005 corrected from absolute prohibition to deletion guard. Ownership table, Section 6 lifecycle dependency, Section 8 deletion, and Section 9 failure mode all updated accordingly. |
+| 0.2 | 2026-03-09 | Stu | BR-006 updated — defaultMarkup documented as serving dual role: billing fallback and item-level markup default when unitLP unsupported. |
+| 0.1 | 2026-03-09 | Stu | Initial canon. |

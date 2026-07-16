@@ -122,6 +122,7 @@ If you have a sample API response for the object being canonised, attach it to t
 - Never name internal source-code identifiers (class names, method names, file paths, line numbers, migration names, query-filter mechanics) — this repo is public, and those details belong to a separate, private engineering repo
 - Never write "Confirmed directly", "Confirmed by [name]", "Confirmed empirically/via live fetch", or similar attribution in canon body content
 - Never write "Corrects prior canon", "New, not in prior canon", or similar historical framing in canon body content — canon is always a present-state snapshot; that history belongs only in the Changelog
+- Order the Changelog (Section 11) newest-first — the most recent version is the top data row (directly under the header), the oldest at the bottom; add each new entry at the top, never appended to the bottom
 
 ---
 
@@ -153,7 +154,8 @@ From there, I will ask clarifying questions and we will build each section toget
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 1.0 | 2026-03-09 | Stu | Initial version |
-| 2.0 | 2026-03-09 | Stu | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |
-| 2.1 | 2026-07-15 | Stu | Section 3 guidance updated: the Transitions table's Endpoint / Verb column (template v0.3) is mandatory and must name the literal API mechanism, not just a human-readable Action description. |
+| 2.3 | 2026-07-16 | Stu | Language and Terminology Standards: added the rule that the Section 11 Changelog is ordered newest-first (most recent entry at the top). This doc's own changelog reordered to match. |
 | 2.2 | 2026-07-15 | Stu | Section 4 guidance added — keep Rule Statements short, move enumerated/supplementary detail to Notes; Notes hold behavioral information only. Section 10 guidance added — an empty Open Questions section says only "No open questions at this time.", no recap of prior resolutions. Language and Terminology Standards expanded — no internal source-code identifiers (this repo is public), no inline attribution, no "corrects prior canon" framing in canon body content. |
+| 2.1 | 2026-07-15 | Stu | Section 3 guidance updated: the Transitions table's Endpoint / Verb column (template v0.3) is mandatory and must name the literal API mechanism, not just a human-readable Action description. |
+| 2.0 | 2026-03-09 | Stu | Platform foundations section removed — replaced with instruction to attach PLATFORM_CANON_PREAMBLE.md. JSON guidance added as dedicated section — JSON informs canon but is never saved into canon documents. Open questions protocol updated to reflect two-tracker system and PREFIX-NNN ID convention. Changelog added. |
+| 1.0 | 2026-03-09 | Stu | Initial version |
