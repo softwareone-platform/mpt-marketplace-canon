@@ -14,9 +14,14 @@ never a candidate for accidental commit into the canon repo.
 Usage:
     python scripts/canon_repo_sync.py <namespace>
 
-Looks up config/canon_pipeline.config.json:
-    namespaceRepoMap.<namespace> -> {"project": "...", "repos": ["..."]}
-    azdo.orgUrl -> e.g. "https://dev.azure.com/softwareone"
+Reads the Azure DevOps org URL and the namespace's project/repo mapping
+from environment variables (see .env.example) — kept in .env (gitignored)
+rather than the committed config so private org/project/repo names are
+never published in this public repo:
+    CANON_AZDO_ORG_URL      -> e.g. "https://dev.azure.com/<org>"
+    CANON_REPOMAP_<NAMESPACE> -> "<project>:<repo>[,<repo>...]"
+The disposable cache location (reposCacheDir) still comes from
+config/canon_pipeline.config.json, overridable via CANON_REPOS_DIR.
 
 Requires:
     CANON_AZDO_PAT environment variable (Code Read scope PAT). See .env.example.
@@ -37,7 +42,14 @@ import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from canon_common import load_dotenv, load_config, require_env, normalise
+from canon_common import (
+    load_dotenv,
+    load_config,
+    require_env,
+    normalise,
+    azdo_org_url,
+    namespace_repo_map,
+)
 
 
 def auth_header_value(pat):
@@ -97,23 +109,8 @@ def main():
     config = load_config()
     pat = require_env("CANON_AZDO_PAT")
 
-    org_url = config.get("azdo", {}).get("orgUrl")
-    if not org_url:
-        print("Error: azdo.orgUrl is not set in config/canon_pipeline.config.json.")
-        sys.exit(1)
-
-    mapping = config.get("namespaceRepoMap", {}).get(namespace)
-    if not mapping:
-        print(f"Error: namespaceRepoMap.{namespace} is not configured in "
-              f"config/canon_pipeline.config.json. Add the Azure DevOps project "
-              f"and repo name(s) for this namespace before syncing.")
-        sys.exit(1)
-
-    project = mapping.get("project")
-    repos = mapping.get("repos", [])
-    if not project or not repos:
-        print(f"Error: namespaceRepoMap.{namespace} is missing 'project' or 'repos'.")
-        sys.exit(1)
+    org_url = azdo_org_url()
+    project, repos = namespace_repo_map(namespace)
 
     cache_dir_raw = os.environ.get("CANON_REPOS_DIR") or config.get(
         "reposCacheDir", "~/.cache/mpt-canon-pipeline/repos"

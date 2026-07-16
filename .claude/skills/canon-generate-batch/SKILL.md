@@ -56,7 +56,7 @@ In the same round, ask for any **Confluence page(s)** documenting each object (b
 
 Compute the distinct **namespaces** present in the surviving batch. Run `python scripts/canon_repo_sync.py <namespace>` once per distinct namespace, **strictly one at a time** — never concurrently, even though the rest of the batch fans out in Step D. Redundantly re-syncing a repo shared by two namespaces is safe when done sequentially (just a few wasted seconds); do not attempt to dedupe by underlying repo name — dedupe by namespace only, since that's what the script takes.
 
-If a namespace's sync fails (unmapped `namespaceRepoMap` entry, auth failure), **exclude every object in that namespace** from Step D and report it in Step G with the exact error — do not skip or guess at a repo location, matching `canon-generate`'s own Step 4 behavior.
+If a namespace's sync fails (missing `CANON_REPOMAP_<NAMESPACE>` variable, auth failure), **exclude every object in that namespace** from Step D and report it in Step G with the exact error — do not skip or guess at a repo location, matching `canon-generate`'s own Step 4 behavior.
 
 ## Step D — Parallel per-object evidence + draft assembly (`Workflow` tool)
 

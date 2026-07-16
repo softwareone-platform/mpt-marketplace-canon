@@ -101,7 +101,7 @@ This is the primary empirical input to template §2 (Ownership & Visibility) and
 python scripts/canon_repo_sync.py <namespace>
 ```
 
-If it exits with a `namespaceRepoMap.<namespace>` error, stop and tell the human exactly which key in `config/canon_pipeline.config.json` needs the Azure DevOps project/repo details — do not skip this step silently or guess at repo locations.
+If it exits with a `CANON_REPOMAP_<NAMESPACE>` (or `CANON_AZDO_ORG_URL`) missing-variable error, stop and tell the human exactly which `.env` variable needs the Azure DevOps org/project/repo details (see `.env.example`) — do not skip this step silently or guess at repo locations. (The namespace→repo map lives in gitignored `.env`, not the committed config, so private repo names aren't published.)
 
 ## Step 5 — Source-code research (delegate to a sub-agent)
 
