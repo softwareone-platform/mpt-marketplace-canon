@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 1.9
+> **Version:** 2.0
 > **Owner:** Stu
 > **Last Updated:** 2026-07-16
 > **Status:** Living Document — updated continuously as canon is developed
@@ -197,6 +197,7 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Authorization | Catalog | AUT |
 | Listing | Catalog | LST |
 | Pricing Policy | Catalog | PRP |
+| Unit of Measure | Catalog | UNT |
 | Webhook | Notifications | WBH |
 | Audit Record | Audit | AUD |
 | API Token | Accounts | TKN |
@@ -380,3 +381,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 1.7 | 2026-07-15 | Stu / canon-generate-batch | Section 7.3 updated: ENV-005 added and cross-referenced alongside ENV-001/ENV-002 — whether Accounts: Seller's related-Licensee status-change guard is enforced identically in PROD is unconfirmed (only STAGING was exercised). Invariant 7 known exceptions updated to add Accounts: Seller's soft-delete model, alongside Pricing Policy and Order. Section 9.4 updated with a confirmed Seller-specific icon-removal mechanism (narrows, doesn't resolve, ENV-004). Surfaced during a canon-generate-batch dry run refreshing Seller and Commerce: Asset concurrently. |
 | 1.8 | 2026-07-15 | Stu / canon-generate | Section 5.3 ID Prefixes: BUY (Buyer) and ERP (ErpLink) added, confirmed from live object IDs. Added while canonising Accounts: Buyer and Accounts: ErpLink together. |
 | 1.9 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list corrected: Catalog: Product Items removed from the Draft-deletion cascade — source research during the Catalog: Product Item refresh confirmed Items are independent records that Product deletion does not remove. The other listed children are unchanged (not re-examined this run). |
+| 2.0 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: UNT (Unit of Measure) added, confirmed from live object IDs. Added while refreshing Catalog: Unit of Measure. |
