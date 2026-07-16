@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 2.6
+> **Version:** 2.7
 > **Owner:** Stu
 > **Last Updated:** 2026-07-16
 > **Status:** Living Document — updated continuously as canon is developed
@@ -210,11 +210,13 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | ErpLink | Accounts | ERP |
 | Licensee | Accounts | LCE |
 | Order | Commerce | ORD |
-| Order Line | Commerce | ALI |
+| Entitlement | Commerce | ALI |
 | Agreement | Commerce | AGR |
 | Subscription | Commerce | SUB |
 | Asset | Commerce | AST |
 | Agreement Split Billing | Commerce | SBA |
+
+The `ALI` prefix is shared: `Commerce: Order Line` reuses the same identifier as the `Commerce: Entitlement` it becomes, because a line's identity is preserved when an Order completes and its lines are promoted into the Agreement.
 
 Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 
@@ -393,3 +395,4 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 | 2.4 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: PPA (Pricing Policy Attachment) added, confirmed from a live object ID. Added while canonising Catalog: Pricing Policy Attachment (bundled with the Catalog: Pricing Policy refresh). |
 | 2.5 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: LCE (Licensee) added, confirmed from a live object ID. Added while canonising Accounts: Licensee. |
 | 2.6 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: SBA (Agreement Split Billing) added, confirmed from a live object ID. Added while canonising Commerce: Agreement Split Billing. |
+| 2.7 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: the ALI row relabelled from "Order Line" to "Entitlement" — source research confirmed ALI is registered to the Agreement Line (Entitlement); Order Line has no prefix of its own and reuses the same ALI id via identity-preserving order→agreement promotion. Added a note recording the shared identifier. Corrected while canonising Commerce: Entitlement. |
