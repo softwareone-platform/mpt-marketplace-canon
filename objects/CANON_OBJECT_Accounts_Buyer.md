@@ -1,8 +1,8 @@
 # Object Canon: Buyer
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-07-15
+> **Last Updated:** 2026-07-16
 > **Status:** Draft
 
 ---
@@ -120,9 +120,9 @@ Error overlays (automatic, not action-driven — see 3.1 note and Section 7.2):
 | BR-008 | Assigning a Buyer to an [[Account]] requires the Buyer's `accountExternalId` (CDG) to equal the target Account's ERP identifier, and the target to be a Client Account. | Unassigned | Operations | A Buyer whose CDG resolves to no Account remains Unassigned. |
 | BR-009 | ERP-activating a Buyer (Enabled → Active) requires both `erpCompanyContact` and `erpCustomer`, validated against the ERP, and is permitted only when the Buyer has no pre-existing ERP identifiers. | Enabled | Operations | `erpCompanyContact` and `erpCustomer` cannot be changed in the same operation. |
 | BR-010 | `name` and `address` are required on creation and update. `taxId` is optional (maximum 18 characters). | All | Operations | Address requires all lines — line 1, post code, city, state, country. `name` maximum 500 characters. |
-| BR-011 | Unassigning a Buyer's Account is blocked if the Buyer has an attached Accounts: Licensee, a split-billing Commerce: [[Agreement]], or held certificates, or if the Buyer is not ERP-activated. | Active, Disabled, Mismatch | Operations | Accounts: Licensee and Programs/Certificates are not yet canonised. |
+| BR-011 | Unassigning a Buyer's Account is blocked if the Buyer has an attached [[Licensee]], a split-billing Commerce: [[Agreement]], or held certificates, or if the Buyer is not ERP-activated. | Active, Disabled, Mismatch | Operations | Any attached Licensee blocks unassign, including one in Deleted status — broader than the delete guard (BR-013). Programs and Certificates are not yet canonised. |
 | BR-012 | Transferring a Buyer to a different [[Account]] (ChangeAccount) is permitted from Active, Disabled, or Mismatch; the Buyer's status is otherwise unchanged by the transfer. | Active, Disabled, Mismatch | Operations | Via the `transfer` endpoint. A transfer to the same Account is a no-op. |
-| BR-013 | Deleting a Buyer is a soft-delete: the record is retained with status `Deleted` and remains retrievable to Operations. It is blocked if any non-deleted Accounts: Licensee is attached. | Any except Deleted | Operations | There is no hard-delete endpoint. A Deleted Buyer cannot be updated. The only guard is the attached-Licensee check — an assigned Account or existing [[ErpLink]]s do not block deletion. |
+| BR-013 | Deleting a Buyer is a soft-delete: the record is retained with status `Deleted` and remains retrievable to Operations. It is blocked if any non-deleted [[Licensee]] is attached. | Any except Deleted | Operations | There is no hard-delete endpoint. A Deleted Buyer cannot be updated. The only guard is the attached-Licensee check — an assigned Account or existing [[ErpLink]]s do not block deletion. |
 | BR-014 | A Buyer is created only when both an ERP customer identifier and a CDG (`accountExternalId`) are known. | — (creation) | Operations | Enforced by the ERP-sync integration; a customer record lacking these is not synced into a Buyer. |
 
 ---
@@ -155,7 +155,7 @@ Error overlays (automatic, not action-driven — see 3.1 note and Section 7.2):
 | Accounts: Account | Association | Many Buyers to one Account | A Buyer is linked to at most one Client Account via a direct reference, resolved from the CDG. | No hard dependency — a Buyer may be Unassigned. Unassigning is guarded (BR-011). Account cannot be deleted. |
 | Accounts: ErpLink | Parent of | One Buyer to many ErpLinks | Each ErpLink joins this Buyer to one Seller. The Buyer's `sellers` list is derived from these. | ErpLinks are created and removed by the ERP-sync reconciliation of the Buyer's seller set; removal is blocked while a Licensee references the (Buyer, Seller) pair. |
 | Accounts: Seller | Association | Many Buyers to many Sellers | Mediated by ErpLink — a Buyer relates to each Seller through one ErpLink. | A Seller becoming Disabled forces its ErpLinks to Disabled at the next Buyer synchronisation; Seller status changes enqueue a Buyer re-sync. |
-| Accounts: Licensee | Association | One Buyer to many Licensees | A Licensee is created from a Buyer. Attached Licensees guard Buyer unassign and delete. | Yes — a non-deleted Licensee blocks unassign (BR-011) and delete (BR-013). Accounts: Licensee is not yet canonised. |
+| Accounts: Licensee | Association | One Buyer to many Licensees | A Licensee is created from a Buyer. Attached Licensees guard Buyer unassign and delete. | Yes — any attached Licensee (including Deleted) blocks unassign (BR-011); a non-deleted Licensee blocks delete (BR-013). |
 | Commerce: Agreement | Association | — | A Buyer reaches a Vendor's visibility through an Agreement whose Licensee derives from the Buyer; split-billing Agreements guard unassign. | No direct lifecycle dependency. |
 
 ---
@@ -192,7 +192,7 @@ Error overlays (automatic, not action-driven — see 3.1 note and Section 7.2):
 The Active/Enabled ↔ Disabled cycle is reversible via the Disable and Enable actions. The Assign ↔ Unassign cycle (Account linkage) is reversible subject to the unassign guards (BR-011). The Conflict/Mismatch overlays are automatically reversible as errors clear. `Deleted` is terminal.
 
 **Deletion:**
-Buyer deletion is soft-delete only — the record is retained with status `Deleted` and remains retrievable to Operations. There is no hard-delete endpoint. Deletion is blocked while a non-deleted Accounts: Licensee is attached (BR-013). A `deactivate` action exists to strip ERP identifiers from an already-Deleted Buyer that still carries them; it does not change the `Deleted` status.
+Buyer deletion is soft-delete only — the record is retained with status `Deleted` and remains retrievable to Operations. There is no hard-delete endpoint. Deletion is blocked while a non-deleted [[Licensee]] is attached (BR-013). A `deactivate` action exists to strip ERP identifiers from an already-Deleted Buyer that still carries them; it does not change the `Deleted` status.
 
 **Audit & history requirements:**
 The audit block records `created` and `updated`, plus the state-specific timestamps `activated`, `unassigned`, and `disabled`. These state-specific sub-keys are written only when their transition occurs — `activated` when an Account is assigned, `unassigned` on unassign, `disabled` on disable — so they are absent on a Buyer that has not reached the corresponding state. Audit is omitted from responses by default (request via `select=+audit`). Prior values are not retained beyond the audit trail.
@@ -206,9 +206,9 @@ The audit block records `created` and `updated`, plus the state-specific timesta
 | ERP data disagrees across sources for the same Buyer | Reconciliation attaches entries to `errors`; the Buyer moves to Conflict (if Unassigned) or Mismatch (if Active/Disabled) until the disagreement is resolved. | Operations | Medium | The conflicting values and their sources are recorded in `errors` (Operations-only). |
 | Buyer's CDG does not match its assigned Account's ERP identifier | A reconciliation error is recorded and the Buyer moves to Mismatch. | Operations | Medium | See BR-006, BR-008. |
 | Buyer's CDG resolves to no Account | The Buyer remains Unassigned; it cannot transact until linked. | Operations, Client | Medium | Assignment requires a matching Client [[Account]] (BR-008). |
-| A referenced Seller is removed in the ERP | The corresponding [[ErpLink]] is removed on the next Buyer sync — unless a Licensee still references the (Buyer, Seller) pair, in which case removal is blocked and a reconciliation error is recorded instead. | Operations | Medium | — |
-| Delete attempted while a Licensee is attached | Deletion is blocked. | Operations | Low | Operations must remove the Licensee relationship first (BR-013). |
-| Unassign attempted while split-billing, Licensee, or certificate ties exist | Unassign is blocked. | Operations | Low | See BR-011. |
+| A referenced Seller is removed in the ERP | The corresponding [[ErpLink]] is removed on the next Buyer sync — unless a [[Licensee]] still references the (Buyer, Seller) pair, in which case removal is blocked and a reconciliation error is recorded instead. | Operations | Medium | — |
+| Delete attempted while a [[Licensee]] is attached | Deletion is blocked. | Operations | Low | Operations must remove the [[Licensee]] relationship first (BR-013). |
+| Unassign attempted while split-billing, [[Licensee]], or certificate ties exist | Unassign is blocked. | Operations | Low | See BR-011. |
 | Update attempted on a Deleted Buyer | Rejected — a Deleted Buyer cannot be modified. | Operations | Low | — |
 | Synchronise attempted on a not-yet-activated (Enabled) Buyer | Rejected — a Buyer without ERP identifiers cannot be retrieved from the ERP. | Operations | Low | ERP-activate the Buyer first (BR-009). |
 
@@ -224,5 +224,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-07-16 | Stu / canon-generate | Accounts: Licensee now canonised — bracket-linked the `[[Licensee]]` cross-references (BR-011, BR-013, Section 8, Section 9) and removed the stale "not yet canonised" note. BR-011 and Section 6 clarified: unassign is guarded by *any* attached Licensee including one in Deleted status, which is broader than the delete/deactivate guard (non-deleted only, BR-013). Surfaced while canonising Accounts: Licensee. |
 | 0.2 | 2026-07-15 | Stu / canon-generate | Wikilinked ErpLink cross-references that were left plain in v0.1 (ErpLink was not yet canonised when the initial draft was written) — Section 1 Description, BR-002, BR-003, BR-013, Section 7, and Section 9 now bracket-link `[[ErpLink]]` on first mention per cell. No content change. |
 | 0.1 | 2026-07-15 | Stu / canon-generate | Initial canon. Generated via live OpenAPI schema, live-fetched real object (STAGING, all Actors), and source-code research across the core platform and the ERP-sync extension. Documents the seven-status ERP-reconciliation model (including the Conflict/Mismatch error overlays and their derivation), the derived-status rule, the Account linkage (direct reference, Client-type, CDG-keyed) and Seller linkage (via ErpLink), the Operations-only `errors` array, the full action-endpoint set, soft-delete with the attached-Licensee guard, and the ERP-sync ownership model. |

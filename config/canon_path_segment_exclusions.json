@@ -38,6 +38,14 @@
     "action_verbs": {},
     "non_object_resources": {}
   },
+  "accounts.licensees": {
+    "state_transition_verbs": {
+      "enable": "CANON_OBJECT_Accounts_Licensee.md §3.2 T5a/T5b \"Enable\", via /enable endpoint (Disabled→Active or Enabled, re-derived from the Buyer)",
+      "disable": "CANON_OBJECT_Accounts_Licensee.md §3.2 T4a/T4b \"Disable\", via /disable endpoint (Active/Enabled→Disabled)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
+  },
   "accounts.sellers": {
     "state_transition_verbs": {
       "activate": "CANON_OBJECT_Accounts_Seller.md §3.2 T3 \"Activate Seller\" (dedicated action endpoint)",
