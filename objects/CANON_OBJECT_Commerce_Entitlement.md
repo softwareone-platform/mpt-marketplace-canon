@@ -1,8 +1,8 @@
 # Object Canon: Entitlement
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-17
 > **Status:** Draft
 
 ---
@@ -85,7 +85,7 @@ No Actor can create, update, or delete an Entitlement — it is a read-only proj
 | --- | --- | --- | --- | --- |
 | BR-001 | An Entitlement is a persisted line within exactly one Commerce: [[Agreement]], recording an entitled Catalog: [[Item]] at a quantity. | All | All | The Agreement is the owning aggregate; the same Entitlement is also reachable through its parent [[Subscription]] or [[Asset]] and through the marketplace-wide lines list. |
 | BR-002 | Entitlements are read-only over the API — there are no create, update, delete, or state-transition endpoints. They come into being and change status only as a side effect of Commerce: [[Order]], [[Subscription]], and [[Asset]] operations. | All | All | All `/lines` endpoints are read (`GET`) only. |
-| BR-003 | An Entitlement is created by promoting a completed Order's line into the Agreement, preserving that line's identity. | — (creation) | Platform | The in-flight Commerce: Order Line and the resulting Entitlement share one `ALI` id. Order Line is a distinct object (not yet canonised). |
+| BR-003 | An Entitlement is created by promoting a completed Order's line into the Agreement, preserving that line's identity. | — (creation) | Platform | The in-flight Commerce: [[Order Line]] and the resulting Entitlement share one `ALI` id. Order Line is a distinct, Order-scoped object. |
 | BR-004 | Each Entitlement is tied to exactly one of a Commerce: [[Subscription]] (recurring Items) or a Commerce: [[Asset]] (one-time Items). | All | All | The `order` reference is retained only for one-time (Asset) Entitlements; recurring Entitlements carry no order reference. |
 | BR-005 | `quantity` is the current entitled quantity for the line. | All | All | It is 0 for Items where quantity is not applicable, and for Terminated and Expired lines. It is a per-line value, not a sum across the Subscription or Asset. |
 | BR-006 | An Entitlement's status is stored but is driven by its parent's lifecycle. | All | Platform | Active on creation; Terminated when the line's quantity is set to 0 by an Order or its [[Subscription]]/[[Asset]] is terminated; Expired when its Subscription expires; Deleted when superseded by a replacement line for the same Item on the same Subscription. See Section 3. |
@@ -187,4 +187,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-17 | Stu / canon-generate-batch | Cross-link added while canonising Commerce: Order Line: BR-003 now bracket-links `[[Order Line]]` and the "(not yet canonised)" qualifier is dropped now that Order Line is a canonised object. |
 | 0.1 | 2026-07-16 | Stu / canon-generate | Initial canon. Generated via live OpenAPI schema (STAGING), a multi-Actor live fetch of an Agreement's lines, and source-code research. Object Name set to "Entitlement" (API term "line"; schema `AgreementLine`). Documents the read-only, no-endpoints nature (created and transitioned only as a side effect of Order/Subscription/Asset operations); the persisted-entity model shared across the Agreement, Subscription, Asset, and marketplace-wide lines views; the `ALI` id shared with the in-flight Order Line via identity-preserving promotion; the Active/Terminated/Expired/Deleted status model and its parent-driven transitions; the one-of-{Subscription, Asset} tie and the one-time-only `order` reference; per-Actor price-field visibility; and the no-status-filter listing behaviour. 0 open questions. |

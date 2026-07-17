@@ -1,6 +1,6 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 2.9
+> **Version:** 2.10
 > **Owner:** Stu
 > **Last Updated:** 2026-07-17
 > **Status:** Living Document — updated continuously as canon is developed
@@ -220,6 +220,8 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 
 The `ALI` prefix is shared: `Commerce: Order Line` reuses the same identifier as the `Commerce: Entitlement` it becomes, because a line's identity is preserved when an Order completes and its lines are promoted into the Agreement.
 
+The `AST` and `SUB` prefixes are shared in the same identity-preserving way: a `Commerce: Order Asset` keeps its `AST` identifier when promoted into the live `Commerce: Asset` on Order completion, and a `Commerce: Order Subscription` keeps its `SUB` identifier when promoted into the live `Commerce: Subscription`. In each case the in-flight, Order-scoped object and the live object it becomes are distinct objects sharing one identifier.
+
 Prefixes for remaining Commerce, Billing, and Accounts objects are not yet confirmed — to be documented as those namespaces are canonised.
 
 ### 5.4 Open Questions
@@ -371,32 +373,33 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
-| 0.1 | 2026-03-07 | Stu | Initial stub. Principles captured from Product, Template, Media, Item Group, and Parameter Group canon sessions. |
-| 0.2 | 2026-03-07 | Stu | Actor model expanded to five recognised Actors. Extension architecture documented. |
-| 0.3 | 2026-03-08 | Stu | Notifications namespace added. |
-| 0.4 | 2026-03-08 | Stu | Notification subsystem section added. Mechanics flagged as requiring engineering input. |
-| 0.5 | 2026-03-09 | Stu | Environments section added. Constraint relaxation pattern documented. Open questions ENV-001/ENV-002 logged. |
-| 0.6 | 2026-03-09 | Stu | Section 6 API Conventions added: null suppression, select=+ field omission, Actor-based field suppression. Canon JSON examples note added to Section 5. Sections renumbered. |
-| 0.7 | 2026-03-09 | Stu | Platform invariants 6 and 7 added: no-cascade deletion, deletion = permanently removed from API visibility. Audit namespace added to Section 4. Section 6.2 expanded to document full select= mechanism: field inclusion/exclusion operators, reference expansion, dot notation for nested field selection. |
-| 0.8 | 2026-03-09 | Stu | Section 5.3 added: Object ID Prefixes table. All Catalog and known non-Catalog prefixes documented. Section 5.4 renumbered from 5.3. |
-| 0.9 | 2026-03-14 | Stu | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
-| 1.0 | 2026-03-14 | Stu | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
-| 1.1 | 2026-03-14 | Stu | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
-| 1.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — standardised on API path prefix. Section 4 namespace table updated with API path prefix column and naming note. Section 5.3 ID Prefixes table updated: SEL prefix added for Seller; TKN and ACC namespace updated to Accounts. Section 5.4 duplicate heading corrected to 5.5. Section 7.3 Licensee/Buyer references updated to Accounts namespace. |
-| 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
-| 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |
-| 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |
-| 1.6 | 2026-07-15 | Stu / canon-generate | Invariant 6 known exception added: deleting a Catalog: Product in Draft state cascades to its child objects (Items, Item Groups, Parameters, Parameter Groups, Templates, Terms/Variants, Media, Price Lists/Items), Authorizations, and Listings, plus Documents/Media/Icon — confirmed via source-code research during the Product canon refresh. Previously undocumented; existing Product canon incorrectly stated deletion was impossible in any state. |
-| 1.7 | 2026-07-15 | Stu / canon-generate-batch | Section 7.3 updated: ENV-005 added and cross-referenced alongside ENV-001/ENV-002 — whether Accounts: Seller's related-Licensee status-change guard is enforced identically in PROD is unconfirmed (only STAGING was exercised). Invariant 7 known exceptions updated to add Accounts: Seller's soft-delete model, alongside Pricing Policy and Order. Section 9.4 updated with a confirmed Seller-specific icon-removal mechanism (narrows, doesn't resolve, ENV-004). Surfaced during a canon-generate-batch dry run refreshing Seller and Commerce: Asset concurrently. |
-| 1.8 | 2026-07-15 | Stu / canon-generate | Section 5.3 ID Prefixes: BUY (Buyer) and ERP (ErpLink) added, confirmed from live object IDs. Added while canonising Accounts: Buyer and Accounts: ErpLink together. |
-| 1.9 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list corrected: Catalog: Product Items removed from the Draft-deletion cascade — source research during the Catalog: Product Item refresh confirmed Items are independent records that Product deletion does not remove. The other listed children are unchanged (not re-examined this run). |
-| 2.0 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: UNT (Unit of Measure) added, confirmed from live object IDs. Added while refreshing Catalog: Unit of Measure. |
-| 2.1 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list: Items restored to the Product Draft-deletion cascade, reverting v1.9. Source research during the Catalog: Product Terms refresh found that the delete-Product API path removes the Product's Items via a cleanup step (v1.9 had inspected only the domain Product.Delete() method, which leaves Items untouched). A full re-verification of the delete-Product cascade was then completed and confirmed every listed child is removed on Draft-Product deletion. |
-| 2.2 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: TCV (Terms Variant) added, confirmed from live object IDs. Added while refreshing Catalog: Product Terms Variant. |
-| 2.3 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: PDC (Catalog Document) added, confirmed from live object IDs. Added while creating the Catalog: Product Document canon. |
-| 2.4 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: PPA (Pricing Policy Attachment) added, confirmed from a live object ID. Added while canonising Catalog: Pricing Policy Attachment (bundled with the Catalog: Pricing Policy refresh). |
-| 2.5 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: LCE (Licensee) added, confirmed from a live object ID. Added while canonising Accounts: Licensee. |
-| 2.6 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: SBA (Agreement Split Billing) added, confirmed from a live object ID. Added while canonising Commerce: Agreement Split Billing. |
+| 2.10 | 2026-07-17 | Stu / canon-generate-batch | Section 5.3: added shared-prefix notes for `AST` (Commerce: Order Asset ↔ Commerce: Asset) and `SUB` (Commerce: Order Subscription ↔ Commerce: Subscription), mirroring the existing `ALI` note — each in-flight Order-scoped object keeps its identifier when promoted into the live object on Order completion. Added while canonising the Commerce Order batch (Order Line/Asset/Subscription). |
 | 2.9 | 2026-07-17 | Stu / canon-generate | Section 5.3 ID Prefixes: SBS (Subscription Split Billing) added, confirmed from a live object ID. Added while canonising Commerce: Subscription Split Billing. |
 | 2.8 | 2026-07-17 | Stu / canon-generate | Section 5.3 ID Prefixes: ATT (Agreement Attachment) added, confirmed from live object IDs. Added while canonising Commerce: Agreement Attachment. |
 | 2.7 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: the ALI row relabelled from "Order Line" to "Entitlement" — source research confirmed ALI is registered to the Agreement Line (Entitlement); Order Line has no prefix of its own and reuses the same ALI id via identity-preserving order→agreement promotion. Added a note recording the shared identifier. Corrected while canonising Commerce: Entitlement. |
+| 2.6 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: SBA (Agreement Split Billing) added, confirmed from a live object ID. Added while canonising Commerce: Agreement Split Billing. |
+| 2.5 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: LCE (Licensee) added, confirmed from a live object ID. Added while canonising Accounts: Licensee. |
+| 2.4 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: PPA (Pricing Policy Attachment) added, confirmed from a live object ID. Added while canonising Catalog: Pricing Policy Attachment (bundled with the Catalog: Pricing Policy refresh). |
+| 2.3 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: PDC (Catalog Document) added, confirmed from live object IDs. Added while creating the Catalog: Product Document canon. |
+| 2.2 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: TCV (Terms Variant) added, confirmed from live object IDs. Added while refreshing Catalog: Product Terms Variant. |
+| 2.1 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list: Items restored to the Product Draft-deletion cascade, reverting v1.9. Source research during the Catalog: Product Terms refresh found that the delete-Product API path removes the Product's Items via a cleanup step (v1.9 had inspected only the domain Product.Delete() method, which leaves Items untouched). A full re-verification of the delete-Product cascade was then completed and confirmed every listed child is removed on Draft-Product deletion. |
+| 2.0 | 2026-07-16 | Stu / canon-generate | Section 5.3 ID Prefixes: UNT (Unit of Measure) added, confirmed from live object IDs. Added while refreshing Catalog: Unit of Measure. |
+| 1.9 | 2026-07-16 | Stu / canon-generate | Invariant 6 known-exception list corrected: Catalog: Product Items removed from the Draft-deletion cascade — source research during the Catalog: Product Item refresh confirmed Items are independent records that Product deletion does not remove. The other listed children are unchanged (not re-examined this run). |
+| 1.8 | 2026-07-15 | Stu / canon-generate | Section 5.3 ID Prefixes: BUY (Buyer) and ERP (ErpLink) added, confirmed from live object IDs. Added while canonising Accounts: Buyer and Accounts: ErpLink together. |
+| 1.7 | 2026-07-15 | Stu / canon-generate-batch | Section 7.3 updated: ENV-005 added and cross-referenced alongside ENV-001/ENV-002 — whether Accounts: Seller's related-Licensee status-change guard is enforced identically in PROD is unconfirmed (only STAGING was exercised). Invariant 7 known exceptions updated to add Accounts: Seller's soft-delete model, alongside Pricing Policy and Order. Section 9.4 updated with a confirmed Seller-specific icon-removal mechanism (narrows, doesn't resolve, ENV-004). Surfaced during a canon-generate-batch dry run refreshing Seller and Commerce: Asset concurrently. |
+| 1.6 | 2026-07-15 | Stu / canon-generate | Invariant 6 known exception added: deleting a Catalog: Product in Draft state cascades to its child objects (Items, Item Groups, Parameters, Parameter Groups, Templates, Terms/Variants, Media, Price Lists/Items), Authorizations, and Listings, plus Documents/Media/Icon — confirmed via source-code research during the Product canon refresh. Previously undocumented; existing Product canon incorrectly stated deletion was impossible in any state. |
+| 1.5 | 2026-04-12 | Stu | Section 2.1a added: User Account Context Model. Documents multi-account membership, Group-based granular permissions, and the correct framing of Actor context in canon. Section 5.3 updated: ORD and ALI prefixes added for Commerce namespace. Invariant 7 known exceptions updated to include Commerce: Order soft-delete model. |
+| 1.4 | 2026-03-16 | Stu | PRP prefix added to Section 5.3. Invariant 7 updated with known exception: Catalog Pricing Policy uses soft-delete and remains retrievable after deletion. |
+| 1.3 | 2026-03-15 | Stu | Section 4 naming note expanded — both names documented explicitly: "Administration" (UI and internal communications) and "Accounts" (API path prefix). Canon rationale clarified. |
+| 1.2 | 2026-03-15 | Stu | Administration namespace renamed to Accounts throughout — standardised on API path prefix. Section 4 namespace table updated with API path prefix column and naming note. Section 5.3 ID Prefixes table updated: SEL prefix added for Seller; TKN and ACC namespace updated to Accounts. Section 5.4 duplicate heading corrected to 5.5. Section 7.3 Licensee/Buyer references updated to Accounts namespace. |
+| 1.1 | 2026-03-14 | Stu | Section 9.4 corrected: DELETE on /icon endpoint is unconfirmed. Mechanism for icon removal parked as ENV-004. |
+| 1.0 | 2026-03-14 | Stu | Section 9.3 corrected: /icon endpoint is GET only. Icon upload is via multipart/form-data on the parent object endpoint. Section 9.4 updated accordingly. ENV-003 resolved. |
+| 0.9 | 2026-03-14 | Stu | Section 9 added: Icon Pattern. Documents the two icon behaviours (jdenticon and required), jdenticon generation, custom icon upload and removal, and icon field API behaviour. |
+| 0.8 | 2026-03-09 | Stu | Section 5.3 added: Object ID Prefixes table. All Catalog and known non-Catalog prefixes documented. Section 5.4 renumbered from 5.3. |
+| 0.7 | 2026-03-09 | Stu | Platform invariants 6 and 7 added: no-cascade deletion, deletion = permanently removed from API visibility. Audit namespace added to Section 4. Section 6.2 expanded to document full select= mechanism: field inclusion/exclusion operators, reference expansion, dot notation for nested field selection. |
+| 0.6 | 2026-03-09 | Stu | Section 6 API Conventions added: null suppression, select=+ field omission, Actor-based field suppression. Canon JSON examples note added to Section 5. Sections renumbered. |
+| 0.5 | 2026-03-09 | Stu | Environments section added. Constraint relaxation pattern documented. Open questions ENV-001/ENV-002 logged. |
+| 0.4 | 2026-03-08 | Stu | Notification subsystem section added. Mechanics flagged as requiring engineering input. |
+| 0.3 | 2026-03-08 | Stu | Notifications namespace added. |
+| 0.2 | 2026-03-07 | Stu | Actor model expanded to five recognised Actors. Extension architecture documented. |
+| 0.1 | 2026-03-07 | Stu | Initial stub. Principles captured from Product, Template, Media, Item Group, and Parameter Group canon sessions. |

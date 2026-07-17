@@ -31,13 +31,27 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | # | Question |
 |---|----------|
-| ORD-001 | Can Operations move a Processing Order to Querying status, or is that transition Vendor-only? Gut says both Vendor and Operations, but unconfirmed. |
-| ORD-002 | Can a Querying Order transition directly to Failed, or must it return to Processing first? The state machine diagram suggests a direct transition is possible; prior discussion suggests it is not. |
-| ORD-003 | When submitting a new Order to the API, which initial status values are valid — is the Client limited to `Draft`, `Quoted`, and `Processing`, or can other values be set directly? |
 | ORD-004 | During Processing and Querying status, can Operations write to `parameters.ordering` and/or `parameters.fulfillment` directly, or must they switch to a Client or Vendor Account to do so? |
 | ORD-005 | Whether the platform handles simultaneous Order placement attempts against the same Agreement atomically — preventing race conditions where two Orders could both reach Processing status simultaneously — is not confirmed. |
 | ORD-006 | Split Billing is enabled at the Agreement level and has implications for Order behaviour. This section requires updating once Split Billing has been canonised in the Agreement canon. |
 | ORD-007 | The `certificates` array on the Order is always empty in observed samples where no Program is assigned to the Product. The full structure of a populated `certificates` entry, which Actors can read it, and whether it is suppressed for any Actor type is not confirmed. See Programs and Certificates canon — pending canonisation. |
+
+---
+
+## CANON_OBJECT_Commerce_Order_Asset.md
+
+| # | Question |
+|---|----------|
+| AST-004 | The Order Asset write endpoints (`POST`/`PUT`) enforce no parent-Order-status precondition. Whether the platform blocks creating or updating an Order Asset against an already-Completed or Failed Order by another mechanism is unconfirmed; only in-flight Orders were exercised. |
+| AST-005 | What Audit Records (on the platform-wide Audit bus) are generated for Order Asset create/update/delete/promotion events, if any, is not confirmed — only the inline `audit` block is observed. |
+
+---
+
+## CANON_OBJECT_Commerce_Order_Subscription.md
+
+| # | Question |
+|---|----------|
+| SUB-004 | Whether an Operations-created Suspend or Resume Order produces an Order Subscription record (and how it presents) is unconfirmed — the captured evidence covers Purchase and Change Orders only. |
 
 ---
 
@@ -53,6 +67,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.4 | 2026-07-17 | Stu / canon-generate-batch | Order batch: ORD-001/002/003 resolved and removed (Querying is Vendor-only to enter and Operations-only to fail from; valid creation statuses Draft/Quoted/Processing) — ORD-004/005/006/007 retained. ORD-008 (Suspend/Resume Order types) and the /quote authority question resolved into the Order canon, not tracked. Added AST-004/AST-005 (Commerce: Order Asset) and SUB-004 (Commerce: Order Subscription). Order Line has no open questions. |
 | 3.3 | 2026-07-17 | Stu / canon-generate | SUB-001, SUB-002, SUB-003 all resolved/closed via live schema + multi-Actor fetch + source-code research and removed (Subscription section retired). SUB-001 — the `/terminate` body is applied as a Vendor update then terminates immediately (no effective-date field). SUB-002 — `commitmentDate` defaults to `startDate + terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal. SUB-003 — subscription-side split fields documented; the full Split Billing Subscription object stays tracked in the backlog (`split | subscriptions`). Incorporated into the Commerce: Subscription refresh. |
 | 3.2 | 2026-07-16 | Stu / canon-generate | AGR-001, AGR-002, AGR-003, AGR-007, AGR-008 all resolved via live schema + multi-Actor fetch + source-code research and removed (Agreement section retired) — `startDate`/`endDate`/`error` are vestigial contract fields; Order and Agreement attachments are one shared collection; the audit block genuinely has no `failed` sub-key; Split Billing documented in the Agreement canon (BR-018). SUB-003's stale "See AGR-007" reference repointed to Agreement BR-018. Incorporated into the Commerce: Agreement canon refresh. |
 | 3.1 | 2026-07-16 | Stu / canon-generate | PRP-001, PRP-002, PRP-004 resolved via source-code research and removed (section retired) — `None` status is defined-but-unused (policies are created Active); multiple-match resolution is deterministic (Product-level over Client-level, lowest markup). Incorporated into Pricing Policy canon. |
