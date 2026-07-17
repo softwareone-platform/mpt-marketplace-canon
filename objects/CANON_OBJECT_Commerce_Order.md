@@ -1,8 +1,8 @@
 # Object Canon: Order
 
-> **Version:** 0.1
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-04-12
+> **Last Updated:** 2026-07-17
 > **Status:** Draft
 
 ---
@@ -186,7 +186,7 @@ None known.
 | Commerce: Order Line | Child | One Order to many Lines | Lines are the unit of work within a Purchase, Change, or Termination Order — one Line per SKU at one quantity. Each Line must be mapped to a Subscription or Asset before the Order can complete. Not present on Configuration Orders. | Lines are created within the scope of the Order. See Commerce: Order Line canon — pending canonisation. |
 | Commerce: Subscription | Association | One Order to many Subscriptions | Subscriptions associated with this Order. For Purchase and Change Orders, Draft Subscriptions are created by the Vendor Extension during Processing and linked to the Agreement on completion. For Termination Orders, references the Subscriptions being terminated. | Order completion drives Subscription state transitions — see BR-019 through BR-022. If all Subscriptions on an Agreement are Terminated, the Agreement also transitions to Terminated. |
 | Commerce: Asset | Association | One Order to many Assets | Assets associated with this Order. For Purchase and Change Orders, Draft Assets are created by the Vendor Extension during Processing and linked to the Agreement on completion. Assets cannot be terminated. | Order completion drives Asset state transitions — see BR-019 and BR-020. Assets are unaffected by Termination Orders and by Agreement termination. |
-| Commerce: Order Attachment | Child | One Order to many Attachments | Files or License Key text attached to the Order by Vendor or Operations. Attachments can be added in any status except Failed and Deleted. | See Commerce: Order Attachment canon — pending canonisation. |
+| Commerce: Agreement Attachment | Association | One Order to many Attachments (optional) | Files or License Key text attached to the Order by the Agreement's Vendor or Operations. These are not a distinct object — they belong to the shared Commerce: Agreement Attachment collection and reference this Order via their `orderId`. There is no Order attachments endpoint; they are created and retrieved through the parent Agreement's `/attachments` endpoint. Attachment creation and deletion are not gated by Order status. | No cascade. The `orderId` is a plain reference — the Order and its attachments are deleted independently. See Commerce: Agreement Attachment canon. |
 | Catalog: Listing | Association | Many Orders to one Listing | The Listing under which the Order was placed. Determines the Seller, Price List, and Authorization applicable to the Order. | Immutable after Order creation. The Listing must be Active at the time of Order creation. |
 | Catalog: Authorization | Association | Many Orders to one Authorization | The Authorization associated with the Listing. Determines the currency and billing context for the Order. | Derived from the Listing at creation. Immutable after Order creation. |
 | Catalog: Product | Association | Many Orders to one Product | The Product being ordered. Derived from the Listing at creation. | Immutable after Order creation. If the Product has a Program assigned, the Client must hold a valid Certificate to place an Order. |
@@ -211,8 +211,8 @@ None known.
 | Parameter values updated | Client updates `parameters.ordering` on a Draft or Querying Order | Client | Platform re-validates parameter values on save. Invalid values are rejected. |
 | Parameter values updated | Vendor updates `parameters.ordering` or `parameters.fulfillment` on a Processing Order | Vendor | No state transition occurs. Changes are persisted immediately. |
 | Assignee set | Vendor sets `assignee` on a Processing Order | Vendor | No material effect on Order processing. Persisted as a reference field only. |
-| Attachment added | Vendor or Operations uploads a file or License Key Attachment to an Order | Vendor, Operations | Attachment is persisted and associated with the Order. No state transition occurs. See Commerce: Order Attachment canon — pending canonisation. |
-| Attachment deleted | Vendor or Operations deletes an Attachment from an Order | Vendor, Operations | Attachment is permanently removed. No state transition occurs. |
+| Attachment added | The [[Agreement]]'s Vendor or Operations uploads a file or records a License Key, optionally against this Order | Vendor, Operations | The attachment is persisted on the parent [[Agreement]]'s shared attachment collection and associated with this Order via `orderId`. No state transition occurs. See Commerce: [[Agreement Attachment]] canon. |
+| Attachment deleted | The [[Agreement]]'s Vendor or Operations deletes an attachment | Vendor, Operations | The attachment is permanently removed — no longer retrievable via the API. No state transition occurs. |
 | Template updated | Vendor updates the Template on a Processing or Querying Order | Vendor | The rendered content shown to the Client updates immediately. Typically used to provide contextually relevant instructions during Querying. No state transition occurs. |
 
 ### 7.2 Cross-Object State Effects
@@ -292,5 +292,6 @@ Audit Records are generated for all Order state transitions. Prior versions of p
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-07-17 | Stu / canon-generate | Attachment references corrected while canonising Commerce: Agreement Attachment. The former "Commerce: Order Attachment" child (§6) is not a distinct object — reframed as an Association to the shared Commerce: Agreement Attachment collection, referenced via `orderId` and served only through the parent Agreement's `/attachments` endpoint (there is no Order attachments endpoint). Removed the unsupported "attachments can be added in any status except Failed and Deleted" claim — attachment create/delete is not gated by Order (or Agreement) status. §7 attachment events repointed to the Commerce: Agreement Attachment canon, with `[[Agreement Attachment]]` bracket-linked now that the child object is canonised. Header version corrected (was 0.1 with a 0.2 changelog row already present). |
 | 0.2 | 2026-04-13 | Stu | BR-012a added: parameter scope semantics — Agreement-scoped vs Order-scoped distinction, carry-over behaviour on Purchase Order completion, Order type constraints. Section 7.2 updated: Purchase Order completion parameter carry-over to Agreement added as a cross-object side effect. |
 | 0.1 | 2026-04-12 | Stu | Initial canon. Commerce namespace — first object canonised. Covers all four Order types, full state machine, coupled Agreement/Subscription/Asset state transitions, parameter write rules, pre-validation webhook mechanism, pricing field visibility, soft-delete model, Attachment and Line child objects identified as pending canonisation. |
