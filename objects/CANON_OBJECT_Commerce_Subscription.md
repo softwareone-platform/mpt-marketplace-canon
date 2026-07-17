@@ -1,6 +1,6 @@
 # Object Canon: Subscription
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
 > **Last Updated:** 2026-07-17
 > **Status:** Draft
@@ -135,7 +135,7 @@ None known.
 | BR-012 | The `template` reference can be set and updated by the Vendor. | Active, Expired, Terminated, Suspended | Vendor | Determines the content rendered to the Client (via the `/render` endpoint) when viewing the Subscription. Absent from the response when null. |
 | BR-013 | Operations can update `commitmentDate` and `price.defaultMarkup` directly, and manage Split Billing via the `/split` endpoint. These are the only direct Operations write capabilities on a Subscription. | Active, Suspended | Operations | Operations does not set `price.defaultMargin` directly. |
 | BR-014 | A Vendor may suspend an Active Subscription and resume a Suspended one via the `/suspend` and `/resume` endpoints; both act immediately, moving the Subscription straight to Suspended or Active. | Active (suspend), Suspended (resume) | Vendor | Permitted only when the parent [[Agreement]] is Active and the [[Product]]'s Suspend/Resume setting permits Vendor suspend/resume. Operations-driven Suspend/Resume [[Order]]s use the transient Suspending/Resuming states and additionally require the setting to permit Operations. |
-| BR-015 | The `split` reference and `splitStatus` are visible to Client and Operations only — both are suppressed from Vendor responses. | All | Client, Operations | `split` is absent from the response when null. `splitStatus` values: `Disabled`, `Active`, `Review`. The full Split Billing configuration is a separate object accessed via the `/split` endpoint. |
+| BR-015 | The `split` reference and `splitStatus` are visible to Client and Operations only — both are suppressed from Vendor responses. | All | Client, Operations | `split` is absent from the response when null. `splitStatus` values: `Disabled`, `Active`. The full split configuration is a separate object — see Commerce: [[Subscription Split Billing]]. |
 | BR-016 | Subscription pricing field visibility mirrors the [[Agreement]] and [[Order]] model: `PPxY`/`PPxM` are visible to Vendor and Operations; `SPxY`/`SPxM` to Client and Operations; `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, and `markupSource` to Operations only; `currency` to Client and Operations. | All | All | — |
 | BR-017 | `commitmentDate` is the date by which the Subscription must be renewed or it will expire. It defaults to `startDate` + `terms.commitment` at creation, may be supplied by the Vendor at direct creation, and is advanced by `terms.commitment` on each successful renewal. | Active, Suspended | Vendor, Operations, Platform | Also directly settable by the Vendor, or by Operations while Active or Suspended. |
 | BR-018 | The `/terminate` endpoint's request body is applied as a Vendor update (the same fields a Vendor may update) immediately before termination; it carries no termination-date or effective-date field. Termination is immediate — `terminationDate` is always set to the current time. | Active, Terminating, Suspended | Vendor | There is no future-dated or effective-dated termination via this endpoint. |
@@ -164,7 +164,7 @@ None known.
 | `externalIds.vendor` | String | The Vendor's own reference for this Subscription. | Vendor | Yes | Optional. Absent when null. |
 | `externalIds.client` | String | The Client's own reference for this Subscription. | Client | Yes | Optional. Absent when null. |
 | `split` | Object | Reference to the Subscription's Split Billing configuration. | Operations | Yes | Suppressed for the Vendor Actor. Absent when null. See BR-015. |
-| `splitStatus` | Enum | Split Billing status: `Disabled`, `Active`, `Review`. | Platform | Yes — platform-managed | Suppressed for the Vendor Actor. |
+| `splitStatus` | Enum | Split Billing status: `Disabled`, `Active`. | Platform | Yes — platform-managed | Suppressed for the Vendor Actor. `Active` once a split is seeded, `Disabled` before. |
 | `agreement` | Object | Reference to the parent Commerce Agreement. | Platform | No | — |
 | `product` | Object | Reference to the Catalog Product. | Platform | No | Derived from the Agreement. |
 | `buyer` | Object | Reference to the Accounts Buyer. | Platform | No | Derived from the Agreement. |
@@ -202,7 +202,7 @@ None known.
 | Subscription terminated directly | Vendor calls `/terminate` | Vendor | Subscription → Terminated; `terminationDate` set; `autoRenew` forced false; Lines reduced to quantity 0. If last, parent [[Agreement]] → Terminated. |
 | Subscription suspended directly | Vendor calls `/suspend` | Vendor | Subscription → Suspended immediately. Parent [[Agreement]] status unchanged. |
 | Subscription resumed directly | Vendor calls `/resume` | Vendor | Subscription → Active immediately; `resumed` audit event recorded. Parent [[Agreement]] status unchanged. |
-| Split Billing updated | Operations updates Split Billing via `/split` | Operations | Allocations updated; `splitStatus` updated by the platform. No state transition on the Subscription. |
+| Split Billing updated | Client or Operations updates Split Billing via `/split` | Client, Operations | Allocations updated and the parent [[Agreement]]'s split is recomputed. `splitStatus` is not changed by an update — it is set to Active only when the split is first seeded. No state transition on the Subscription. |
 
 ### 7.2 Cross-Object State Effects
 
@@ -259,5 +259,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-07-17 | Stu / canon-generate | `splitStatus` corrected while canonising Commerce: Subscription Split Billing: values are `Disabled` and `Active` only — the platform sets `Active` when a split is first seeded and never sets any other value (BR-015, attribute row). The §7 "Split Billing updated" event corrected — a split-allocation update does not change `splitStatus`, and the update is performed by Client or Operations (was "Operations"). BR-015 now points to the Commerce: Subscription Split Billing canon for the full split object. |
 | 0.2 | 2026-07-17 | Stu / canon-generate | Full evidence-based refresh via live STAGING OpenAPI schema, a multi-Actor live fetch, and source-code research. Added the Suspend/Resume feature: three states (Suspending/Suspended/Resuming) and their transitions — a Vendor-direct immediate path (`/suspend`→Suspended, `/resume`→Active) and an Operations Suspend/Resume Order path using the transient states — gated by the Product's Suspend/Resume setting and not yet exposed on the public API surface. §3.2 transition mechanisms confirmed and filled (were "Unconfirmed"): direct `terminate`/`suspend`/`resume` endpoints vs plain status writes driven by Order state; direct create via `POST` with the Agreement Active/New/Draft precondition; renewal/expiry via the daily service. Resolved SUB-001 (the `/terminate` body is applied as a Vendor update then terminates immediately — no effective/termination-date field; BR-018) and SUB-002 (`commitmentDate` defaults to `startDate` + `terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal; BR-017). Corrected: BR-005 renewal advances `commitmentDate` by `terms.commitment` (was `terms.period`); BR-013 Operations sets `defaultMarkup` only, not `defaultMargin`, and can set `commitmentDate`, only while Active or Suspended; expiry (BR-006) is gated by the parent Agreement being Active and the Product's cessation setting, not `autoRenew` = false alone; `terms.period` enum adds `3y`; `terms.commitment` enum is `1m`/`1y`/`2y`/`3y`/`4y`/`5y` and may be absent. Documented the Agreement-termination condition as all Subscriptions Terminated-or-Expired. Closed SUB-003 — the subscription-side split fields are documented (Client/Operations-only, `splitStatus` Disabled/Active/Review, Vendor-suppressed, own `/split` endpoint); the full Split Billing Subscription object remains tracked separately. Removed the duplicate `---` after §1. |
 | 0.1 | 2026-04-13 | Stu | Initial canon. Covers all five Subscription statuses, the OrderSubscription promotion model, the daily renewal and expiry service, Vendor ownership model, parameter write rules, pricing visibility, Split Billing noted as pending. |

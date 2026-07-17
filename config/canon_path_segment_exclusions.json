@@ -141,7 +141,6 @@
       "terminate": "CANON_OBJECT_Commerce_Subscription.md §3.2 T5 \"Terminate Subscription\", via /terminate endpoint (BR-003)"
     },
     "action_verbs": {
-      "split": "CANON_OBJECT_Commerce_Subscription.md §4 BR-013/BR-015 \"manage Split Billing via /split endpoint\" — not a Section 3.2 transition, doesn't change Subscription's own lifecycle state",
       "render": "CANON_OBJECT_Commerce_Subscription.md — GET /render renders the Subscription's assigned template; read-only render action, not a Section 3.2 state transition (same render pattern as Agreement/Asset)"
     },
     "non_object_resources": {}
