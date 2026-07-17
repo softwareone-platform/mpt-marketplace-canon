@@ -148,11 +148,16 @@
   "commerce.orders": {
     "state_transition_verbs": {
       "quote": "CANON_OBJECT_Commerce_Order.md §3.2 T5 \"Quote Order\", via /quote endpoint (BR-007)",
+      "process": "CANON_OBJECT_Commerce_Order.md §3.2 T6/T8 \"Place Order\" (Draft/Quoted → Processing), via /process endpoint",
+      "query": "CANON_OBJECT_Commerce_Order.md §3.2 T12 \"Move to Querying\" (Processing → Querying), via /query endpoint",
       "complete": "CANON_OBJECT_Commerce_Order.md §3.2 T10 \"Complete Order\"",
       "fail": "CANON_OBJECT_Commerce_Order.md §3.2 T11 \"Fail Order\""
     },
     "action_verbs": {
-      "validate": "CANON_OBJECT_Commerce_Order.md §4 BR-028–BR-033 \"Order validated\", via /validate endpoint — not a Section 3.2 transition, a pre-check operation"
+      "validate": "CANON_OBJECT_Commerce_Order.md §4 BR-028–BR-033 \"Order validated\", via /validate endpoint — not a Section 3.2 transition, a pre-check operation",
+      "notify": "CANON_OBJECT_Commerce_Order.md — /notify endpoint (Client/Operations), a notification action, not a Section 3.2 state transition",
+      "render": "CANON_OBJECT_Commerce_Order.md — GET /render renders the Order's assigned template; read-only render action, not a state transition (same render pattern as Agreement/Asset/Subscription)",
+      "template": "CANON_OBJECT_Commerce_Order.md — /template renders/returns the Order's assigned template; not a Section 3.2 transition (same render action as /render)"
     },
     "non_object_resources": {}
   },
