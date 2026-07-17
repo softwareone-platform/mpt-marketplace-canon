@@ -41,16 +41,6 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
-## CANON_OBJECT_Commerce_Subscription.md
-
-| # | Question |
-|---|----------|
-| SUB-001 | What fields are meaningful in the request body of the `/terminate` endpoint? Specifically whether `terminationDate` or other Subscription fields can be set by the Vendor at termination time, or whether the body is unused. |
-| SUB-002 | Whether `commitmentDate` is set by the Vendor Extension at Subscription creation, computed by the platform from `startDate + terms.commitment`, or both, is not confirmed. |
-| SUB-003 | Split Billing on Subscription — full semantics, write rules, and `splitStatus` lifecycle — to be canonised separately. See Commerce: Agreement canon BR-018 for the Agreement-side model. |
-
----
-
 ## CANON_OBJECT_Catalog_PriceList_Item.md
 
 | # | Question |
@@ -63,6 +53,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.3 | 2026-07-17 | Stu / canon-generate | SUB-001, SUB-002, SUB-003 all resolved/closed via live schema + multi-Actor fetch + source-code research and removed (Subscription section retired). SUB-001 — the `/terminate` body is applied as a Vendor update then terminates immediately (no effective-date field). SUB-002 — `commitmentDate` defaults to `startDate + terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal. SUB-003 — subscription-side split fields documented; the full Split Billing Subscription object stays tracked in the backlog (`split | subscriptions`). Incorporated into the Commerce: Subscription refresh. |
 | 3.2 | 2026-07-16 | Stu / canon-generate | AGR-001, AGR-002, AGR-003, AGR-007, AGR-008 all resolved via live schema + multi-Actor fetch + source-code research and removed (Agreement section retired) — `startDate`/`endDate`/`error` are vestigial contract fields; Order and Agreement attachments are one shared collection; the audit block genuinely has no `failed` sub-key; Split Billing documented in the Agreement canon (BR-018). SUB-003's stale "See AGR-007" reference repointed to Agreement BR-018. Incorporated into the Commerce: Agreement canon refresh. |
 | 3.1 | 2026-07-16 | Stu / canon-generate | PRP-001, PRP-002, PRP-004 resolved via source-code research and removed (section retired) — `None` status is defined-but-unused (policies are created Active); multiple-match resolution is deterministic (Product-level over Client-level, lowest markup). Incorporated into Pricing Policy canon. |
 | 3.0 | 2026-07-16 | Stu / canon-generate | PRI-002 added from Price List Item canon-generate run — retrievability of Price List Items after a direct Price List deletion (not via Product deletion) is unconfirmed for Operations/Client and needs a live test. |
