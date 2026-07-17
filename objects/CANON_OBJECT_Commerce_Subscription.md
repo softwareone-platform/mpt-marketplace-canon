@@ -1,8 +1,8 @@
 # Object Canon: Subscription
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-04-13
+> **Last Updated:** 2026-07-17
 > **Status:** Draft
 
 ---
@@ -24,12 +24,10 @@
 **ID Prefix:** SUB
 
 **Description:**
-A Subscription is the platform's record of a recurring fulfilment relationship between a Client and a Vendor for a specific Product Item. Subscriptions are owned by the Vendor — the Vendor Extension creates and maintains them as the authoritative fulfilment record. A Subscription is created during Order Processing and linked to its parent Agreement on Order completion, or created directly by the Vendor in migration and edge-case scenarios. Subscriptions carry their own parameters, pricing, terms, and template, and are renewed or expired automatically by the platform's daily renewal service based on the `autoRenew` flag and `commitmentDate`.
+A Subscription is the platform's record of a recurring fulfilment relationship between a Client and a Vendor for a specific Item under a Commerce [[Agreement]]. Subscriptions are owned by the Vendor — the Vendor Extension creates and maintains them as the authoritative fulfilment record — while SoftwareOne (Operations) owns the parent [[Agreement]]. A Subscription is created during [[Order]] processing and promoted to a live record when the Purchase or Change [[Order]] completes, or created directly by the Vendor for migration and edge-case scenarios. Subscriptions carry their own parameters, pricing, terms, and rendered [[Template]], and are renewed or expired automatically by the platform's daily renewal service. A Subscription can also be suspended and resumed.
 
 **Also Known As:**
 None known.
-
----
 
 ---
 
@@ -40,9 +38,9 @@ None known.
 
 | Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Vendor | Yes | Yes | Yes | No | Can create Subscriptions directly (migration/edge cases) or via Order Processing. Can update `name`, `template`, `autoRenew`, `parameters.fulfillment`, `externalIds.vendor`. Can terminate via `/terminate` endpoint. Read is scoped to Subscriptions on Agreements where they are the Vendor. |
-| Operations | No | Yes | Yes | No | Can update `price.defaultMarkup`, `price.defaultMargin`, and manage Split Billing via `/split` endpoint. Can also manage markup on Subscription Lines. Read is not self-scoped — Operations sees all Subscriptions platform-wide. |
-| Client | No | Yes | Yes | No | Can update `name` and `externalIds.client`. Cannot create, terminate, or delete Subscriptions. Read is scoped to Subscriptions on Agreements belonging to their own Account. |
+| Vendor | Yes | Yes | Yes | No | Creates Subscriptions directly (migration/edge cases) or via [[Order]] processing. Updates `name`, `template`, `autoRenew`, `commitmentDate`, `parameters.fulfillment`, `externalIds.vendor`. Terminates, suspends, and resumes via dedicated endpoints. Read is scoped to Subscriptions on [[Agreement]]s where they are the Vendor (BR-020). |
+| Operations | No | Yes | Yes | No | Updates `commitmentDate` and `price.defaultMarkup` (only while Active or Suspended), and manages Split Billing via the `/split` endpoint. Suspend and resume Orders are Operations-driven. Read is not self-scoped — Operations sees all Subscriptions platform-wide. |
+| Client | No | Yes | Yes | No | Updates `name` and `externalIds.client`. Cannot create, terminate, suspend, resume, or delete. Read is scoped to Subscriptions on [[Agreement]]s belonging to their own [[Account]] (BR-020). |
 
 ---
 
@@ -52,42 +50,69 @@ None known.
 
 | State | Description | Initial State? | Terminal State? |
 | --- | --- | --- | --- |
-| Active | The Subscription is live and fulfilling. The Vendor owns and maintains it. It will be renewed or expired by the platform's daily renewal service based on `autoRenew` and `commitmentDate`. | — | — |
-| Updating | A Change, Configuration, or Termination Order affecting this Subscription has been placed and is being processed. The Subscription returns to Active when the Order completes or fails. | — | — |
-| Terminating | A Termination Order affecting this Subscription has been placed and is being processed. The Subscription transitions to Terminated when the Termination Order completes. | — | — |
-| Terminated | The Subscription has been permanently ended — either by a completed Termination Order or by direct Vendor action via the `/terminate` endpoint. Terminal state — no outbound transitions. | — | — |
-| Expired | The Subscription's `commitmentDate` passed with `autoRenew = false`. The platform's daily renewal service moved it to Expired. Terminal state — no outbound transitions. | — | — |
+| Active | The Subscription is live and fulfilling. It is evaluated daily by the platform's renewal service and may be renewed, expired, suspended, updated, or terminated. | Yes | No |
+| Updating | A Change or Configuration Order affecting this Subscription is being processed. The Subscription returns to Active when the Order completes or fails. | No | No |
+| Terminating | A Termination Order affecting this Subscription is being processed. The Subscription transitions to Terminated when the Order completes, or reverts when it fails. | No | No |
+| Suspending | A Suspend Order affecting this Subscription is being processed. The Subscription transitions to Suspended when the Order completes, or reverts to Active when it fails. | No | No |
+| Suspended | Fulfilment is paused. The Subscription can be resumed, terminated, or expired. | No | No |
+| Resuming | A Resume Order affecting this Subscription is being processed. The Subscription transitions to Active when the Order completes, or reverts to Suspended when it fails. | No | No |
+| Terminated | The Subscription has been permanently ended — by a completed Termination Order or by direct Vendor action. Terminal — no outbound transitions. | No | Yes |
+| Expired | The Subscription's `commitmentDate` passed without renewal and the platform's daily service moved it to Expired. Terminal — no outbound transitions. | No | Yes |
 
-> **Note on Draft:** Subscriptions have no Draft state. During Order Processing, the Vendor creates an `OrderSubscription` object (a temporary representation scoped to the Order, accessible via `/orders/{id}/subscriptions`). When the Purchase or Change Order completes, the platform copies the OrderSubscription to create the live Subscription, retaining the same ID. The live Subscription is created directly in Active status.
+> **Note on Draft:** Subscriptions have no Draft state. During Order processing the Vendor works on an Order-scoped representation (accessible via `/orders/{id}/subscriptions`). When the Purchase or Change Order completes, the platform promotes it to the live Subscription, retaining the same ID, created directly in Active.
+>
+> **Note on the two suspend/resume paths:** A Vendor suspends or resumes *directly* via the `/suspend` and `/resume` endpoints, which move the Subscription straight to Suspended or Active without passing through the transient Suspending/Resuming states. The transient states occur only on the Operations-driven Suspend/Resume Order path, and resolve when that Order completes or fails.
 
 ### 3.2 Transitions
 
 | ID | From State | To State | Action | Endpoint / Verb | Actor | Precondition | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | — | Active | Order completed — copied from OrderSubscription | Unconfirmed — pending refresh | Platform | Purchase or Change Order transitions to Completed | Platform copies the OrderSubscription to create the live Subscription under Vendor token context. Same ID retained. Subscription linked to Agreement simultaneously. |
-| T2 | — | Active | Vendor creates directly | Unconfirmed — pending refresh | Vendor | None — Vendor discretion | Used for migration scenarios or direct vendor sync. Subscription created directly in Active status without an Order. |
-| T3 | Active | Updating | Change or Configuration Order placed | Unconfirmed — pending refresh | Platform | Change or Configuration Order transitions to Processing | Automated under Client token context. Subscription returns to Active when the Order completes or fails. |
-| T4 | Active | Terminating | Termination Order placed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Processing | Automated under Client token context. |
-| T5 | Active | Terminated | Terminate Subscription | Unconfirmed — pending refresh | Vendor | Subscription must be Active | Via `/terminate` endpoint. `terminationDate` set automatically by platform. If this is the last Active Subscription on the Agreement, Agreement → Terminated. |
-| T6 | Active | Expired | Renewal service — not renewed | Unconfirmed — pending refresh | Platform | `autoRenew = false` and `commitmentDate < today` | Automated daily. Executed by the platform's renewal service. Terminal state. |
-| T7 | Active | Active | Renewal service — renewed | Unconfirmed — pending refresh | Platform | `autoRenew = true` and `commitmentDate < today` | Not a state transition — Subscription remains Active. `commitmentDate` updated to `commitmentDate + term`. `renewed` audit event recorded. |
-| T8 | Updating | Active | Change or Configuration Order completed or failed | Unconfirmed — pending refresh | Platform | Order transitions to Completed or Failed | Automated under Vendor or Operations token context. |
-| T9 | Terminating | Terminated | Termination Order completed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Completed | Automated under Vendor token context. `terminationDate` set automatically by platform. If this is the last Active/Terminating Subscription on the Agreement, Agreement → Terminated. |
-| T10 | Terminating | Active | Termination Order failed | Unconfirmed — pending refresh | Platform | Termination Order transitions to Failed | Automated under Vendor or Operations token context. Subscription reverts to Active unchanged. |
+| T1 | — | Active | Order completed — promoted from the Order-scoped representation | No dedicated endpoint — driven by Purchase/Change Order completion | Platform | Purchase or Change Order transitions to Completed | Under Vendor token context. Same ID retained. Linked to the Agreement simultaneously. |
+| T2 | — | Active | Vendor creates directly | `POST` (base collection endpoint) | Vendor | Parent Agreement is Active, New, or Draft | Migration/vendor-sync. Created directly in Active without an Order. |
+| T3 | Active | Updating | Change or Configuration Order placed | No dedicated endpoint — driven by Order state | Platform | Change or Configuration Order enters Processing | Under the placing Actor's token context. |
+| T4 | Active | Terminating | Termination Order placed | No dedicated endpoint — driven by Order state | Platform | Termination Order enters Processing | Parent Agreement transitions to Updating. |
+| T5 | Active | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active | Immediate. `terminationDate` set to now, `autoRenew` forced false, active Lines set to quantity 0 and terminated. If last, Agreement → Terminated (BR-003). |
+| T6 | Active | Suspended | Vendor suspends directly | `suspend` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor suspend | Immediate — skips Suspending. |
+| T7 | Active | Suspending | Suspend Order placed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order (Operations) enters Processing; the Product's Suspend/Resume setting permits it | |
+| T8 | Active | Expired | Renewal service — not renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today, `autoRenew` = false, parent Agreement Active, and the Product's cessation setting permits expiry (BR-006) | Terminal. |
+| T9 | Active | Active | Renewal service — renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today and `autoRenew` = true | Not a state change. `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded (BR-005). |
+| T10 | Updating | Active | Change or Configuration Order completed or failed | No dedicated endpoint — driven by Order state | Platform | Order transitions to Completed or Failed | Returns to Active in both cases. |
+| T11 | Terminating | Terminated | Termination Order completed | No dedicated endpoint — driven by Order state | Platform | Termination Order transitions to Completed | `terminationDate` set. If last, Agreement → Terminated (BR-003). |
+| T12 | Terminating | Active | Termination Order failed | No dedicated endpoint — driven by Order state | Platform | Termination Order transitions to Failed | Reverts unchanged (or to Suspended if the Subscription was Suspended before the Order). |
+| T13 | Suspending | Suspended | Suspend Order completed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order transitions to Completed | |
+| T14 | Suspending | Active | Suspend Order failed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order transitions to Failed | Reverts unchanged. |
+| T15 | Suspended | Active | Vendor resumes directly | `resume` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor resume | Immediate — skips Resuming. `resumed` audit event recorded. |
+| T16 | Suspended | Resuming | Resume Order placed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order (Operations) enters Processing; the Product's Suspend/Resume setting permits it | |
+| T17 | Suspended | Terminating | Termination Order placed | No dedicated endpoint — driven by Order state | Platform | Termination Order enters Processing | |
+| T18 | Suspended | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active | Immediate. |
+| T19 | Suspended | Expired | Renewal service — not renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today, parent Agreement Active, and the Product's cessation setting permits expiry | Terminal. A Suspended Subscription past its commitment date is expired by the same daily service. |
+| T20 | Resuming | Active | Resume Order completed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order transitions to Completed | |
+| T21 | Resuming | Suspended | Resume Order failed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order transitions to Failed | Reverts to Suspended. |
 
 ### 3.3 State Diagram
 
 ```
-— ---(Order completed, copied from OrderSubscription : Platform)---> [Active]
+— ---(Order completed, promoted : Platform)---> [Active]
 — ---(Vendor creates directly : Vendor)---> [Active]
-[Active] ---(Change or Configuration Order placed : Platform)---> [Updating]
+[Active] ---(Change/Configuration Order placed : Platform)---> [Updating]
 [Active] ---(Termination Order placed : Platform)---> [Terminating]
-[Active] ---(Vendor terminates directly : Vendor)---> [Terminated]
+[Active] ---(Vendor suspends directly : Vendor)---> [Suspended]
+[Active] ---(Suspend Order placed : Platform)---> [Suspending]
 [Active] ---(Renewal service, not renewed : Platform)---> [Expired]
-[Active] ---(Renewal service, renewed : Platform)---> [Active] (commitmentDate updated)
+[Active] ---(Renewal service, renewed : Platform)---> [Active] (commitmentDate advanced)
+[Active] ---(Vendor terminates directly : Vendor)---> [Terminated]
 [Updating] ---(Order completed or failed : Platform)---> [Active]
 [Terminating] ---(Termination Order completed : Platform)---> [Terminated]
-[Terminating] ---(Termination Order failed : Platform)---> [Active]
+[Terminating] ---(Termination Order failed : Platform)---> [Active] (or [Suspended])
+[Suspending] ---(Suspend Order completed : Platform)---> [Suspended]
+[Suspending] ---(Suspend Order failed : Platform)---> [Active]
+[Suspended] ---(Vendor resumes directly : Vendor)---> [Active]
+[Suspended] ---(Resume Order placed : Platform)---> [Resuming]
+[Suspended] ---(Termination Order placed : Platform)---> [Terminating]
+[Suspended] ---(Vendor terminates directly : Vendor)---> [Terminated]
+[Suspended] ---(Renewal service, not renewed : Platform)---> [Expired]
+[Resuming] ---(Resume Order completed : Platform)---> [Active]
+[Resuming] ---(Resume Order failed : Platform)---> [Suspended]
 ```
 
 ---
@@ -96,23 +121,26 @@ None known.
 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
-| BR-001 | Subscriptions are owned by the Vendor. The Vendor Extension creates and maintains Subscriptions as the authoritative fulfilment record. SoftwareOne (Operations) owns the [[Agreement]]; the Vendor owns the Subscriptions under it. | All | Vendor | This ownership distinction drives the write permission model — the Vendor has broad direct write access to Subscriptions without requiring an [[Order]]. |
-| BR-002 | A Subscription is normally created during [[Order]] Processing as an OrderSubscription and promoted to a live Subscription when the Purchase or Change [[Order]] completes. The platform copies the OrderSubscription to create the live Subscription, retaining the same ID. The Subscription is created directly in Active status — there is no Draft state. | — (creation) | Vendor | The Vendor may also create a Subscription directly in Active status without an [[Order]] for migration or vendor sync scenarios. |
-| BR-003 | When a Termination [[Order]] completes, the affected Subscriptions transition to Terminated. When a Vendor terminates a Subscription directly via the `/terminate` endpoint, the Subscription transitions immediately to Terminated. In both cases, `terminationDate` is set automatically by the platform. | Active, Terminating | Vendor | If the terminated Subscription is the last Active or Terminating Subscription on the [[Agreement]], the [[Agreement]] automatically transitions to Terminated. |
-| BR-004 | Expired and Terminated are permanently terminal states. A Subscription cannot be reactivated from either state. A new Subscription must be created — typically via a new Purchase or Change [[Order]] — to replace a terminated or expired Subscription. | Terminated, Expired | All | — |
-| BR-005 | The platform runs a daily renewal service that evaluates all Active Subscriptions. For Subscriptions where `autoRenew = true` and `commitmentDate < today`: the `renewed` audit event is recorded and `commitmentDate` is updated to `commitmentDate + terms.period`. The Subscription status does not change. | Active | Platform | The renewal service is a platform-level automated process. |
-| BR-006 | The platform runs a daily renewal service that evaluates all Active Subscriptions. For Subscriptions where `autoRenew = false` and `commitmentDate < today`: the Subscription transitions to Expired. `commitmentDate` is not updated. Expired is a terminal state. | Active | Platform | Expiry is driven by the same daily service as renewal. |
-| BR-007 | The `autoRenew` flag can only be updated directly by the Vendor. The Client cannot update `autoRenew` directly — it may be toggled via a Configuration [[Order]], which the Vendor Extension processes. | All | Vendor | Configuration Orders are the standard mechanism for Clients to request auto-renewal changes. The Vendor Extension implements the business logic and updates `autoRenew` directly. |
-| BR-008 | Subscription-scoped `parameters.fulfillment` are written and maintained exclusively by the Vendor. The Client cannot update Subscription parameters directly. | All | Vendor | Parameters with `hidden=true` are suppressed from Client API responses — consistent with the parameter suppression model on Orders and Agreements. |
-| BR-009 | The `terms` object on a Subscription (`model`, `period`, `commitment`) is set at Subscription creation and is immutable thereafter. The terms of all Lines under a Subscription must match the terms of the Subscription. | All | All | Valid values: `model` — `one-time`, `usage`, `quantity`; `period` — `1m`, `1y`, `one-time`; `commitment` — `1m`, `1y`, `3y`. |
-| BR-010 | There is no DELETE endpoint on Subscription. The only paths to terminal states are Termination (via Termination [[Order]] or direct Vendor action) and Expiry (via the platform's daily renewal service). | All | All | — |
-| BR-011 | The `name` field on a Subscription can be updated by any Actor. | All | All | — |
-| BR-012 | The `template` field on a Subscription can be set and updated by the Vendor in any non-terminal status. The template is absent from the Subscription response when null — consistent with null suppression. | Active, Updating, Terminating | Vendor | The Subscription template determines the rendered content shown to the Client when viewing their Subscription. |
-| BR-013 | Operations can update `price.defaultMarkup` and `price.defaultMargin` directly on a Subscription, and can manage Split Billing via the `/split` endpoint. Operations can also manage markup on Subscription Lines. These are the only direct update capabilities available to the Operations Actor on a Subscription. | Active | Operations | — |
-| BR-014 | The `split` field and `splitStatus` field are suppressed from Vendor API responses — visible to Client and Operations only. See AGR-007 for Split Billing canon — pending canonisation. | All | Client, Operations | `split` is absent from response when null (null suppression). `splitStatus` valid values: `Disabled`, `Active`, `Review`. |
-| BR-015 | Subscription pricing field visibility mirrors the [[Agreement]] and [[Order]] pricing model: `PPxY` and `PPxM` are visible to Vendor and Operations; `SPxY` and `SPxM` are visible to Client and Operations; `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, and `markupSource` are visible to Operations only. | All | All | — |
-| BR-016 | The `commitmentDate` field represents the date by which the Subscription must be renewed or it will expire. It is evaluated daily by the platform's renewal service. After a successful renewal, it is updated to `commitmentDate + terms.period`. | Active | Platform | See SUB-001 for whether `commitmentDate` can be set by the Vendor at creation or via the `/terminate` endpoint. |
-| BR-017 | Subscription visibility is self-scoped per Actor: Vendor sees only Subscriptions on Agreements where they are the Vendor; Client sees only Subscriptions on Agreements belonging to their own [[Account]]; Operations sees all Subscriptions platform-wide. | All | All | — |
+| BR-001 | Subscriptions are owned by the Vendor, who creates and maintains them as the authoritative fulfilment record. SoftwareOne (Operations) owns the parent [[Agreement]]. | All | Vendor | This ownership distinction drives the write model — the Vendor has broad direct write access without requiring an [[Order]]. |
+| BR-002 | A Subscription is normally created during [[Order]] processing and promoted to a live record when the Purchase or Change [[Order]] completes, retaining the same ID. It is created directly in Active — there is no Draft state. | — (creation) | Vendor | The Vendor may also create a Subscription directly in Active for migration or vendor-sync scenarios; this requires the parent [[Agreement]] to be Active, New, or Draft. |
+| BR-003 | When a Termination [[Order]] completes, or when the Vendor terminates directly via the `/terminate` endpoint, the Subscription transitions to Terminated and `terminationDate` is set by the platform. If it is the last Subscription on the [[Agreement]] not already Terminated or Expired, the [[Agreement]] transitions to Terminated. | Active, Terminating, Suspended | Vendor | Direct termination also sets `autoRenew` to false and reduces the Subscription's Lines to quantity 0. |
+| BR-004 | Terminated and Expired are permanently terminal. A Subscription cannot be reactivated from either state; a new Subscription must be created to replace it. | Terminated, Expired | All | — |
+| BR-005 | The platform's daily renewal service renews Active Subscriptions where `autoRenew` = true and `commitmentDate` < today: `commitmentDate` is advanced and a `renewed` audit event is recorded. The status does not change. | Active | Platform | `commitmentDate` is advanced by `terms.commitment` (the commitment term), not `terms.period`. |
+| BR-006 | The platform's daily service expires a Subscription whose `commitmentDate` has passed and which is not set to auto-renew, moving it to the terminal Expired state. | Active, Suspended | Platform | Expiry additionally requires the parent [[Agreement]] to be Active and the [[Product]]'s cessation setting to permit auto-renewal-based expiry. A Subscription whose Product does not permit it is not auto-expired even with `autoRenew` = false. |
+| BR-007 | `autoRenew` can only be set directly by the Vendor. The Client cannot set it directly; it may be changed via a Configuration [[Order]] processed by the Vendor Extension. | All | Vendor | — |
+| BR-008 | Subscription-scoped `parameters.fulfillment` are written and maintained exclusively by the Vendor. | All | Vendor | Parameters marked hidden are suppressed from Client API responses, consistent with the parameter suppression model on [[Order]]s and [[Agreement]]s. |
+| BR-009 | The `terms` object (`model`, `period`, `commitment`) is set at creation and is immutable thereafter. The terms of all Lines under a Subscription match the Subscription's terms. | All | All | Valid values — `model`: `one-time`, `usage`, `quantity`; `period`: `1m`, `1y`, `3y`, `one-time`; `commitment`: `1m`, `1y`, `2y`, `3y`, `4y`, `5y` (may be absent). |
+| BR-010 | There is no delete endpoint on Subscription. The only terminal states are Terminated and Expired. | All | All | — |
+| BR-011 | `name` can be updated by any Actor; `externalIds.vendor` by the Vendor and `externalIds.client` by the Client. | Non-terminal (Client name limited to Updating/Active/Suspended/Suspending/Resuming) | All | The Client can still update `externalIds.client` on a Terminating or Terminated Subscription. |
+| BR-012 | The `template` reference can be set and updated by the Vendor. | Active, Expired, Terminated, Suspended | Vendor | Determines the content rendered to the Client (via the `/render` endpoint) when viewing the Subscription. Absent from the response when null. |
+| BR-013 | Operations can update `commitmentDate` and `price.defaultMarkup` directly, and manage Split Billing via the `/split` endpoint. These are the only direct Operations write capabilities on a Subscription. | Active, Suspended | Operations | Operations does not set `price.defaultMargin` directly. |
+| BR-014 | A Vendor may suspend an Active Subscription and resume a Suspended one via the `/suspend` and `/resume` endpoints; both act immediately, moving the Subscription straight to Suspended or Active. | Active (suspend), Suspended (resume) | Vendor | Permitted only when the parent [[Agreement]] is Active and the [[Product]]'s Suspend/Resume setting permits Vendor suspend/resume. Operations-driven Suspend/Resume [[Order]]s use the transient Suspending/Resuming states and additionally require the setting to permit Operations. |
+| BR-015 | The `split` reference and `splitStatus` are visible to Client and Operations only — both are suppressed from Vendor responses. | All | Client, Operations | `split` is absent from the response when null. `splitStatus` values: `Disabled`, `Active`, `Review`. The full Split Billing configuration is a separate object accessed via the `/split` endpoint. |
+| BR-016 | Subscription pricing field visibility mirrors the [[Agreement]] and [[Order]] model: `PPxY`/`PPxM` are visible to Vendor and Operations; `SPxY`/`SPxM` to Client and Operations; `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, and `markupSource` to Operations only; `currency` to Client and Operations. | All | All | — |
+| BR-017 | `commitmentDate` is the date by which the Subscription must be renewed or it will expire. It defaults to `startDate` + `terms.commitment` at creation, may be supplied by the Vendor at direct creation, and is advanced by `terms.commitment` on each successful renewal. | Active, Suspended | Vendor, Operations, Platform | Also directly settable by the Vendor, or by Operations while Active or Suspended. |
+| BR-018 | The `/terminate` endpoint's request body is applied as a Vendor update (the same fields a Vendor may update) immediately before termination; it carries no termination-date or effective-date field. Termination is immediate — `terminationDate` is always set to the current time. | Active, Terminating, Suspended | Vendor | There is no future-dated or effective-dated termination via this endpoint. |
+| BR-019 | Subscription state transitions are driven by [[Order]] state, the platform's daily renewal service, or direct Vendor action (terminate/suspend/resume). No Actor can set `status` through a plain field write. | All | All | — |
+| BR-020 | Subscription visibility is self-scoped per Actor: the Vendor sees only Subscriptions on [[Agreement]]s where they are the Vendor; the Client only those on [[Agreement]]s belonging to their own [[Account]]; Operations sees all. | All | All | — |
 
 ---
 
@@ -120,30 +148,29 @@ None known.
 
 | Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `id` | String | Unique platform identifier for the Subscription. | Platform | No | Format: SUB-XXXX-XXXX-XXXX. Same ID as the OrderSubscription it was promoted from. |
-| `revision` | Integer | Increments each time the Subscription is updated. | Platform | Yes — platform-managed | — |
-| `name` | String | Human-readable name for the Subscription. | Platform (at creation) | Yes — all Actors | Typically auto-generated as "Subscription for [Item Name]". |
-| `status` | Enum | Current status. Valid values: `Active`, `Updating`, `Terminating`, `Terminated`, `Expired`. | Platform | Yes — platform-managed | Driven by Order transitions, direct Vendor action, or the platform's renewal service. Not directly writable. |
-| `autoRenew` | Boolean | Whether the Subscription will be automatically renewed by the platform's daily renewal service when `commitmentDate` is reached. | Vendor | Yes — Vendor only | Client cannot update directly. May be toggled via Configuration Order. |
-| `commitmentDate` | DateTime | The date by which the Subscription must be renewed or it will expire. Updated by the renewal service after each successful renewal (`commitmentDate + terms.period`). | Vendor (at creation), Platform (on renewal) | Yes — platform-managed after creation | See SUB-001. |
-| `startDate` | DateTime | The date the Subscription became active. | Vendor (at creation) | No | Set at Subscription creation. Immutable. |
-| `terminationDate` | DateTime | The date the Subscription was terminated. | Platform | No | Set automatically by the platform when a Subscription transitions to Terminated. Absent from response when null — consistent with null suppression. |
-| `terms` | Object | The billing terms for this Subscription. Contains `model` (`one-time`, `usage`, `quantity`), `period` (`1m`, `1y`, `one-time`), and `commitment` (`1m`, `1y`, `3y`). | Vendor (at creation) | No | Immutable after creation. All Lines under this Subscription must have matching terms. |
-| `price` | Object | Aggregate pricing for the Subscription. Contains `SPxY`, `SPxM`, `PPxY`, `PPxM`, `currency`, `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, `markupSource`. | Platform (computed), Operations (defaultMarkup/defaultMargin) | Yes — Operations only for markup fields | `PPxY`, `PPxM` visible to Vendor and Operations. `SPxY`, `SPxM` visible to Client and Operations. `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, `markupSource` visible to Operations only. |
-| `parameters.fulfillment` | Array | Subscription-scoped fulfilment parameters written and maintained by the Vendor Extension. Contains parameters with `phase: "Fulfillment"` and `scope: "Subscription"`. | Vendor | Yes — Vendor only | Parameters with `hidden=true` suppressed from Client API responses. Not writable by Client or Operations directly. |
-| `template` | Object | Reference to the Catalog: Template assigned to this Subscription. Determines rendered content shown to the Client when viewing their Subscription. | Vendor | Yes — Vendor, non-terminal states only | Absent from response when null. |
-| `lines` | Array | Lines (Entitlements) associated with this Subscription. Accessible via `/subscriptions/{id}/lines` endpoint. | Platform | No | Each Line maps one SKU at one quantity to this Subscription. Line terms must match Subscription terms. |
-| `externalIds.vendor` | String | Vendor's reference for this Subscription — e.g. the vendor-side subscription identifier. | Vendor | Yes | Optional. Absent from response when null. |
-| `externalIds.client` | String | Client's own reference for this Subscription. | Client | Yes | Optional. Absent from response when null. |
-| `split` | Object | Split Billing configuration for this Subscription. Accessible via `/split` endpoint. | Operations | Yes | Suppressed for Vendor Actor. Absent from response when null. See AGR-007. |
-| `splitStatus` | Enum | Current Split Billing status. Valid values: `Disabled`, `Active`, `Review`. | Platform | Yes — platform-managed | Suppressed for Vendor Actor. |
-| `agreement` | Object | Reference to the parent Commerce: Agreement. | Platform | No | Immutable after creation. |
-| `product` | Object | Reference to the Catalog: Product. | Platform | No | Immutable after creation. Derived from the Agreement. |
-| `buyer` | Object | Reference to the Accounts: Buyer. | Platform | No | Immutable after creation. Derived from the Agreement. |
-| `licensee` | Object | Reference to the Accounts: Licensee. | Platform | No | Immutable after creation. Derived from the Agreement. |
-| `seller` | Object | Reference to the Accounts: Seller. | Platform | No | Immutable after creation. Derived from the Agreement. |
-| `audit` | Object | Audit timestamps for key lifecycle events. Contains `created`, `updated`, `active`, `terminated`, `terminating`, `updating`, `expired`, `renewed`. | Platform | No | Omitted by default — request via `select=+audit`. State-specific entries only present if the Subscription has reached that state. `renewed` is an event sub-key — not a state — updated each time the renewal service renews the Subscription. |
-| References | — | Group of immutable reference fields derived from the parent Agreement at Subscription creation. Includes agreement, product, buyer, licensee, and seller. None of these can be changed after creation. | — | — | — |
+| `id` | String | Unique platform identifier. | Platform | No | Format: `SUB-XXXX-XXXX-XXXX`. Same ID as the Order-scoped representation it was promoted from. |
+| `revision` | Integer | Increments on each update. | Platform | Yes — platform-managed | — |
+| `name` | String | Human-readable name. | Platform (at creation) | Yes — all Actors | Typically auto-generated from the Item name. |
+| `status` | Enum | Current status. | Platform | Yes — platform-managed | Values: `Active`, `Updating`, `Terminating`, `Suspending`, `Suspended`, `Resuming`, `Terminated`, `Expired`. Not directly writable (see BR-019). |
+| `autoRenew` | Boolean | Whether the daily renewal service renews the Subscription at `commitmentDate`. | Vendor | Yes — Vendor only | Client cannot set directly; may be changed via a Configuration Order (see BR-007). |
+| `commitmentDate` | DateTime | The date by which the Subscription must be renewed or it will expire. | Platform (computed) / Vendor / Operations | Yes | Defaults to `startDate` + `terms.commitment`; advanced by `terms.commitment` on renewal (see BR-017). |
+| `startDate` | DateTime | The date the Subscription became active. | Vendor (at creation) | No | — |
+| `terminationDate` | DateTime | The date the Subscription was terminated. | Platform | No | Set to the current time on termination. Absent from the response when null. |
+| `terms` | Object | Billing terms: `model`, `period`, `commitment`. | Vendor (at creation) | No | Immutable. Enum values listed in BR-009. `commitment` may be absent. |
+| `price` | Object | Aggregate pricing: `SPxY`, `SPxM`, `PPxY`, `PPxM`, `currency`, `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, `markupSource`. | Platform (computed); Operations (`defaultMarkup`) | `defaultMarkup` by Operations | Field-level visibility per Actor described in BR-016. |
+| `parameters.fulfillment` | Array | Subscription-scoped fulfilment parameters. | Vendor | Yes — Vendor only | Hidden parameters are suppressed from Client responses. Subscriptions carry only fulfilment-phase parameters. |
+| `template` | Object | Reference to the Catalog Template rendered for the Client. | Vendor | Yes — Vendor | Absent from the response when null. See BR-012. |
+| `lines` | Array | Lines (Entitlements) under this Subscription. | Platform | No | Also reachable via `/subscriptions/{id}/lines`. Line terms match Subscription terms. See BR-009. |
+| `externalIds.vendor` | String | The Vendor's own reference for this Subscription. | Vendor | Yes | Optional. Absent when null. |
+| `externalIds.client` | String | The Client's own reference for this Subscription. | Client | Yes | Optional. Absent when null. |
+| `split` | Object | Reference to the Subscription's Split Billing configuration. | Operations | Yes | Suppressed for the Vendor Actor. Absent when null. See BR-015. |
+| `splitStatus` | Enum | Split Billing status: `Disabled`, `Active`, `Review`. | Platform | Yes — platform-managed | Suppressed for the Vendor Actor. |
+| `agreement` | Object | Reference to the parent Commerce Agreement. | Platform | No | — |
+| `product` | Object | Reference to the Catalog Product. | Platform | No | Derived from the Agreement. |
+| `buyer` | Object | Reference to the Accounts Buyer. | Platform | No | Derived from the Agreement. |
+| `licensee` | Object | Reference to the Accounts Licensee. | Platform | No | Derived from the Agreement. |
+| `seller` | Object | Reference to the Accounts Seller. | Platform | No | Derived from the Agreement. |
+| `audit` | Object | Lifecycle event timestamps and Actors: `created`, `updated`, `active`, `terminated`, `terminating`, `updating`, `expired`, `renewed`. | Platform | No | Omitted by default — request via `select=+audit`. Only entries for states the Subscription has reached are present. |
 
 ---
 
@@ -151,14 +178,14 @@ None known.
 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
 | --- | --- | --- | --- | --- |
-| Commerce: Agreement | Parent | Many Subscriptions to one Agreement | Every Subscription belongs to an Agreement. Created and linked during Order Processing. | If all Subscriptions on an Agreement reach Terminated status, the Agreement automatically transitions to Terminated. |
-| Commerce: Order | Association | Many Subscriptions to many Orders | Subscriptions are created during Purchase or Change Order Processing and linked to the Agreement on completion. Termination Orders affect Subscriptions in Terminating status. | Subscription state is driven by Order state transitions. See Commerce: Order canon Section 7.2. |
-| Commerce: Order Line | Child | One Subscription to many Lines | Lines are the unit of work mapped to this Subscription. Accessible via `/subscriptions/{id}/lines`. Also accessible via the Agreement `/lines` endpoint as Entitlements. | Line terms must match Subscription terms. Lines reflect the current quantity of each Item under this Subscription. |
-| Catalog: Product | Association | Many Subscriptions to one Product | The Product this Subscription covers. Derived from the Agreement. | Immutable after creation. |
-| Catalog: Template | Association | Many Subscriptions to one Template | The Template determining rendered content shown to the Client when viewing their Subscription. Set and updated by the Vendor. | No lifecycle dependency — Template changes do not affect Subscription status. |
-| Accounts: Agreement (Buyer) | Association | Many Subscriptions to one Buyer | The Buyer associated with the Subscription's Agreement. | Immutable after creation. |
-| Accounts: Licensee | Association | Many Subscriptions to one Licensee | The Licensee associated with the Subscription's Agreement. | Immutable after creation. |
-| Accounts: Seller | Association | Many Subscriptions to one Seller | The Seller associated with the Subscription's Agreement. | Immutable after creation. |
+| Commerce: Agreement | Parent | Many Subscriptions to one Agreement | Every Subscription belongs to an Agreement, created and linked during Order processing. | When every Subscription on the Agreement is Terminated or Expired, the Agreement transitions to Terminated. |
+| Commerce: Order | Association | Many Subscriptions to many Orders | Subscriptions are created during Purchase or Change Order processing; Change, Configuration, Termination, Suspend, and Resume Orders drive the Subscription's state transitions. | Subscription state is driven by Order state. See Commerce: Order canon Section 7.2. |
+| Commerce: Entitlement | Child | One Subscription to many Entitlements | The Subscription's Lines (Entitlements), reachable via `/subscriptions/{id}/lines` and via the Agreement's `/lines` endpoint. | Line terms match Subscription terms; Lines are terminated or expired with the Subscription. |
+| Catalog: Product | Association | Many Subscriptions to one Product | The Product this Subscription covers, derived from the Agreement. The Product's cessation and suspend/resume settings gate the Subscription's expiry and suspend/resume behaviour. | Immutable after creation. |
+| Catalog: Template | Association | Many Subscriptions to one Template | The Template rendered to the Client when viewing the Subscription. | No lifecycle dependency — Template changes do not affect Subscription status. |
+| Accounts: Buyer | Association | Many Subscriptions to one Buyer | The Buyer on the Subscription's Agreement. | Immutable after creation. |
+| Accounts: Licensee | Association | Many Subscriptions to one Licensee | The Licensee on the Subscription's Agreement. | Immutable after creation. |
+| Accounts: Seller | Association | Many Subscriptions to one Seller | The Seller on the Subscription's Agreement. | Immutable after creation. |
 
 ---
 
@@ -168,39 +195,43 @@ None known.
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Subscription renewed | Platform renewal service runs; `autoRenew = true` and `commitmentDate < today` | Platform | `commitmentDate` updated to `commitmentDate + terms.period`. `renewed` audit event recorded. No status transition. |
-| `autoRenew` updated | Vendor updates `autoRenew` directly via PUT | Vendor | Value persisted immediately. Affects next renewal service evaluation. No state transition. |
-| Parameters updated | Vendor updates `parameters.fulfillment` via PUT | Vendor | Values persisted immediately. No state transition. |
-| Template updated | Vendor updates `template` via PUT | Vendor | Rendered content shown to Client updates immediately. No state transition. |
-| Subscription terminated directly | Vendor calls `/terminate` endpoint | Vendor | Subscription → Terminated. `terminationDate` set by platform. If last Active/Terminating Subscription on Agreement, Agreement → Terminated. |
-| Split Billing updated | Operations updates Split Billing via `/split` endpoint | Operations | Split Billing allocations updated. `splitStatus` updated by platform. No state transition on Subscription. |
+| Subscription renewed | Daily renewal service; `autoRenew` = true and `commitmentDate` < today | Platform | `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded. No status change. |
+| `autoRenew` updated | Vendor updates `autoRenew` | Vendor | Persisted immediately; affects the next renewal evaluation. No state transition. |
+| Parameters updated | Vendor updates `parameters.fulfillment` | Vendor | Persisted immediately. No state transition. |
+| Template updated | Vendor updates `template` | Vendor | Rendered content shown to the Client updates immediately. No state transition. |
+| Subscription terminated directly | Vendor calls `/terminate` | Vendor | Subscription → Terminated; `terminationDate` set; `autoRenew` forced false; Lines reduced to quantity 0. If last, parent [[Agreement]] → Terminated. |
+| Subscription suspended directly | Vendor calls `/suspend` | Vendor | Subscription → Suspended immediately. Parent [[Agreement]] status unchanged. |
+| Subscription resumed directly | Vendor calls `/resume` | Vendor | Subscription → Active immediately; `resumed` audit event recorded. Parent [[Agreement]] status unchanged. |
+| Split Billing updated | Operations updates Split Billing via `/split` | Operations | Allocations updated; `splitStatus` updated by the platform. No state transition on the Subscription. |
 
 ### 7.2 Cross-Object State Effects
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
-| All Subscriptions on Agreement reach Terminated or Expired | Commerce: Agreement | Agreement → Terminated | Yes — platform | All Subscriptions are in Terminated or Expired status | Whether via Termination Order, direct Vendor action, or platform expiry. |
-| Subscription transitions to Terminating (Termination Order placed) | Commerce: Agreement | Agreement → Updating | Yes — platform, under Client token context | Termination Order placed | Agreement remains in Updating until the Termination Order completes or fails. |
-| Termination Order completed | Commerce: Subscription | Subscription → Terminated | Yes — platform, under Vendor token context | Termination Order transitions to Completed | `terminationDate` set automatically by platform. |
-| Termination Order failed | Commerce: Subscription | Subscription → Active | Yes — platform, under Vendor or Operations token context | Termination Order transitions to Failed | Subscription reverts to Active unchanged. Agreement → Active. |
-| Change or Configuration Order completed or failed | Commerce: Subscription | Subscription → Active | Yes — platform, under Vendor or Operations token context | Order type is Change or Configuration | Subscription reverts to Active regardless of whether the Order completed or failed. |
+| Every Subscription on the Agreement reaches Terminated or Expired | Commerce: Agreement | Agreement → Terminated | Yes — platform | No Subscription remains that is not Terminated or Expired | Via Termination [[Order]], direct Vendor action, or expiry. |
+| Termination Order placed on a Subscription | Commerce: Agreement | Agreement → Updating | Yes — platform, under the placing Actor's token | Termination [[Order]] enters Processing | Agreement remains Updating until the Order completes or fails. |
+| Termination Order completed | Commerce: Subscription | Subscription → Terminated | Yes — platform, under Vendor token | Termination [[Order]] → Completed | `terminationDate` set. |
+| Termination Order failed | Commerce: Subscription | Subscription → Active (or Suspended) | Yes — platform | Termination [[Order]] → Failed | Reverts to its pre-Order status. |
+| Change or Configuration Order completed or failed | Commerce: Subscription | Subscription → Active | Yes — platform | [[Order]] type is Change or Configuration | Returns to Active in both cases. |
+| Suspend/Resume Order completed or failed | Commerce: Subscription | Subscription → Suspended/Active, or reverts | Yes — platform, under Operations-driven flow | Suspend/Resume [[Order]] reaches a terminal state | The Operations Order path also moves the [[Agreement]] Active → Updating → Active. |
 
 ---
 
 ## 8. Reversibility & Data Retention
 
 **Reversible transitions:**
-Updating → Active is reversible with no limit on cycles — each new Order placed against the Agreement returns Updating Subscriptions to Active when the Order completes or fails.
+- Updating → Active is reversible with no limit on cycles — each Change or Configuration [[Order]] returns the Subscription to Active on completion or failure.
+- Terminating → Active is reversible if the Termination [[Order]] fails.
+- Suspending → Active is reversible if the Suspend [[Order]] fails; Resuming → Suspended if the Resume [[Order]] fails.
+- Suspended ↔ Active is fully reversible — a Subscription may be suspended and resumed repeatedly.
 
-Terminating → Active is reversible if the Termination Order fails.
-
-All other transitions are irreversible. Terminated and Expired are permanently terminal states. A Subscription cannot be reactivated from either state.
+Terminated and Expired are permanently terminal. A Subscription cannot be reactivated from either state.
 
 **Deletion:**
-There is no DELETE endpoint on Subscription. Subscriptions cannot be deleted. The only terminal states are Terminated and Expired — both permanently remove the Subscription from the active fulfilment picture but it remains retrievable via the API. Consistent with Platform Invariant 7 — terminated and expired Subscriptions are not removed from API visibility.
+There is no delete endpoint on Subscription. Subscriptions cannot be deleted. The only terminal states are Terminated and Expired; both remove the Subscription from the active fulfilment picture, but it remains retrievable via the API — consistent with Platform Invariant 7.
 
 **Audit & history requirements:**
-The Subscription audit block captures `created`, `updated`, `active`, `terminated`, `terminating`, `updating`, `expired`, and `renewed` timestamps and Actor references. The `renewed` sub-key is updated each time the renewal service successfully renews the Subscription — it reflects the most recent renewal event. The audit block is omitted from API responses by default — request via `select=+audit`.
+The audit block captures `created`, `updated`, `active`, `terminating`, `updating`, `terminated`, `expired`, and `renewed` timestamps with Actor references; a `resumed` event is recorded on direct resume. Only entries for states the Subscription has reached are present. The audit block is omitted from responses by default — request via `select=+audit`.
 
 ---
 
@@ -208,20 +239,19 @@ The Subscription audit block captures `created`, `updated`, `active`, `terminate
 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
-| `autoRenew` not set to false before `commitmentDate` | The platform's renewal service will renew the Subscription automatically, extending `commitmentDate` and generating a billing event. The Client may be charged for an unintended renewal period. | Client, Vendor | High | The Client must ensure `autoRenew = false` before `commitmentDate` if they do not wish to renew. Only the Vendor can update `autoRenew` directly — the Client must request this via a Configuration Order. |
-| Termination Order fails — Subscription reverts to Active | The Subscription reverts to Active unchanged. The Agreement reverts to Active. A new Termination Order must be created to retry. The renewal service will continue to evaluate the Subscription on its normal schedule. | Client, Vendor | Medium | If the `commitmentDate` passes while the Termination Order is in Processing, the renewal service may renew the Subscription before the Order can complete. |
-| Subscription remains in Updating indefinitely | No platform-level safeguard. If the associated Order is abandoned, the Subscription remains in Updating indefinitely. | Client, Operations | High | Operations should monitor long-running Orders. See Commerce: Order canon Section 9. |
-| Vendor creates Subscription directly without Order | The Subscription is created directly in Active status and linked to the Agreement. No Order audit trail exists for this Subscription. | Operations, Client | Medium | Used for migration scenarios. The absence of an Order means there is no Order-level audit for this Subscription's creation. Operations should ensure direct creations are documented externally. |
-| All Subscriptions on an Agreement expire | The platform transitions each Subscription to Expired individually as their `commitmentDate` passes. Once all Subscriptions are Expired, the Agreement transitions to Terminated. Assets are unaffected. | Client | Medium | Expiry-driven Agreement termination may surprise Clients who did not actively place a Termination Order. |
-| Terms mismatch between Subscription and Line | The platform enforces that Line terms must match the parent Subscription's terms. A Line with mismatched terms cannot be added to the Subscription. | Vendor | Low | Platform-enforced — see BR-009. |
+| `autoRenew` not set to false before `commitmentDate`, on a Product that permits expiry | The daily service renews the Subscription automatically, advancing `commitmentDate` and generating a billing event. The Client may be charged for an unintended renewal period. | Client, Vendor | High | Only the Vendor can set `autoRenew` directly; the Client must request the change via a Configuration [[Order]]. |
+| `autoRenew` = false but the Product's cessation setting does not permit expiry | The Subscription is not auto-expired and remains Active past its `commitmentDate`. | Client, Vendor | Medium | Expiry is gated by the [[Product]]'s cessation setting; `autoRenew` = false alone does not guarantee expiry (BR-006). |
+| Termination Order fails — Subscription reverts | The Subscription reverts to its pre-Order status (Active or Suspended) and the [[Agreement]] reverts to Active. A new Termination [[Order]] must be created to retry. | Client, Vendor | Medium | If `commitmentDate` passes while the Order is in Processing, the renewal service may act before the Order completes. |
+| Subscription stuck in Updating, Terminating, Suspending, or Resuming | No platform-level timeout. If the driving [[Order]] is abandoned, the Subscription remains in the transient state indefinitely. | Client, Operations | High | Operations should monitor long-running [[Order]]s. See Commerce: Order canon Section 9. |
+| Vendor creates a Subscription directly without an Order | Created directly in Active and linked to the [[Agreement]]; no [[Order]]-level audit trail exists for its creation. | Operations, Client | Medium | Used for migration. Operations should ensure direct creations are documented externally. |
+| Renewal service races a pending Termination Order | An Active Subscription with a Termination [[Order]] not yet in Processing can still be picked up by the daily renewal. Once the Order moves the Subscription to Terminating it is excluded from renewal. | Client, Vendor | Medium | The renewal service re-checks `commitmentDate` to avoid double-renewal within a run. |
+| Direct Vendor suspend/resume while an Operations Suspend/Resume Order is in flight | The direct endpoint jumps straight to Suspended/Active, bypassing the transient state the Order path expects, which can leave the in-flight Order inconsistent with the Subscription's status. | Operations, Vendor | Medium | The two suspend/resume paths are independent; coordinating them is the operator's responsibility (preamble §3.1). |
 
 ---
 
 ## 10. Open Questions
 
-- [ ] **SUB-001:** What fields are meaningful in the request body of the `/terminate` endpoint? Specifically whether `terminationDate` or other Subscription fields can be set by the Vendor at termination time, or whether the body is unused.
-- [ ] **SUB-002:** Whether `commitmentDate` is set by the Vendor Extension at Subscription creation, computed by the platform from `startDate + terms.commitment`, or both, is not confirmed.
-- [ ] **SUB-003:** Split Billing on Subscription — full semantics, write rules, and `splitStatus` lifecycle — to be canonised separately. See AGR-007.
+No open questions at this time.
 
 ---
 
@@ -229,4 +259,5 @@ The Subscription audit block captures `created`, `updated`, `active`, `terminate
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-17 | Stu / canon-generate | Full evidence-based refresh via live STAGING OpenAPI schema, a multi-Actor live fetch, and source-code research. Added the Suspend/Resume feature: three states (Suspending/Suspended/Resuming) and their transitions — a Vendor-direct immediate path (`/suspend`→Suspended, `/resume`→Active) and an Operations Suspend/Resume Order path using the transient states — gated by the Product's Suspend/Resume setting and not yet exposed on the public API surface. §3.2 transition mechanisms confirmed and filled (were "Unconfirmed"): direct `terminate`/`suspend`/`resume` endpoints vs plain status writes driven by Order state; direct create via `POST` with the Agreement Active/New/Draft precondition; renewal/expiry via the daily service. Resolved SUB-001 (the `/terminate` body is applied as a Vendor update then terminates immediately — no effective/termination-date field; BR-018) and SUB-002 (`commitmentDate` defaults to `startDate` + `terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal; BR-017). Corrected: BR-005 renewal advances `commitmentDate` by `terms.commitment` (was `terms.period`); BR-013 Operations sets `defaultMarkup` only, not `defaultMargin`, and can set `commitmentDate`, only while Active or Suspended; expiry (BR-006) is gated by the parent Agreement being Active and the Product's cessation setting, not `autoRenew` = false alone; `terms.period` enum adds `3y`; `terms.commitment` enum is `1m`/`1y`/`2y`/`3y`/`4y`/`5y` and may be absent. Documented the Agreement-termination condition as all Subscriptions Terminated-or-Expired. Closed SUB-003 — the subscription-side split fields are documented (Client/Operations-only, `splitStatus` Disabled/Active/Review, Vendor-suppressed, own `/split` endpoint); the full Split Billing Subscription object remains tracked separately. Removed the duplicate `---` after §1. |
 | 0.1 | 2026-04-13 | Stu | Initial canon. Covers all five Subscription statuses, the OrderSubscription promotion model, the daily renewal and expiry service, Vendor ownership model, parameter write rules, pricing visibility, Split Billing noted as pending. |
