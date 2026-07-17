@@ -1,8 +1,8 @@
 # Object Canon: Agreement Split Billing
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-17
 > **Status:** Draft
 
 ---
@@ -24,7 +24,7 @@
 **ID Prefix:** SBA
 
 **Description:**
-Agreement Split Billing is the configuration that distributes a Commerce: [[Agreement]]'s billing across more than one [[Buyer]], so that a single commercial relationship can be invoiced to several paying entities. It holds a set of per-Buyer allocations — each a share of the Agreement's price — and is created by activating split billing on the Agreement once. It exists only for Agreements whose Catalog: [[Product]] permits split billing, and its allocations are a roll-up of the split allocations held on the Agreement's [[Subscription]]s. There is a separate, Subscription-scoped split billing configuration; this object is the Agreement-level view (not yet mirrored by a distinct Subscription Split Billing canon).
+Agreement Split Billing is the configuration that distributes a Commerce: [[Agreement]]'s billing across more than one [[Buyer]], so that a single commercial relationship can be invoiced to several paying entities. It holds a set of per-Buyer allocations — each a share of the Agreement's price — and is created by activating split billing on the Agreement once. It exists only for Agreements whose Catalog: [[Product]] permits split billing, and its allocations are a roll-up of the split allocations held on the Agreement's [[Subscription]]s' own split configurations (Commerce: [[Subscription Split Billing]]) — this object is the Agreement-level view.
 
 **Also Known As:**
 Split Billing.
@@ -174,4 +174,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-17 | Stu / canon-generate | Section 1 updated while canonising Commerce: Subscription Split Billing: the Subscription-scoped split configuration is now a distinct object, so the "not yet mirrored by a distinct canon" note is dropped and `[[Subscription Split Billing]]` is cross-linked. |
 | 0.1 | 2026-07-16 | Stu / canon-generate | Initial canon. Generated via live OpenAPI schema (STAGING), a multi-Actor live fetch of a split-active Agreement, and source-code research. Documents the Agreement-scoped split billing object (`SBA`): no status field (present-vs-absent, permanent once activated, no deactivation/delete); activation preconditions (Product-enabled, default-Buyer inclusion, not-already-active, Buyer eligibility) with no Agreement-status gate; the caller-supplies-Buyers / platform-computes-percentages update model; the default-Buyer 100% seed and Subscription cascade; per-allocation price visibility (Client sees SP, Operations adds PP, Vendor 403); Actor-scoped Buyer eligibility; and the Buyer unassign/transfer guard. 0 open questions. |
