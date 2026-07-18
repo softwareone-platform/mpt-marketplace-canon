@@ -13,3 +13,6 @@ dist/
 .evidence/
 __pycache__/
 *.pyc
+
+# canon-drift object->source-path cache — per-clone, internal paths never committed
+config/canon_source_paths.local.json
