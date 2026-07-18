@@ -326,6 +326,203 @@
         }
       }
     },
+    "CANON_OBJECT_Accounts_AccountUser.md": {
+      "namespace": "accounts",
+      "object": "account-users",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-18",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/accounts/account-users/{id}",
+          "GET /public/v1/accounts/account-users",
+          "GET /public/v1/accounts/account-users/{id}",
+          "POST /public/v1/accounts/account-users",
+          "POST /public/v1/accounts/account-users/{id}/accept-invite",
+          "POST /public/v1/accounts/account-users/{id}/resend-invite",
+          "POST /public/v1/accounts/account-users/{id}/send-new-invite"
+        ],
+        "attributes": {
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "AccountUserQueryLegacy": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->AccountUserLegacyAudit:opt",
+            "buyers:array<BuyerRef>:opt",
+            "groups:array<UserGroupRef>:opt",
+            "id:string:opt",
+            "invitation:->InvitationQueryModel:opt",
+            "lastLoginAt:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "revision:integer:opt",
+            "user:->UserRef:opt"
+          ],
+          "UserGroupRef": [
+            "description:string:opt",
+            "id:string:opt",
+            "isDefault:boolean:opt",
+            "logo:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "AccountUserLegacyAudit": [
+            "access:->DateEvent:opt",
+            "created:->PlatformObjectEvent:opt",
+            "invitationAcceptedAt:string:opt",
+            "joined:->DateEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "ModuleRef": [
+            "description:string:opt",
+            "filters:->Filters:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "settings:->ModuleSettings:opt"
+          ],
+          "UserRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "DateEvent": [
+            "at:string:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "BuyerRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "CreateAccountUserDto": [
+            "account:->AccountDto:opt",
+            "email:->EmailDto:opt",
+            "firstName:string:opt",
+            "groups:array<UserGroupDto>:req",
+            "id:string:opt",
+            "invitation:->InvitationDto:opt",
+            "lastName:string:opt",
+            "notes:string:opt",
+            "phone:->SetPhoneNumberDto:opt",
+            "settings:->SetUserSettingsDto:opt",
+            "user:->UserProfileDto:opt"
+          ],
+          "AccountUserQueryLegacyListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<AccountUserQueryLegacy>:opt"
+          ],
+          "InvitationQueryModel": [
+            "notes:string:opt",
+            "status:string:opt",
+            "url:string:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "UserGroupDto": [
+            "id:string:opt"
+          ],
+          "ModuleSettings": [
+            "configurable:boolean:opt",
+            "default:boolean:opt",
+            "eligibility:->ModuleSettingsEligibility:opt",
+            "obsolete:boolean:opt",
+            "paid:boolean:opt",
+            "sharedAccount:boolean:opt",
+            "type:array<string>:opt"
+          ],
+          "Filters": [
+            "group.buyers:array<string>:opt"
+          ],
+          "SetUserSettingsDto": [
+            "cultureCode:string:opt",
+            "dateFormat:string:opt",
+            "languageCode:string:opt",
+            "numberFormat:->SetNumberFormatDto:opt",
+            "timeFormat:string:opt",
+            "timeZone:string:opt"
+          ],
+          "SetNumberFormatDto": [
+            "decimalSeparator:string:opt",
+            "groupSeparator:string:opt"
+          ],
+          "AccountDto": [
+            "id:string:opt"
+          ],
+          "InvitationDto": [
+            "status:string:opt"
+          ],
+          "UserProfileDto": [
+            "email:->EmailDto:opt",
+            "firstName:string:opt",
+            "id:string:opt",
+            "lastName:string:opt",
+            "notes:string:opt",
+            "phone:->SetPhoneNumberDto:opt",
+            "settings:->SetUserSettingsDto:opt"
+          ],
+          "SetPhoneNumberDto": [
+            "number:string:opt",
+            "prefix:string:opt"
+          ],
+          "ModuleSettingsEligibility": [
+            "multi:boolean:opt",
+            "single:boolean:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ]
+        },
+        "enums": {
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ]
+        }
+      }
+    },
     "CANON_OBJECT_Accounts_Buyer.md": {
       "namespace": "accounts",
       "object": "buyers",
@@ -1419,6 +1616,92 @@
         }
       }
     },
+    "CANON_OBJECT_Accounts_Module.md": {
+      "namespace": "accounts",
+      "object": "modules",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-18",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/accounts/modules",
+          "GET /public/v1/accounts/modules/{id}"
+        ],
+        "attributes": {
+          "Module": [
+            "$meta:->PlatformMetadata:opt",
+            "accountTypes:array<string>:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "code:string:opt",
+            "description:string:opt",
+            "filters:->Filters:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "settings:->ModuleSettings:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "ModuleSettings": [
+            "configurable:boolean:opt",
+            "default:boolean:opt",
+            "eligibility:->ModuleSettingsEligibility:opt",
+            "obsolete:boolean:opt",
+            "paid:boolean:opt",
+            "sharedAccount:boolean:opt",
+            "type:array<string>:opt"
+          ],
+          "Filters": [
+            "group.buyers:array<string>:opt"
+          ],
+          "ModuleListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<Module>:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "ModuleSettingsEligibility": [
+            "multi:boolean:opt",
+            "single:boolean:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ]
+        },
+        "enums": {}
+      }
+    },
     "CANON_OBJECT_Accounts_Seller.md": {
       "namespace": "accounts",
       "object": "sellers",
@@ -1732,6 +2015,547 @@
             "Deleted",
             "Disabled",
             "Offline"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Accounts_User.md": {
+      "namespace": "accounts",
+      "object": "users",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-18",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/accounts/accounts/{accountId}/users/{userId}",
+          "DELETE /public/v1/accounts/users/{uniqueFilter}",
+          "DELETE /public/v1/accounts/{accountId}/users/{userId}",
+          "GET /public/v1/accounts/accounts/{accountId}/users",
+          "GET /public/v1/accounts/accounts/{accountId}/users/{userId}",
+          "GET /public/v1/accounts/users",
+          "GET /public/v1/accounts/users/{uniqueFilter}",
+          "GET /public/v1/accounts/users/{uniqueFilter}/icon",
+          "GET /public/v1/accounts/users/{uniqueFilter}/sso",
+          "GET /public/v1/accounts/users/{uniqueFilter}/sso-check",
+          "GET /public/v1/accounts/{accountId}/users",
+          "GET /public/v1/accounts/{accountId}/users/{userId}",
+          "POST /public/v1/accounts/accounts/{accountId}/users",
+          "POST /public/v1/accounts/accounts/{accountId}/users/{userId}/accept-invite",
+          "POST /public/v1/accounts/accounts/{accountId}/users/{userId}/resend-invite",
+          "POST /public/v1/accounts/accounts/{accountId}/users/{userId}/send-new-invite",
+          "POST /public/v1/accounts/users/{uniqueFilter}/block",
+          "POST /public/v1/accounts/users/{uniqueFilter}/set-password",
+          "POST /public/v1/accounts/users/{uniqueFilter}/unblock",
+          "POST /public/v1/accounts/{accountId}/users",
+          "POST /public/v1/accounts/{accountId}/users/{userId}/accept-invite",
+          "POST /public/v1/accounts/{accountId}/users/{userId}/resend-invite",
+          "POST /public/v1/accounts/{accountId}/users/{userId}/send-new-invite",
+          "PUT /public/v1/accounts/accounts/{accountId}/users/{userId}",
+          "PUT /public/v1/accounts/users/{uniqueFilter}",
+          "PUT /public/v1/accounts/{accountId}/users/{userId}"
+        ],
+        "attributes": {
+          "PlatformIdentity": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "UserGroup": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "buyers:array<BuyerRef>:opt",
+            "description:string:opt",
+            "extensions:array<PlatformObjectAuditPlatformExtension>:opt",
+            "id:string:opt",
+            "isDefault:boolean:opt",
+            "logo:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "users:array<UserRef>:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "PlatformObjectAuditPlatformExtension": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "UserListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<User>:opt"
+          ],
+          "BuyerRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "UserRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "UserDelta": [
+            "data:->User:opt",
+            "isDefined:boolean:opt",
+            "node:->DeltaNode:opt",
+            "path:string:opt"
+          ],
+          "Account": [
+            "$meta:->PlatformMetadata:opt",
+            "address:->Address:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "defaultLanguageCode:string:opt",
+            "description:string:opt",
+            "eligibility:->Eligibility:opt",
+            "externalId:string:opt",
+            "externalIds:->AccountExternalIds:opt",
+            "externalName:string:opt",
+            "groups:array<UserGroupRef>:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "technicalSupportEmail:string:opt",
+            "type:->AccountType:opt",
+            "website:string:opt"
+          ],
+          "CreateAccountUserDto": [
+            "account:->AccountDto:opt",
+            "email:->EmailDto:opt",
+            "firstName:string:opt",
+            "groups:array<UserGroupDto>:req",
+            "id:string:opt",
+            "invitation:->InvitationDto:opt",
+            "lastName:string:opt",
+            "notes:string:opt",
+            "phone:->SetPhoneNumberDto:opt",
+            "settings:->SetUserSettingsDto:opt",
+            "user:->UserProfileDto:opt"
+          ],
+          "AccountUser": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->AccountUserAudit:opt",
+            "buyers:array<BuyerRef>:opt",
+            "email:string:opt",
+            "firstName:string:opt",
+            "groups:array<UserGroupRef>:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "invitation:->InvitationQueryModel:opt",
+            "lastName:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "name:string:opt",
+            "phone:->PhoneNumber:opt",
+            "revision:integer:opt",
+            "settings:->UserSettings:opt",
+            "status:string:opt",
+            "user:->UserRef:opt"
+          ],
+          "ModuleRef": [
+            "description:string:opt",
+            "filters:->Filters:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "settings:->ModuleSettings:opt"
+          ],
+          "AccountExternalIds": [
+            "pyraTenantId:string:opt"
+          ],
+          "SetPasswordDto": [
+            "currentPassword:string:opt",
+            "password:string:req"
+          ],
+          "DeltaNode": [
+            "children:array<DeltaNode>:opt",
+            "name:string:opt"
+          ],
+          "ModuleSettings": [
+            "configurable:boolean:opt",
+            "default:boolean:opt",
+            "eligibility:->ModuleSettingsEligibility:opt",
+            "obsolete:boolean:opt",
+            "paid:boolean:opt",
+            "sharedAccount:boolean:opt",
+            "type:array<string>:opt"
+          ],
+          "Address": [
+            "addressLine1:string:opt",
+            "addressLine2:string:opt",
+            "city:string:opt",
+            "country:string:opt",
+            "postCode:string:opt",
+            "state:string:opt"
+          ],
+          "AccountDto": [
+            "id:string:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "SetPhoneNumberDto": [
+            "number:string:opt",
+            "prefix:string:opt"
+          ],
+          "UserProfileDto": [
+            "email:->EmailDto:opt",
+            "firstName:string:opt",
+            "id:string:opt",
+            "lastName:string:opt",
+            "notes:string:opt",
+            "phone:->SetPhoneNumberDto:opt",
+            "settings:->SetUserSettingsDto:opt"
+          ],
+          "UserSettings": [
+            "cultureCode:string:opt",
+            "dateFormat:string:opt",
+            "languageCode:string:opt",
+            "numberFormat:->NumberFormat:opt",
+            "optOuts:->UserSettingsOptOuts:opt",
+            "timeFormat:string:opt",
+            "timeZone:string:opt"
+          ],
+          "UserGroupDto": [
+            "id:string:opt"
+          ],
+          "UserSettingsOptOuts": [
+            "objectTypes:array<string>:opt"
+          ],
+          "UserGroupRef": [
+            "description:string:opt",
+            "id:string:opt",
+            "isDefault:boolean:opt",
+            "logo:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "ModuleSettingsEligibility": [
+            "multi:boolean:opt",
+            "single:boolean:opt"
+          ],
+          "AccountUserListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<AccountUser>:opt"
+          ],
+          "User": [
+            "$meta:->PlatformMetadata:opt",
+            "accounts:array<AccountRef>:opt",
+            "audit:->UserAudit:opt",
+            "currentAccount:->AccountRef:opt",
+            "email:string:opt",
+            "firstName:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "lastLoginAt:string:opt",
+            "lastName:string:opt",
+            "name:string:opt",
+            "phone:->PhoneNumber:opt",
+            "revision:integer:opt",
+            "settings:->UserSettings:opt",
+            "status:string:opt"
+          ],
+          "AccountUserQueryLegacy": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->AccountUserLegacyAudit:opt",
+            "buyers:array<BuyerRef>:opt",
+            "groups:array<UserGroupRef>:opt",
+            "id:string:opt",
+            "invitation:->InvitationQueryModel:opt",
+            "lastLoginAt:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "revision:integer:opt",
+            "user:->UserRef:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "PhoneNumber": [
+            "number:string:opt",
+            "prefix:string:opt"
+          ],
+          "SetUserSettingsDto": [
+            "cultureCode:string:opt",
+            "dateFormat:string:opt",
+            "languageCode:string:opt",
+            "numberFormat:->SetNumberFormatDto:opt",
+            "timeFormat:string:opt",
+            "timeZone:string:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "NumberFormat": [
+            "decimalSeparator:string:opt",
+            "groupSeparator:string:opt"
+          ],
+          "AccountUserAudit": [
+            "access:->DateEvent:opt",
+            "created:->PlatformObjectEvent:opt",
+            "invited:->PlatformObjectEvent:opt",
+            "joined:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "InvitationQueryModel": [
+            "notes:string:opt",
+            "status:string:opt",
+            "url:string:opt"
+          ],
+          "Filters": [
+            "group.buyers:array<string>:opt"
+          ],
+          "SetNumberFormatDto": [
+            "decimalSeparator:string:opt",
+            "groupSeparator:string:opt"
+          ],
+          "AccountUserLegacyAudit": [
+            "access:->DateEvent:opt",
+            "created:->PlatformObjectEvent:opt",
+            "invitationAcceptedAt:string:opt",
+            "joined:->DateEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "InvitationDto": [
+            "status:string:opt"
+          ],
+          "Eligibility": [
+            "client:boolean:opt",
+            "partner:boolean:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "DateEvent": [
+            "at:string:opt"
+          ],
+          "UserAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "invitationAcceptedAt:string:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ]
+        },
+        "enums": {
+          "IdentityType": [
+            "ApiToken",
+            "Extension",
+            "Service",
+            "User"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Accounts_UserGroup.md": {
+      "namespace": "accounts",
+      "object": "user-groups",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-18",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/accounts/user-groups/{id}",
+          "GET /public/v1/accounts/user-groups",
+          "GET /public/v1/accounts/user-groups/{id}",
+          "POST /public/v1/accounts/user-groups",
+          "PUT /public/v1/accounts/user-groups/{id}"
+        ],
+        "attributes": {
+          "UserGroup": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "buyers:array<BuyerRef>:opt",
+            "description:string:opt",
+            "extensions:array<PlatformObjectAuditPlatformExtension>:opt",
+            "id:string:opt",
+            "isDefault:boolean:opt",
+            "logo:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "users:array<UserRef>:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "BuyerRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformObjectAuditPlatformExtension": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "UserRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "UserGroupListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<UserGroup>:opt"
+          ],
+          "ModuleRef": [
+            "description:string:opt",
+            "filters:->Filters:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "settings:->ModuleSettings:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "Filters": [
+            "group.buyers:array<string>:opt"
+          ],
+          "CreateUserGroupDto": [
+            "account:->AccountDto:opt",
+            "buyers:array<BuyerDto>:opt",
+            "description:string:opt",
+            "extensions:array<ExtensionDto>:opt",
+            "logo:string:opt",
+            "modules:array<ModuleDto>:opt",
+            "name:string:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "AccountDto": [
+            "id:string:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "ModuleDto": [
+            "id:string:opt"
+          ],
+          "BuyerDto": [
+            "id:string:opt"
+          ],
+          "ModuleSettings": [
+            "configurable:boolean:opt",
+            "default:boolean:opt",
+            "eligibility:->ModuleSettingsEligibility:opt",
+            "obsolete:boolean:opt",
+            "paid:boolean:opt",
+            "sharedAccount:boolean:opt",
+            "type:array<string>:opt"
+          ],
+          "ModuleSettingsEligibility": [
+            "multi:boolean:opt",
+            "single:boolean:opt"
+          ],
+          "ExtensionDto": [
+            "id:string:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ]
+        },
+        "enums": {
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
           ]
         }
       }
