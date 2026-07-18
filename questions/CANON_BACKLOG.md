@@ -50,22 +50,18 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 
 | Object | Parent | Status | Last Updated | Canon File | Notes |
 |--------|--------|--------|--------------|------------|-------|
-| account-users | — | 🔴 Not Started | | | |
-| groups | account-users | 🔴 Not Started | | | |
+| account-users | — | 🟢 Up to Date | 2026-07-18 | [CANON_OBJECT_Accounts_AccountUser.md](../objects/CANON_OBJECT_Accounts_AccountUser.md) | — |
 | accounts | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Account.md](../objects/CANON_OBJECT_Accounts_Account.md) | — |
-| users | accounts | 🔴 Not Started | | | |
-| groups | users | 🔴 Not Started | | | |
 | api-tokens | — | 🔴 Not Started | | | |
 | buyers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Buyer.md](../objects/CANON_OBJECT_Accounts_Buyer.md) | — |
 | cloud-tenants | — | 🔴 Not Started | | | |
 | erp-links | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_ErpLink.md](../objects/CANON_OBJECT_Accounts_ErpLink.md) | — |
 | licensees | — | 🟢 Up to Date | 2026-07-16 | [CANON_OBJECT_Accounts_Licensee.md](../objects/CANON_OBJECT_Accounts_Licensee.md) | — |
-| modules | — | 🔴 Not Started | | | |
+| modules | — | 🟢 Up to Date | 2026-07-18 | [CANON_OBJECT_Accounts_Module.md](../objects/CANON_OBJECT_Accounts_Module.md) | — |
 | sellers | — | 🟢 Up to Date | 2026-07-15 | [CANON_OBJECT_Accounts_Seller.md](../objects/CANON_OBJECT_Accounts_Seller.md) | — |
 | services | — | 🔴 Not Started | | | |
-| user-groups | — | 🔴 Not Started | | | |
-| users | — | 🔴 Not Started | | | |
-| accounts | users | 🔴 Not Started | | | |
+| user-groups | — | 🟢 Up to Date | 2026-07-18 | [CANON_OBJECT_Accounts_UserGroup.md](../objects/CANON_OBJECT_Accounts_UserGroup.md) | — |
+| users | — | 🟢 Up to Date | 2026-07-18 | [CANON_OBJECT_Accounts_User.md](../objects/CANON_OBJECT_Accounts_User.md) | — |
 
 ---
 
@@ -309,6 +305,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 4.35 | 2026-07-18 | Stu / canon-generate-batch | Accounts batch (4 objects) drafted via canon-generate-batch — live STAGING multi-Actor evidence + source research (deletion/retention, field-visibility, status-recalculation, permission-gating, buyer-visibility, gating-change behaviour confirmed via an Opus source dig). Fresh drafts: Accounts: User (USR — global human identity, full state machine, membership-projection status incl. backward transitions out of Active, soft-delete retained/Operations-retrievable, `accounts` Operations-only suppression), Module (MOD — read-only Operations-only reference catalog, no state machine, buyer-visibility capability, non-retroactive gating changes), User Group (UGR — stateless CRUD permission set, intended Default-group non-transferability, no minimum-Module count), Account User (AUSR — invite lifecycle Invited/Active/InvitationExpired/Deleted, Operations-only directly-Active path, deleted membership not API-retrievable, no Actor field suppression). All 4 → 🟡, 0 open questions each, pending PM review. Preamble §5.3 USR/MOD/UGR/AUSR added (v2.11). **Accounts backlog de-duplicated:** removed the four parented rows (`groups`↔account-users, `users`↔accounts, `groups`↔users, `accounts`↔users) — all confirmed sub-resources or deprecated alternate-addressings of User / Account User / User Group, not distinct objects; corresponding segments added to `config/canon_path_segment_exclusions.json` (accounts.users, accounts.account-users, accounts.accounts) so they do not regenerate. |
 | 4.34 | 2026-07-17 | Stu / canon-generate-batch | Order batch (4 objects) drafted via canon-generate-batch — live STAGING evidence across all Order types (Purchase/Change/Configuration/Termination) and states (Draft/Quoted/Processing/Completed), plus source research. Commerce: Order refreshed (was 🟡, 7 open questions → 4): filled every §3.2 Endpoint/Verb; corrected the Draft→Quoted model (Client `/quote` OR an Operations update to a Draft Order — the "Client-only" claim was wrong); added Suspend/Resume as real Operations-created Order types (BR-002/BR-037/§7.2); corrected the Configuration-order Lines claim; corrected BR-006 (competing-order deletion at completion, not placement); attributed fulfilment to "the Vendor" (no "extension"). New fresh drafts: Commerce: Order Line (ALI, 0 open questions), Commerce: Order Asset (AST, AST-004/005), Commerce: Order Subscription (SUB, SUB-004). Bundled fulfilment-terminology corrections to Commerce: Subscription (v0.4), Asset (v0.5), Agreement (v0.9) — "Vendor" not "Vendor Extension". All drafts pending PM review. |
 | 4.33 | 2026-07-17 | Stu / canon-submit-pr | Subscription Split Billing marked 🟢 Up to Date — PM confirmed coverage is complete at the canon-submit-pr Step 2.5 checkpoint, no known gaps, 0 open questions. Fresh canon (v0.1) promoted into objects/ as `CANON_OBJECT_Commerce_Subscription_Split.md`. Promoted in one PR with the preamble §5.3 SBS prefix (v2.9), the bundled Commerce: Subscription `splitStatus` correction (v0.3, incl. the co-promoted `[[Subscription Split Billing]]` cross-link), the Commerce: Agreement Split Billing §1 staleness fix + cross-link (v0.2), and the `split` exclusions removal. |
 | 4.32 | 2026-07-17 | Stu / canon-generate | Subscription Split Billing (Commerce: Subscription child, prefix SBS) — fresh canon drafted (was 🔴 Not Started, `split | subscriptions`) via live STAGING OpenAPI schema, a multi-Actor live fetch of a split-active Subscription, and source-code research. Documents the no-status seeded-by-Agreement-activation model (GET/PUT only, no POST/DELETE, no deactivation); the caller-supplies-explicit-percentages update with the sum-to-100 constraint (the level where the split is actually set, vs the platform-computed Agreement roll-up); default-Buyer requirement; Buyer eligibility scoped to the Agreement split's Buyer set; 0–100 percentages (0 allowed, no duplicates); Suspended→Operations-only; per-allocation price visibility (Client SP+currency, Operations adds PP, Vendor 403 on GET and PUT); and the Agreement-split recompute on every update. `split` removed from `config/canon_path_segment_exclusions.json` (commerce.subscriptions) — confirmed a distinct object, not an action verb. Bundled a scoped Commerce: Subscription correction (v0.2→0.3): `splitStatus` is `Disabled`/`Active` only (never `Review`), and a split update does not change `splitStatus`. 0 open questions. Draft pending PM review. |

@@ -13,8 +13,13 @@
       "enable": "CANON_OBJECT_Accounts_Account.md §3.2 T4a/T4b \"Enable Account\", via /enable endpoint",
       "deactivate": "CANON_OBJECT_Accounts_Account.md §3.2 T5 \"Deactivate Account\", via /deactivate endpoint, Client Accounts only"
     },
-    "action_verbs": {},
-    "non_object_resources": {}
+    "action_verbs": {
+      "validate": "CANON_OBJECT_Accounts_Account.md — validates the Account; not a status change"
+    },
+    "non_object_resources": {
+      "users": "CANON_OBJECT_Accounts_AccountUser.md — account-scoped membership addressing (/accounts/{accountId}/users); the same object as Accounts: Account User, not a distinct object",
+      "settings": "CANON_OBJECT_Accounts_Account.md — account settings sub-resource; not a distinct object"
+    }
   },
   "accounts.buyers": {
     "state_transition_verbs": {
@@ -168,5 +173,30 @@
     },
     "action_verbs": {},
     "non_object_resources": {}
+  },
+  "accounts.users": {
+    "state_transition_verbs": {
+      "block": "CANON_OBJECT_Accounts_User.md §3.2 \"Block\", via /block endpoint (→Blocked)",
+      "unblock": "CANON_OBJECT_Accounts_User.md §3.2 \"Unblock\", via /unblock endpoint (Blocked→recalculated)"
+    },
+    "action_verbs": {
+      "set-password": "CANON_OBJECT_Accounts_User.md §4 BR-008 \"set-password\" — self-only password set/change; not a status change",
+      "sso": "CANON_OBJECT_Accounts_User.md — SSO auth resource; not a status change",
+      "sso-check": "CANON_OBJECT_Accounts_User.md — SSO auth check resource; not a status change"
+    },
+    "non_object_resources": {
+      "accounts": "CANON_OBJECT_Accounts_User.md §5 `accounts` — read view of the Accounts a User belongs to (Account User memberships from the User side); not a distinct object"
+    }
+  },
+  "accounts.account-users": {
+    "state_transition_verbs": {
+      "accept-invite": "CANON_OBJECT_Accounts_AccountUser.md §3.2 T3 \"Accept invitation\" (Invited→Active)",
+      "resend-invite": "CANON_OBJECT_Accounts_AccountUser.md §3.2 T4 \"Resend invitation\" (Invited→Invited)",
+      "send-new-invite": "CANON_OBJECT_Accounts_AccountUser.md §3.2 T7 \"Send new invitation\" (InvitationExpired→Invited)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {
+      "groups": "CANON_OBJECT_Accounts_AccountUser.md §5 `groups` — Group-assignment sub-resource (User Group assignment on a membership); not a distinct object (see Accounts: User Group)"
+    }
   }
 }
