@@ -213,6 +213,8 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Module | Accounts | MOD |
 | User Group | Accounts | UGR |
 | Account User | Accounts | AUSR |
+| Service | Accounts | SVC |
+| Cloud Tenant | Accounts | CLT |
 | Order | Commerce | ORD |
 | Entitlement | Commerce | ALI |
 | Agreement | Commerce | AGR |
@@ -377,6 +379,7 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.12 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: SVC (Service) and CLT (Cloud Tenant) added, each confirmed from a live object ID. Added while canonising the Accounts Service/Cloud Tenant/API Token batch (API Token's TKN prefix was already present). |
 | 2.11 | 2026-07-18 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: USR (User), MOD (Module), UGR (User Group), AUSR (Account User) added, each confirmed from a live object ID. Added while canonising the Accounts User/Module/User Group/Account User batch. |
 | 2.10 | 2026-07-17 | Stu / canon-generate-batch | Section 5.3: added shared-prefix notes for `AST` (Commerce: Order Asset ↔ Commerce: Asset) and `SUB` (Commerce: Order Subscription ↔ Commerce: Subscription), mirroring the existing `ALI` note — each in-flight Order-scoped object keeps its identifier when promoted into the live object on Order completion. Added while canonising the Commerce Order batch (Order Line/Asset/Subscription). |
 | 2.9 | 2026-07-17 | Stu / canon-generate | Section 5.3 ID Prefixes: SBS (Subscription Split Billing) added, confirmed from a live object ID. Added while canonising Commerce: Subscription Split Billing. |

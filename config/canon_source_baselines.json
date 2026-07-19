@@ -523,6 +523,153 @@
         }
       }
     },
+    "CANON_OBJECT_Accounts_ApiToken.md": {
+      "namespace": "accounts",
+      "object": "api-tokens",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-19",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/accounts/api-tokens/{id}",
+          "GET /public/v1/accounts/api-tokens",
+          "GET /public/v1/accounts/api-tokens/{id}",
+          "POST /public/v1/accounts/api-tokens",
+          "POST /public/v1/accounts/api-tokens/{id}/disable",
+          "POST /public/v1/accounts/api-tokens/{id}/enable",
+          "PUT /public/v1/accounts/api-tokens/{id}"
+        ],
+        "attributes": {
+          "ApiToken": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "description:string:opt",
+            "extensions:array<PlatformObjectAuditPlatformExtension>:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "lastAccessAt:string:opt",
+            "modules:array<ModuleRef>:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt",
+            "token:string:opt"
+          ],
+          "PlatformObjectAuditPlatformExtension": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "CreateApiTokenDto": [
+            "account:->AccountDto:opt",
+            "description:string:opt",
+            "extensions:array<ExtensionDto>:opt",
+            "icon:string:opt",
+            "modules:array<ModuleDto>:opt",
+            "name:string:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "ApiTokenListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<ApiToken>:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "ModuleRef": [
+            "description:string:opt",
+            "filters:->Filters:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "settings:->ModuleSettings:opt"
+          ],
+          "ExtensionDto": [
+            "id:string:opt"
+          ],
+          "AccountDto": [
+            "id:string:opt"
+          ],
+          "ModuleDto": [
+            "id:string:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "Filters": [
+            "group.buyers:array<string>:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "ModuleSettings": [
+            "configurable:boolean:opt",
+            "default:boolean:opt",
+            "eligibility:->ModuleSettingsEligibility:opt",
+            "obsolete:boolean:opt",
+            "paid:boolean:opt",
+            "sharedAccount:boolean:opt",
+            "type:array<string>:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "ModuleSettingsEligibility": [
+            "multi:boolean:opt",
+            "single:boolean:opt"
+          ]
+        },
+        "enums": {
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ]
+        }
+      }
+    },
     "CANON_OBJECT_Accounts_Buyer.md": {
       "namespace": "accounts",
       "object": "buyers",
@@ -949,6 +1096,132 @@
             "Active",
             "Blocked",
             "Disabled"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Accounts_CloudTenant.md": {
+      "namespace": "accounts",
+      "object": "cloud-tenants",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-19",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/accounts/cloud-tenants/{id}",
+          "GET /public/v1/accounts/cloud-tenants",
+          "GET /public/v1/accounts/cloud-tenants/{id}",
+          "POST /public/v1/accounts/cloud-tenants",
+          "PUT /public/v1/accounts/cloud-tenants/{id}"
+        ],
+        "attributes": {
+          "CloudTenantListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CloudTenant>:opt"
+          ],
+          "CloudTenant": [
+            "$meta:->PlatformMetadata:opt",
+            "account:->AccountRef:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "externalIds:->CloudTenantExternalIds:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt",
+            "type:string:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "CreateCloudTenantDto": [
+            "account:->AccountDto:opt",
+            "externalIds:->CloudTenantExternalIdsDto:req",
+            "name:string:req",
+            "status:->CloudTenantStatus:opt",
+            "type:->CloudTenantType:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "AccountDto": [
+            "id:string:opt"
+          ],
+          "CloudTenantExternalIds": [
+            "cloudConsumptionId:string:opt",
+            "providerId:string:opt",
+            "pyraTenantId:string:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "CloudTenantExternalIdsDto": [
+            "cloudConsumptionId:string:req",
+            "providerId:string:opt",
+            "pyraTenantId:string:req"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ]
+        },
+        "enums": {
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "CloudTenantStatus": [
+            "Active",
+            "Deleted",
+            "Disabled"
+          ],
+          "CloudTenantType": [
+            "AwsDirect",
+            "AwsService",
+            "Csp365",
+            "CspAzure",
+            "Ea365",
+            "EaAzure",
+            "Slm",
+            "Virtual"
           ]
         }
       }
@@ -2017,6 +2290,74 @@
             "Offline"
           ]
         }
+      }
+    },
+    "CANON_OBJECT_Accounts_Service.md": {
+      "namespace": "accounts",
+      "object": "services",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "41d12c0099be6d6e7081f5a98be142eb8785746a"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-19",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/accounts/services",
+          "GET /public/v1/accounts/services/{id}"
+        ],
+        "attributes": {
+          "ServiceListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<Service>:opt"
+          ],
+          "Service": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "description:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ]
+        },
+        "enums": {}
       }
     },
     "CANON_OBJECT_Accounts_User.md": {
