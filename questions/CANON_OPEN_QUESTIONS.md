@@ -63,6 +63,22 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Billing_Journal.md
+
+| # | Question |
+|---|----------|
+| BJO-005 | The action policy restricts Journal creation to the Vendor Actor, but business context describes Operations acting "on behalf of the Vendor." Is there a separate Operations path for injecting billing data (e.g. a manual-upload / custom-ledger flow), and if so is it a distinct object rather than a Journal? |
+
+---
+
+## CANON_OBJECT_Billing_Journal_Charge.md
+
+| # | Question |
+|---|----------|
+| CHG-001 | What creates a charge of `Consolidated` billing type, and what does it represent? Only `Automated` is observed for Charges, and `Manual` maps to a Manual Upload — the origin and semantics of `Consolidated` are unconfirmed (possibly a custom-ledger charge). |
+
+---
+
 ## CANON_OBJECT_Audit_EventType.md
 
 | # | Question |
@@ -75,6 +91,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.6 | 2026-07-19 | Stu / canon-generate-batch | Billing batch: added BJO-005 (Billing: Journal — possible Operations manual-upload/custom-ledger injection path) and CHG-001 (Billing: Charge — origin of the Consolidated billing type). Billing: Journal Attachment has no open questions. |
 | 3.5 | 2026-07-19 | Stu / canon-generate-batch | Audit batch: added AET-002 (Audit: Event Type — the update endpoint enforces no actor restriction, diverging from the Operations-curated intent; engineering to decide if defect or intended). Audit: Audit Record has no open questions. |
 | 3.4 | 2026-07-17 | Stu / canon-generate-batch | Order batch: ORD-001/002/003 resolved and removed (Querying is Vendor-only to enter and Operations-only to fail from; valid creation statuses Draft/Quoted/Processing) — ORD-004/005/006/007 retained. ORD-008 (Suspend/Resume Order types) and the /quote authority question resolved into the Order canon, not tracked. Added AST-004/AST-005 (Commerce: Order Asset) and SUB-004 (Commerce: Order Subscription). Order Line has no open questions. |
 | 3.3 | 2026-07-17 | Stu / canon-generate | SUB-001, SUB-002, SUB-003 all resolved/closed via live schema + multi-Actor fetch + source-code research and removed (Subscription section retired). SUB-001 — the `/terminate` body is applied as a Vendor update then terminates immediately (no effective-date field). SUB-002 — `commitmentDate` defaults to `startDate + terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal. SUB-003 — subscription-side split fields documented; the full Split Billing Subscription object stays tracked in the backlog (`split | subscriptions`). Incorporated into the Commerce: Subscription refresh. |

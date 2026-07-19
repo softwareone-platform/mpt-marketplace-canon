@@ -26,7 +26,7 @@ These invariants apply universally across all objects, actors, and namespaces. T
 5. **Multi-actor workflows are modelled as sequential transitions.** Each transition is executed by one Actor at a time. A transition may be permitted to more than one Actor type, but each execution instance has exactly one Actor.
 6. **The platform never cascades deletions.** Deleting an object never automatically deletes any other object as a side effect. Each object must be deleted independently. Deletion guards exist to prevent removal of objects that have dependents — see Section 3.5.
 
-   **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations.
+   **Known exceptions:** Deleting a `Catalog: Product` while it is in Draft state cascades to its child objects — Items, Item Groups, Parameters, Parameter Groups, Templates, Terms (and Terms Variants), Media, Price Lists (and Price List Items) — and to its Authorizations and Listings, plus removes Documents/Media/Icon. Products cannot be deleted once they leave Draft state, so this cascade only ever applies pre-publication. See `Catalog: Product` canon Section 6 and Section 8 for the full confirmed list and citations. Deleting a `Billing: Journal` (permitted only in its pre-review states) removes its child `Billing: Charge` entries and `Billing: Journal Attachment` files. See `Billing: Journal` canon Section 8.
 7. **Deletion means permanently removed from API visibility.** When an object is deleted, it is no longer retrievable through the API. Canon makes no claims about physical database retention. The accurate statement is always: "no longer retrievable via the API."
 
    **Known exceptions:** Catalog: Pricing Policy, Commerce: Order, and Accounts: Seller use a soft-delete model — deleted records remain fully retrievable via the API including in standard list responses. Where an object deviates from this invariant, the deviation is documented explicitly in that object's canon.
@@ -224,6 +224,9 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Agreement Split Billing | Commerce | SBA |
 | Subscription Split Billing | Commerce | SBS |
 | Agreement Attachment | Commerce | ATT |
+| Journal | Billing | BJO |
+| Charge | Billing | CHG |
+| Journal Attachment | Billing | JOA |
 
 The `ALI` prefix is shared: `Commerce: Order Line` reuses the same identifier as the `Commerce: Entitlement` it becomes, because a line's identity is preserved when an Order completes and its lines are promoted into the Agreement.
 
@@ -380,6 +383,7 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.14 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BJO (Journal), CHG (Charge), JOA (Journal Attachment) added — the first confirmed Billing prefixes, from live PROD object IDs. Invariant 6 known-exception list: added the `Billing: Journal` delete cascade (deleting a Journal in its pre-review states removes its child Journal Charges and Journal Attachments). Added while canonising the Billing Journal/Charge/Attachment batch. |
 | 2.13 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: AET (Event Type) added, confirmed from a live object ID. Added while canonising the Audit Event Type/Audit Record batch (Audit Record's AUD prefix was already present). |
 | 2.12 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: SVC (Service) and CLT (Cloud Tenant) added, each confirmed from a live object ID. Added while canonising the Accounts Service/Cloud Tenant/API Token batch (API Token's TKN prefix was already present). |
 | 2.11 | 2026-07-18 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: USR (User), MOD (Module), UGR (User Group), AUSR (Account User) added, each confirmed from a live object ID. Added while canonising the Accounts User/Module/User Group/Account User batch. |
