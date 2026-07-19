@@ -2901,6 +2901,173 @@
         }
       }
     },
+    "CANON_OBJECT_Audit_AuditRecord.md": {
+      "namespace": "audit",
+      "object": "records",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "64f88fcf7b28beb3fd65ce2dacd4d585d0aeaea9"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-19",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/audit/records",
+          "GET /public/v1/audit/records/{id}",
+          "POST /public/v1/audit/records"
+        ],
+        "attributes": {
+          "AuditRecordListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<AuditRecord>:opt"
+          ],
+          "AuditRecord": [
+            "actor:->EventActor:opt",
+            "details:string:opt",
+            "documents:object:opt",
+            "event:string:opt",
+            "id:string:opt",
+            "object:->EventObject:opt",
+            "request:->AuditRecordRequest:opt",
+            "revision:integer:opt",
+            "summary:string:opt",
+            "timestamp:string:opt",
+            "type:->AuditRecordType:opt",
+            "viewers:array<EventViewer>:opt"
+          ],
+          "EventObject": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "objectType:string:opt"
+          ],
+          "JsonNode": [
+            "options:->JsonNodeOptions:opt",
+            "parent:->JsonNode:opt",
+            "root:->JsonNode:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "EventViewer": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "type:string:opt"
+          ],
+          "EventActor": [
+            "account:->EventActorAccount:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "AuditRecordRequest": [
+            "api:->AuditRecordApiRequest:opt",
+            "log:->AuditRecordLogInfo:opt",
+            "message:->AuditRecordMessageInfo:opt",
+            "worker:->AuditRecordWorkerRequest:opt"
+          ],
+          "JsonNodeOptions": [
+            "propertyNameCaseInsensitive:boolean:opt"
+          ],
+          "AuditRecordMessageInfo": [
+            "id:string:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "EventActorAccount": [
+            "accountType:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt"
+          ],
+          "AuditRecordWorkerRequest": [
+            "workerName:string:opt"
+          ],
+          "AuditRecordApiRequest": [
+            "geolocation:->GeolocationData:opt",
+            "ip:string:opt",
+            "userAgent:string:opt"
+          ],
+          "AuditRecordLogInfo": [
+            "operationId:string:opt",
+            "requestId:string:opt"
+          ],
+          "GeolocationData": [
+            "countryCode:string:opt",
+            "countryName:string:opt",
+            "region:string:opt"
+          ]
+        },
+        "enums": {
+          "AuditRecordType": [
+            "Private",
+            "Public"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Audit_EventType.md": {
+      "namespace": "audit",
+      "object": "event-types",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "64f88fcf7b28beb3fd65ce2dacd4d585d0aeaea9"
+      ],
+      "specVersion": "5.0.5820-g6d037d0a",
+      "baselineDate": "2026-07-19",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/audit/event-types",
+          "GET /public/v1/audit/event-types/{id}",
+          "PUT /public/v1/audit/event-types/{id}"
+        ],
+        "attributes": {
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "AuditEventType": [
+            "description:string:opt",
+            "id:string:opt",
+            "key:string:opt",
+            "name:string:opt"
+          ],
+          "AuditEventTypeListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<AuditEventType>:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ]
+        },
+        "enums": {}
+      }
+    },
     "CANON_OBJECT_Catalog_Authorization.md": {
       "namespace": "catalog",
       "object": "authorizations",
