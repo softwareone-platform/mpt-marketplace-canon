@@ -208,5 +208,40 @@
     },
     "action_verbs": {},
     "non_object_resources": {}
+  },
+  "billing.custom-ledgers": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "charges": "Billing Charge — the same shared Charge object accessed under billing/custom-ledgers; canonised once under billing.journals.charges, not a distinct object."
+    }
+  },
+  "billing.ledgers": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "charges": "Billing Charge — the same shared Charge object accessed under billing/ledgers; canonised once under billing.journals.charges, not a distinct object."
+    }
+  },
+  "billing.statements": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "charges": "Billing Charge — the same shared Charge object accessed under billing/statements; canonised once under billing.journals.charges, not a distinct object."
+    }
+  },
+  "billing.journals": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "sellers": "A view of Accounts: Seller (already canonised) scoped to the journal; not a distinct billing object."
+    }
+  },
+  "billing": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "analytics": "Billing analytics report/query surface (GET /billing/analytics only, no get-by-id); not an object."
+    }
   }
 }

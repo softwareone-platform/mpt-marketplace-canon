@@ -78,25 +78,20 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 
 | Object | Parent | Status | Last Updated | Canon File | Notes |
 |--------|--------|--------|--------------|------------|-------|
-| analytics | — | 🔴 Not Started | | | |
 | credit-memos | — | 🔴 Not Started | | | |
 | attachments | credit-memos | 🔴 Not Started | | | |
 | custom-ledgers | — | 🔴 Not Started | | | |
 | attachments | custom-ledgers | 🔴 Not Started | | | |
-| charges | custom-ledgers | 🔴 Not Started | | | |
 | invoices | — | 🔴 Not Started | | | |
 | attachments | invoices | 🔴 Not Started | | | |
 | journals | — | 🔴 Not Started | | | |
 | attachments | journals | 🔴 Not Started | | | |
-| charges | journals | 🔴 Not Started | | | |
-| sellers | journals | 🔴 Not Started | | | |
+| charges | journals | 🔴 Not Started | | | Single shared Charge object, also accessed under custom-ledgers, ledgers, and statements. |
 | ledgers | — | 🔴 Not Started | | | |
 | attachments | ledgers | 🔴 Not Started | | | |
-| charges | ledgers | 🔴 Not Started | | | |
 | manual-overrides | — | 🔴 Not Started | | | |
 | statements | — | 🔴 Not Started | | | |
 | attachments | statements | 🔴 Not Started | | | |
-| charges | statements | 🔴 Not Started | | | |
 
 ---
 
@@ -305,6 +300,7 @@ Status reflects trust level, not permanence — the platform keeps evolving, so 
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 4.38 | 2026-07-19 | Stu | Billing backlog trimmed ahead of canonising the namespace. Removed the three duplicate `charges` rows (custom-ledgers/ledgers/statements) — Charge is a single shared object, kept once under `journals` (its richest context, with `match`/`ignore`/`reset` actions). Removed `sellers | journals` (a view of the already-canonised Accounts: Seller) and `analytics` (a report/query surface — collection GET only, no get-by-id, not an object). Matching entries added to `config/canon_path_segment_exclusions.json` (billing.{custom-ledgers,ledgers,statements}.charges, billing.journals.sellers, billing.analytics) so they don't regenerate. |
 | 4.37 | 2026-07-19 | Stu / canon-generate-batch | Audit batch (2 objects) drafted via canon-generate-batch — live STAGING multi-Actor evidence, source research over the dedicated `mpt-audit` service, and the Audit Trail business-context page; an Opus source dig resolved the Event Type update-authorization question. Fresh drafts: **Audit Record** (AUD — platform-wide, append-only immutable log; no state machine; Private/Public visibility via account links; per-Actor structured-data masking + credential masking; Vendor/Operations-only submission; self-view read path for records about one's own identity; 0 open questions), **Event Type** (AET — system-provisioned immutable-key label catalog, key/name/description only, Operations-curated names, standard-vs-custom by key prefix; the thin model is intended by design; 1 open question AET-002 — the update endpoint enforces no actor restriction, an intent-vs-implementation gap for engineering to adjudicate). Preamble §5.3 AET added (v2.13). Drift baselines recorded. Co-promotion cross-link Event Type ↔ Audit Record to bracket at promotion. |
 | 4.36 | 2026-07-19 | Stu / canon-generate-batch | Accounts batch (3 objects) drafted via canon-generate-batch — live STAGING evidence + source research, plus the Service Identity and Cloud tenant (CLT) business-context pages. Fresh drafts: **API Token** (TKN — priority object; Active/Disabled/Deleted state machine via enable/disable + soft-delete, Account-scoped, Module/Group-derived permissions; confirmed intended that the token secret is returned in full on read, deletion is a soft-delete retained/Operations-retrievable, and no minimum Module is enforced), **Service** (SVC — read-only GET-only identity of an internal platform component, no state machine), **Cloud Tenant** (CLT — Active/Disabled/Deleted, Operations-only, maps a legacy consumption-management tenant onto a client Account; public write surface documented as observed alongside its one-way sync). All 3 → 🟡, 0 open questions each, pending PM review. Preamble §5.3 SVC/CLT added (v2.12); api-tokens enable/disable added to exclusions. New-object candidate surfaced: **Extension** (EXT), referenced by API Token's permission scoping. |
 | 4.35 | 2026-07-18 | Stu / canon-generate-batch | Accounts batch (4 objects) drafted via canon-generate-batch — live STAGING multi-Actor evidence + source research (deletion/retention, field-visibility, status-recalculation, permission-gating, buyer-visibility, gating-change behaviour confirmed via an Opus source dig). Fresh drafts: Accounts: User (USR — global human identity, full state machine, membership-projection status incl. backward transitions out of Active, soft-delete retained/Operations-retrievable, `accounts` Operations-only suppression), Module (MOD — read-only Operations-only reference catalog, no state machine, buyer-visibility capability, non-retroactive gating changes), User Group (UGR — stateless CRUD permission set, intended Default-group non-transferability, no minimum-Module count), Account User (AUSR — invite lifecycle Invited/Active/InvitationExpired/Deleted, Operations-only directly-Active path, deleted membership not API-retrievable, no Actor field suppression). All 4 → 🟡, 0 open questions each, pending PM review. Preamble §5.3 USR/MOD/UGR/AUSR added (v2.11). **Accounts backlog de-duplicated:** removed the four parented rows (`groups`↔account-users, `users`↔accounts, `groups`↔users, `accounts`↔users) — all confirmed sub-resources or deprecated alternate-addressings of User / Account User / User Group, not distinct objects; corresponding segments added to `config/canon_path_segment_exclusions.json` (accounts.users, accounts.account-users, accounts.accounts) so they do not regenerate. |
