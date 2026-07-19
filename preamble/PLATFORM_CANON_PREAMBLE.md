@@ -227,6 +227,8 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Journal | Billing | BJO |
 | Charge | Billing | CHG |
 | Journal Attachment | Billing | JOA |
+| Ledger | Billing | BLE |
+| Ledger Attachment | Billing | LEA |
 
 The `ALI` prefix is shared: `Commerce: Order Line` reuses the same identifier as the `Commerce: Entitlement` it becomes, because a line's identity is preserved when an Order completes and its lines are promoted into the Agreement.
 
@@ -383,6 +385,7 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.15 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BLE (Ledger) and LEA (Ledger Attachment) added, confirmed from live PROD object IDs. Added while canonising the Billing Ledger/Ledger Attachment batch. |
 | 2.14 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BJO (Journal), CHG (Charge), JOA (Journal Attachment) added — the first confirmed Billing prefixes, from live PROD object IDs. Invariant 6 known-exception list: added the `Billing: Journal` delete cascade (deleting a Journal in its pre-review states removes its child Journal Charges and Journal Attachments). Added while canonising the Billing Journal/Charge/Attachment batch. |
 | 2.13 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: AET (Event Type) added, confirmed from a live object ID. Added while canonising the Audit Event Type/Audit Record batch (Audit Record's AUD prefix was already present). |
 | 2.12 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: SVC (Service) and CLT (Cloud Tenant) added, each confirmed from a live object ID. Added while canonising the Accounts Service/Cloud Tenant/API Token batch (API Token's TKN prefix was already present). |

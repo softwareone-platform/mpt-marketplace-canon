@@ -217,7 +217,11 @@
     }
   },
   "billing.ledgers": {
-    "state_transition_verbs": {},
+    "state_transition_verbs": {
+      "accept": "CANON_OBJECT_Billing_Ledger.md §3.2 \"Accept\" (Review→Generating)",
+      "queue": "CANON_OBJECT_Billing_Ledger.md §3.2 \"Queue\" (Generated→Queued)",
+      "recalculate": "CANON_OBJECT_Billing_Ledger.md §3.2 \"Recalculate\" (Review/Error→Rating)"
+    },
     "action_verbs": {},
     "non_object_resources": {
       "charges": "Billing Charge — the same shared Charge object accessed under billing/ledgers; canonised once under billing.journals.charges, not a distinct object."
@@ -260,5 +264,12 @@
     },
     "action_verbs": {},
     "non_object_resources": {}
+  },
+  "billing.ledgers.charges": {
+    "state_transition_verbs": {},
+    "action_verbs": {},
+    "non_object_resources": {
+      "charges": "CANON_OBJECT_Billing_Journal_Charge.md — the shared Charge object viewed via a Ledger (GET only); canonised once under billing.journals.charges, not a distinct object."
+    }
   }
 }
