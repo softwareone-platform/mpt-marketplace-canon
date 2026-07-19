@@ -63,10 +63,19 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Audit_EventType.md
+
+| # | Question |
+|---|----------|
+| AET-002 | The Event Type update (`PUT`) endpoint applies no actor-specific authorization in the implementation — no permission or account-type gate — unlike Audit Record creation, which is restricted to Vendor and Operations. Any authenticated Actor could therefore edit an Event Type's name/description, which diverges from the intended Operations-curated model. Whether the missing restriction is a defect to be fixed or the intended behaviour is unresolved pending an engineering decision. |
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.5 | 2026-07-19 | Stu / canon-generate-batch | Audit batch: added AET-002 (Audit: Event Type — the update endpoint enforces no actor restriction, diverging from the Operations-curated intent; engineering to decide if defect or intended). Audit: Audit Record has no open questions. |
 | 3.4 | 2026-07-17 | Stu / canon-generate-batch | Order batch: ORD-001/002/003 resolved and removed (Querying is Vendor-only to enter and Operations-only to fail from; valid creation statuses Draft/Quoted/Processing) — ORD-004/005/006/007 retained. ORD-008 (Suspend/Resume Order types) and the /quote authority question resolved into the Order canon, not tracked. Added AST-004/AST-005 (Commerce: Order Asset) and SUB-004 (Commerce: Order Subscription). Order Line has no open questions. |
 | 3.3 | 2026-07-17 | Stu / canon-generate | SUB-001, SUB-002, SUB-003 all resolved/closed via live schema + multi-Actor fetch + source-code research and removed (Subscription section retired). SUB-001 — the `/terminate` body is applied as a Vendor update then terminates immediately (no effective-date field). SUB-002 — `commitmentDate` defaults to `startDate + terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal. SUB-003 — subscription-side split fields documented; the full Split Billing Subscription object stays tracked in the backlog (`split | subscriptions`). Incorporated into the Commerce: Subscription refresh. |
 | 3.2 | 2026-07-16 | Stu / canon-generate | AGR-001, AGR-002, AGR-003, AGR-007, AGR-008 all resolved via live schema + multi-Actor fetch + source-code research and removed (Agreement section retired) — `startDate`/`endDate`/`error` are vestigial contract fields; Order and Agreement attachments are one shared collection; the audit block genuinely has no `failed` sub-key; Split Billing documented in the Agreement canon (BR-018). SUB-003's stale "See AGR-007" reference repointed to Agreement BR-018. Incorporated into the Commerce: Agreement canon refresh. |
