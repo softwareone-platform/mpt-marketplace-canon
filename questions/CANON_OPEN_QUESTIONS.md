@@ -67,7 +67,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | # | Question |
 |---|----------|
-| BJO-005 | The action policy restricts Journal creation to the Vendor Actor, but business context describes Operations acting "on behalf of the Vendor." Is there a separate Operations path for injecting billing data (e.g. a manual-upload / custom-ledger flow), and if so is it a distinct object rather than a Journal? |
+| BJO-005 | The action policy restricts Journal creation to the Vendor Actor, but business context describes Operations acting "on behalf of the Vendor." Is there a separate Operations path for injecting billing data (e.g. a manual-upload / custom-ledger flow), and if so is it a distinct object rather than a Journal? The Ledger batch surfaced a distinct **Custom Ledger** object (own controller, create/upload/accept/queue/delete, own status enum, no Journal parent) that is very likely this path — to be confirmed when Custom Ledger is canonised. |
 
 ---
 
