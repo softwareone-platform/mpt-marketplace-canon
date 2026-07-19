@@ -198,5 +198,13 @@
     "non_object_resources": {
       "groups": "CANON_OBJECT_Accounts_AccountUser.md §5 `groups` — Group-assignment sub-resource (User Group assignment on a membership); not a distinct object (see Accounts: User Group)"
     }
+  },
+  "accounts.api-tokens": {
+    "state_transition_verbs": {
+      "enable": "CANON_OBJECT_Accounts_ApiToken.md §3.2 T3 \"Enable\", via /enable endpoint (Disabled→Active)",
+      "disable": "CANON_OBJECT_Accounts_ApiToken.md §3.2 T2 \"Disable\", via /disable endpoint (Active→Disabled)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
   }
 }
