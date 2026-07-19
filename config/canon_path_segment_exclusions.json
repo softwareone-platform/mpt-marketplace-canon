@@ -231,7 +231,15 @@
     }
   },
   "billing.journals": {
-    "state_transition_verbs": {},
+    "state_transition_verbs": {
+      "submit": "CANON_OBJECT_Billing_Journal.md §3.2 \"Submit to SoftwareOne\" (Validated/Enquiring→Review)",
+      "accept": "CANON_OBJECT_Billing_Journal.md §3.2 \"Accept\" (Review→Generating)",
+      "enquiry": "CANON_OBJECT_Billing_Journal.md §3.2 \"Return to vendor\" (Review→Enquiring)",
+      "recalculate": "CANON_OBJECT_Billing_Journal.md §3.2 \"Recalculate\" (Reconciling→Validating)",
+      "regenerate": "CANON_OBJECT_Billing_Journal.md §3.2 \"Regenerate\" (Review/Generated→Validating)",
+      "reset": "CANON_OBJECT_Billing_Journal.md §3.2 \"Reset\" (Generated/Accepted→Resetting)",
+      "upload": "CANON_OBJECT_Billing_Journal.md §3.2 \"Upload charge data\" (Draft/Validated/Error/Enquiring→Validating)"
+    },
     "action_verbs": {},
     "non_object_resources": {
       "sellers": "A view of Accounts: Seller (already canonised) scoped to the journal; not a distinct billing object."
@@ -243,5 +251,14 @@
     "non_object_resources": {
       "analytics": "Billing analytics report/query surface (GET /billing/analytics only, no get-by-id); not an object."
     }
+  },
+  "billing.journals.charges": {
+    "state_transition_verbs": {
+      "match": "CANON_OBJECT_Billing_Journal_Charge.md §3.2 \"Match\" reconciliation (→Reconciling)",
+      "ignore": "CANON_OBJECT_Billing_Journal_Charge.md §3.2 \"Ignore\" reconciliation (→Ignored)",
+      "reset": "CANON_OBJECT_Billing_Journal_Charge.md §3.2 \"Reset\" reconciliation (→Reconciling)"
+    },
+    "action_verbs": {},
+    "non_object_resources": {}
   }
 }
