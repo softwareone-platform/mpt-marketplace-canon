@@ -1,8 +1,8 @@
 # Object Canon: Webhook
 
-> **Version:** 0.5
+> **Version:** 0.6
 > **Owner:** Stu
-> **Last Updated:** 2026-07-15
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -184,7 +184,7 @@ Standard field changes (name, description, url, secret, criteria, status transit
 | Webhook endpoint returns a successful HTTP status but an unparseable response body | Platform retries up to 2 additional times, 1 second apart. If still unparseable, recorded as a failure. | Vendor / Operations | Medium | See BR-012. |
 | Webhook endpoint is unreachable, times out, or returns a non-2xx status | Recorded as a single failure. `failuresSinceLastSuccess` incremented. No retry. | Vendor / Operations | Medium | This narrower case (not the parse-failure case above) has no retry. |
 | Webhook's `criteria` anchor object ([[Product]]) is deleted while still in Draft state | The Webhook is left in place, unmodified, still `Enabled` — it goes silently stale rather than being disabled or flagged. It would never actually fire in practice, since [[Order]] creation requires the referenced [[Product]] to be Published, and a deleted Product was never published. | Vendor / Operations | Low | See BR-004a. |
-| Webhook's `createdBy`/`modifiedBy` identity no longer resolves to a valid User, ApiToken, or Service identity | The call proceeds anyway, with no resolvable acting-user security context. | Platform (internal) | Low | Known gap for the Service-identity case. |
+| Webhook's `createdBy`/`modifiedBy` identity no longer resolves to a valid [[User]], [[API Token]], or [[Service]] identity | The call proceeds anyway, with no resolvable acting-user security context. | Platform (internal) | Low | Known gap for the Service-identity case. |
 
 ---
 
@@ -198,6 +198,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.6 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[User]]`, `[[API Token]]`, and `[[Service]]` identity types (Section 9); normalised "ApiToken" to "API Token". No behavioural change. |
 | 0.5 | 2026-07-15 | Stu / canon-generate | WBH-002 resolved via direct source-code research, closing the reopened question from v0.4. Confirmed: Product deletion has no Webhook dependency at all — a Webhook anchored to a deleted Product is left untouched (not disabled, flagged, or notified), going silently stale. A subsequent update to that Webhook fails, since deleted Products are excluded from all normal queries once deleted. Updated BR-004a and the Section 9 failure-mode row accordingly; Section 10 now empty again. |
 | 0.4 | 2026-07-15 | Stu / canon-generate | Corrected BR-004a and its Section 9 failure-mode row: the `Catalog: Product` canon refresh (same date) established that Products *can* be deleted, in Draft state only, with real cascade behavior — the prior "cannot be hard-deleted, Unpublish only" claim (from WBH-002's resolution above) was wrong. Whether the same applies to Programs remains unconfirmed. Reopened WBH-002 (in `questions/CANON_OPEN_QUESTIONS.md`) — what actually happens to a Webhook when its anchor Product is deleted while in Draft is still unconfirmed; the prior closure had mooted the question on the now-disproven premise that deletion was impossible outright. Also removed now-dangling references to the deleted `questions/CANON_SPEC_DISCREPANCIES.md` file (BR-003a, BR-005, Key Attributes Object Type/Criteria rows, Section 10) — spec-vs-reality notes are now stated as plain facts inline rather than tracked separately; and to `questions/CANON_RESOLVED_QUESTIONS.md` (Section 10), which was also removed as a separate tracker. |
 | 0.3 | 2026-07-15 | Stu / canon-generate | WBH-001 through WBH-004 resolved directly with the PM in the same session, per the updated canon-generate process (ask before parking). WBH-001: `Request` object confirmed deprecated/removed from the platform, `Account` never reachable — added BR-003a note, logged SD-007. WBH-002: Products/Programs confirmed non-deletable (Unpublish only) — added BR-004a, simplified Section 6 and Section 9 accordingly, removed the speculative stale-reference failure mode. WBH-003: explicitly descoped as an internal engineering "how" detail, not a canon business rule — noted in BR-012, not tracked as resolved-with-an-answer. WBH-004: confirmed correct as originally inferred — BR-006a citation updated. Section 10 now empty. |

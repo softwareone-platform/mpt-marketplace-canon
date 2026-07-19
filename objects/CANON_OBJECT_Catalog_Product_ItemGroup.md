@@ -1,8 +1,8 @@
 # Object Canon: Item Group
 
-> **Version:** 0.4
+> **Version:** 0.5
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -122,7 +122,7 @@ Not applicable — this object has no state machine.
 A non-Default Item Group containing no Items may be deleted by the Vendor or by Operations. Once deleted, permanently removed — no longer retrievable via the API. Deletion does not cascade to the group's [[Item]]s — a group containing Items cannot be deleted until they are removed or reassigned (BR-009). The Default Item Group cannot be deleted (BR-008).
 
 **Audit & history requirements:**
-The Item Group audit object records the created and updated events, each with a timestamp and the attributed Actor. The revision counter provides a change sequence over the group's own attribute updates. Creation, update, and deletion each publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Item Group audit object records the created and updated events, each with a timestamp and the attributed Actor. The revision counter provides a change sequence over the group's own attribute updates. Creation, update, and deletion each publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -147,6 +147,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.5 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.4 | 2026-07-16 | Stu / canon-generate | Refresh via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. ID Prefix corrected (was "None", is IGR). **Significant corrections**: the auto-assignment of a group-less Item to the Default group (former BR-003) is not platform behaviour — an Item requires an explicit Item Group on creation; BR-003 reframed accordingly. `multiple`/`required` are advisory ordering semantics consumed by the UI/Vendor Extension, not enforced by the platform core at Order submission — corrects the prior "one of the few platform-enforced constraints" claim in BR-004/BR-005. Delete is now Vendor or Operations (was Vendor-only) — Section 2 and BR-008/BR-009 actor scope updated. Section 5: required-on-creation fields documented (name, label, positive displayOrder; description optional; multiple/required/default default to false), Audit attribute added, Item Count/Revision marked read-only. Section 6: parent-Product Draft-deletion removal documented. Section 7: Item Group publishes notification-subsystem events on create/update/delete; the former auto-assignment cross-object effect removed. Section 8: audit filled in; deletion (Vendor or Operations) and no-cascade stated. Section 9: duplicate-displayOrder and advisory-flag failure modes added. Self-references corrected from the mislinked `[[Item]] Group` to plain "Item Group"; `[[Item]]` reserved for real Item references. |
 | 0.3 | 2026-03-14 | Stu | Section 7.1: auto-creation event added — platform creates one Default Item Group on Product creation with known default values. |
 | 0.2 | 2026-03-09 | Stu | Namespace qualification applied to Parent Object and Section 6 relationship references. |

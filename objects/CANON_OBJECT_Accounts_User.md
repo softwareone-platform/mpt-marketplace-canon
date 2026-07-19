@@ -1,8 +1,8 @@
 # Object Canon: User
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-18
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -197,7 +197,7 @@ Block ↔ Unblock is reversible with no limit on cycles; unblocking recalculates
 A User may be deleted by an Actor holding the Platform Account Management permission only while the User is in `Disabled` status, and never on the Actor's own identity (BR-007). Deletion is a soft-delete: the User's status is set to `Deleted` and the record is retained (BR-012). A `Deleted` User remains retrievable by Operations (by ID) but is excluded from Vendor and Client reads, including their list responses. The transition into `Deleted` is terminal.
 
 **Audit & history requirements:**
-The `audit` object records creation and last-update events (each with Actor attribution) and the one-time `invitationAcceptedAt` timestamp; it is omitted by default and retrievable via `select=+audit`. Audit Records generated on the platform-wide Audit bus for User events are not yet canonised. No retention of prior field values beyond the Audit Trail is documented.
+The `audit` object records creation and last-update events (each with Actor attribution) and the one-time `invitationAcceptedAt` timestamp; it is omitted by default and retrievable via `select=+audit`. [[Audit Record]]s are generated on the platform-wide Audit bus for User events. No retention of prior field values beyond the Audit Trail is documented.
 
 ---
 
@@ -225,6 +225,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` (Section 8) and removed the stale "not yet canonised" note. No behavioural change. |
 | 0.1 | 2026-07-18 | Stu / canon-generate | Initial draft. Global User identity documented distinct from the per-Account Account User membership. Full state machine derived (New/Invited/InvitationExpired/Active/Blocked/Disabled/Deleted), with membership-projection status recalculation (including backward transitions out of `Active`), explicit Block/Unblock/Delete transitions, self-only password, SSO-maintained email, and jdenticon icon behaviour. Deletion documented as a soft-delete: record retained, retrievable by Operations, excluded from Vendor/Client reads. `accounts` list confirmed Operations-only (Actor-suppressed); `currentAccount` nulled for Vendor/Client when it differs from the viewer's Account. Administration permissions confirmed available to all Actors (Vendor/Client own-account-scoped). |
 </content>
 </invoke>

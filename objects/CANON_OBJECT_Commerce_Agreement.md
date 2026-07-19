@@ -1,8 +1,8 @@
 # Object Canon: Agreement
 
-> **Version:** 0.9
+> **Version:** 0.10
 > **Owner:** Stu
-> **Last Updated:** 2026-07-17
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -112,7 +112,7 @@ None known.
 | BR-011 | [[Order]]-scoped parameters (`scope: "Order"`) exist only on Orders and are never carried over to the Agreement. Purchase Orders may carry both Agreement-scoped and [[Order]]-scoped parameters; Change, Configuration, and Termination Orders may carry only [[Order]]-scoped parameters. | All | All | [[Order]]-scoped parameters are never visible on the Agreement regardless of [[Order]] type or status. |
 | BR-012 | Parameters with `hidden=true` are suppressed from API responses for the Client on both Orders and Agreements; they remain readable by Vendor and Operations in all statuses. | All | Client | An API-level read suppression, not merely a UI hint. Consistent with Commerce: [[Order]] canon BR-012. |
 | BR-013 | The `billingCurrency` specifies the currency in which the Client is invoiced and must be a currency present in the [[Seller]]'s `currencies` array. Only the Client can set it. | All | Client | When not set, invoicing falls back to the Price List currency. A forex conversion is applied between the transactional ([[Authorization]]) currency and the billing currency for invoicing. Absent from API response when null. |
-| BR-014 | The `termsAndConditions` array records the T&Cs accepted at the time of the original Purchase [[Order]]. T&Cs from subsequent Change, Configuration, or Termination Orders are not accumulated on the Agreement. | All | Client | Each entry records the Catalog: [[Terms]] reference, acceptance timestamp, and accepting User. Empty on Draft. |
+| BR-014 | The `termsAndConditions` array records the T&Cs accepted at the time of the original Purchase [[Order]]. T&Cs from subsequent Change, Configuration, or Termination Orders are not accumulated on the Agreement. | All | Client | Each entry records the Catalog: [[Terms]] reference, acceptance timestamp, and accepting [[User]]. Empty on Draft. |
 | BR-015 | The Vendor or Operations can set an estimated aggregate price on the Agreement by supplying price estimates on update; doing so sets the price `source` to `Manual` and records the acting User. The Vendor may set purchase-price estimates (`PPxM`/`PPxY`) only; Operations may set both purchase- and sell-price estimates (`SPxM`/`SPxY`). The Client cannot set estimates. | All | Vendor, Operations | Intended for reflecting estimated pricing on usage-based / pay-as-you-go entitlements. The platform does not gate this on status or billing model. A manually estimated price is not durable — any subsequent activity that recomputes the aggregate (an [[Order]] completing, a [[Subscription]] or [[Asset]] change, or expiry) resets `source` to `Computed`, discarding the estimate. |
 | BR-016 | Each Actor can update its own `externalIds` field on the Agreement: `externalIds.client` (Client), `externalIds.operations` (Operations), `externalIds.vendor` (Vendor). All are optional. | All | All | — |
 | BR-017 | There can be only one Processing [[Order]] per Agreement at any time. While an [[Order]] is Processing, the Agreement is in Provisioning or Updating and no further Orders can be placed against it. | Provisioning, Updating | All | See Commerce: [[Order]] canon BR-005. |
@@ -247,6 +247,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.10 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[User]]` (BR-014, the accepting User of the recorded T&Cs). No behavioural change. |
 | 0.9 | 2026-07-17 | Stu / canon-generate | Terminology corrected while refreshing Commerce: Order: fulfilment actions are attributed to "the Vendor" (the Actor), not a "Vendor Extension"/"Vendor's fulfilment Extension" — Vendor fulfilment is manual-first and does not require an extension. §3.1 Provisioning state, BR-010, and the §6 Subscription/Asset child rows updated. |
 | 0.8 | 2026-07-17 | Stu / canon-generate | BR-006 (and the §3.1 Terminated state, T11 precondition, and §6 Subscription row) corrected while refreshing Commerce: Subscription: the Agreement auto-terminates when every Subscription is Terminated **or Expired**, not Terminated alone — Expired Subscriptions count toward the condition. |
 | 0.7 | 2026-07-17 | Stu / canon-generate | Section 6 attachment row visibility corrected while canonising Commerce: Agreement Attachment: the "owner-scoped" phrasing was imprecise — attachment visibility is agreement-participant-scoped (derived from the parent Agreement's Vendor/Client), and the attachment carries no owner field of its own. The shared Order/Agreement collection claim is unchanged (confirmed). Dropped the "Not yet canonised" note now that the child object is canonised. |
