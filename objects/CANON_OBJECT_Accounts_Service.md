@@ -1,8 +1,8 @@
 # Object Canon: Service
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-18
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -86,7 +86,7 @@ A Service carries a `status` field with two values, `Active` and `Deleted` (see 
 | Accounts: User | Association | N/A | Both are platform identity types. A User is a human identity; a Service is the identity of an internal component. They are independent. | None. |
 | Audit: Audit Record | Association | 1 Service → many Audit Records | A Service can be the identity attributed to an event when an action is performed autonomously by an internal component. | None — deleting or deactivating a Service does not alter historical Audit Records. |
 
-Audit: Audit Record is not yet canonised. API Token is a platform identity type in the same family as Service and [[User]].
+API Token is a platform identity type in the same family as Service and [[User]].
 
 ---
 
@@ -128,7 +128,7 @@ The `audit` attribute records the creation and last-modification events for the 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
 | An Actor attempts to create, update, or delete a Service | The operation is unavailable — the public surface exposes read operations only. | Vendor, Operations, Client | Low | Service is read-only reference data. |
-| A Service referenced as the acting identity in an Audit Record is later removed or marked `Deleted` | The historical Audit Record is unchanged; the reference remains as recorded. | Operations | Low | Attribution is preserved regardless of the Service's current status. |
+| A Service referenced as the acting identity in an [[Audit Record]] is later removed or marked `Deleted` | The historical Audit Record is unchanged; the reference remains as recorded. | Operations | Low | Attribution is preserved regardless of the Service's current status. |
 
 ---
 
@@ -142,6 +142,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` (Section 9) and removed the stale "Audit Record not yet canonised" note (Section 6). No behavioural change. |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft. Public API is read-only (list + get-by-id); no state machine (status is set internally, no public transition). Documents Service as the identity of an internal platform component alongside User and API Token, with no Actor-based field suppression and an identity-attribution relationship to Audit Records. Derived from the OpenAPI schema, a multi-Actor live fetch, source research, and the Service Identity business-context page. 0 open questions. |
 </content>
 </invoke>

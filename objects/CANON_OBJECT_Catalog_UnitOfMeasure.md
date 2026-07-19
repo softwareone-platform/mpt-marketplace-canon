@@ -1,8 +1,8 @@
 # Object Canon: Unit of Measure
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -112,7 +112,7 @@ Not applicable — this object has no state machine.
 Units of Measure cannot be deleted. The platform exposes no delete, deactivate, or retire mechanism (BR-003).
 
 **Audit & history requirements:**
-The audit object records the `created` and `updated` events, each with a timestamp and the attributed Actor. The `revision` counter provides a change sequence over the unit's updates. Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The audit object records the `created` and `updated` events, each with a timestamp and the attributed Actor. The `revision` counter provides a change sequence over the unit's updates. Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -136,5 +136,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.2 | 2026-07-16 | Stu / canon-generate | Refresh via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. ID Prefix corrected (was "None", is UNT — also added to preamble §5.3). **Significant corrections**: the object HAS a `revision` field that increments on update (Section 5 — removes the prior "no revision field" note); `audit` records both `created` and `updated`, not created-only (Section 5, Section 8); `description` is required, not optional (BR-007, corrects the schema-nullable reading); `name` is required, globally unique, and length-limited (BR-006); `statistics.itemCount` counts Published Items and moves on Item publish/unpublish, not on item create/delete (BR-008 — corrects the prior "currently referencing" wording); the Unit of Measure reference on an Item is mutable, not immutable after Item creation (BR-004, corrects prior canon and matches the Catalog: Product Item refresh). Confirmed create/update are Operations-only and no delete mechanism exists (BR-003). Section 7: no message-bus event is published on create/update. Also Known As reduced to "Unit" (UNT moved to ID Prefix). |
 | 0.1 | 2026-03-09 | Stu | Initial canon. Derived from PROD JSON sample (13 units). |

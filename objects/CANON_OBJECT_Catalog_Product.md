@@ -1,8 +1,8 @@
 # Object Canon: Product
 
-> **Version:** 0.11
+> **Version:** 0.12
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -201,7 +201,7 @@ None known.
 A Product may be deleted by its Vendor only while in Draft state (T7). This is a soft delete — the object is excluded from all normal API responses going forward (permanently removed — no longer retrievable via the API) — and it cascades to remove: [[Item]]s, [[Item Group]]s, [[Parameter]]s, [[Parameter Group]]s, [[Template]]s, [[Terms]] (and [[Terms Variant]]s), [[Price List]]s (and [[Price List Item]]s), [[Authorization]]s, and [[Listing]]s, plus [[Document]]s, Media, and Icon. This is a documented exception to Platform Invariant 6 (see preamble). Once a Product leaves Draft state (Pending, Published, or Unpublished), it can never be deleted by any Actor.
 
 **Audit & history requirements:**
-The Product audit object records timestamps and Actor attribution for five events: created, updated, pending, published, and unpublished. The revision counter provides a change sequence. Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon. State transitions (Review/Publish/Unpublish) do not raise a distinct domain/integration event — they only append an audit-trail entry — so no downstream event handler observes them.
+The Product audit object records timestamps and Actor attribution for five events: created, updated, pending, published, and unpublished. The revision counter provides a change sequence. Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon. State transitions (Review/Publish/Unpublish) do not raise a distinct domain/integration event — they only append an audit-trail entry — so no downstream event handler observes them.
 
 ---
 
@@ -226,6 +226,7 @@ No open questions at this time. A candidate question about whether Operations pe
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.12 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8). No behavioural change. |
 | 0.11 | 2026-07-16 | Stu / canon-generate | Now that `Catalog: Product Document` is canonised, added a Section 6 Child relationship row for it and bracket-linked the previously plain "Documents" mentions to `[[Document]]`s in BR-002, Section 7.1, and Section 8. No behavioural change — Documents were already documented in the Draft-deletion cascade. |
 | 0.10 | 2026-07-16 | Stu / canon-generate | Reverts v0.9's Items change. Source research during the `Catalog: Product Terms` refresh found that deleting a Product removes its Items after all — the domain `Product.Delete()` method leaves Items untouched (v0.9's basis), but the delete-Product API path additionally runs a cleanup that removes the Product's Items. Items restored to the cascade in BR-002, Section 6, Section 7.1/7.2, Section 8, Section 9 (and preamble Invariant 6). A full re-verification of the delete-Product cascade for every listed child was then completed and confirmed the entire list — all listed children are removed on Draft-Product deletion. |
 | 0.9 | 2026-07-16 | Stu / canon-generate | Product [[Item]]s removed from the Draft-deletion cascade (BR-002, Section 6 Item row, Section 7.1/7.2, Section 8, Section 9) — source research during the `Catalog: Product Item` refresh confirmed Items are independent aggregate records that Product deletion does not remove, and no guard blocks deleting a Draft Product that still has Items. Also removed from preamble Invariant 6's known-exception list. Only the Items claim was re-verified this run; the other listed children's cascade was not re-examined (see follow-up). |

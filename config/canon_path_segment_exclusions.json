@@ -75,7 +75,9 @@
       "unpublish": "CANON_OBJECT_Catalog_Product.md §3.2 T4 \"Unpublish Product\", via /unpublish endpoint"
     },
     "action_verbs": {},
-    "non_object_resources": {}
+    "non_object_resources": {
+      "settings": "CANON_OBJECT_Catalog_Product.md — product settings sub-resource (PUT /products/{id}/settings); not a distinct object."
+    }
   },
   "catalog.items": {
     "state_transition_verbs": {

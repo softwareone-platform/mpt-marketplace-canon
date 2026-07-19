@@ -1,8 +1,8 @@
 # Object Canon: Terms
 
-> **Version:** 0.5
+> **Version:** 0.6
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -155,7 +155,7 @@ Terms and Conditions.
 Only Draft Terms may be deleted, by the Vendor. Once deleted, permanently removed — no longer retrievable via the API; no Deleted status value is retained. The platform does not cascade deletions — deleting a Terms does not remove its [[Terms Variant]]s, and a variant-blocking guard is not currently enforced (BR-009a). Published, Pending, and Unpublished Terms cannot be deleted.
 
 **Audit & history requirements:**
-The Terms audit object records created, updated, pending, published, and unpublished events, each with a timestamp and the attributed Actor. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Terms audit object records created, updated, pending, published, and unpublished events, each with a timestamp and the attributed Actor. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -180,6 +180,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.6 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.5 | 2026-07-16 | Stu / canon-generate | Full refresh via live OpenAPI schema (STAGING), live-fetched real objects (multi-Actor; a Published and an Unpublished Terms), and source-code research. ID Prefix corrected (was "None", is TCS). §3.2 endpoints filled (`review`/`publish`/`unpublish`/`DELETE`), replacing "Unconfirmed"; new T6 transition (Unpublished→Pending via `review`, Vendor). **Significant corrections**: unpublish is Vendor **or** Operations, reversing the v0.3 "Operations-only, Vendor cannot unpublish" claim (only republish — the `publish` action — is Operations-only); `description` is optional, not required (BR-011, Section 5); `displayOrder` is optional (defaults to 100), positive, non-unique. BR-004 reframed — the platform auto-records acceptance of all Published Terms onto the Agreement during Order processing rather than gating submission on prior acceptance. BR-009a reframed — the variant-blocking delete guard is intended but not enforced (deleting a Draft Terms orphans its Variants). Deletion is a permanent removal (no retained Deleted status). Terms publishes notification-subsystem events (Section 7). Confirmed Terms↔Variant independence (BR-007) and that Terms are removed on parent-Product deletion (Section 6). Also Known As reduced to "Terms and Conditions". |
 | 0.4 | 2026-03-14 | Stu | Schema review against OpenAPI extract. Section 5: required fields on creation noted, Revision marked read-only. Section 8: unpublished audit event added. T6: hard delete language corrected. Section 10: cleaned up. |
 | 0.3 | 2026-03-09 | Stu | T4 corrected — Vendors cannot unpublish Terms. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |

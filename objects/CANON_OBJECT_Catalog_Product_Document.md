@@ -1,8 +1,8 @@
 # Object Canon: Document
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -156,7 +156,7 @@ No cross-object state effects. A Document event changes no other object's state.
 A Document may be deleted by the Vendor only while in Draft state. Once deleted, permanently removed — no longer retrievable via the API; for a File Document the stored file is removed as well. Operations cannot delete a Document, and Documents beyond Draft state cannot be deleted. Deleting the parent [[Product]] (Draft state only) also removes the Document and its stored file.
 
 **Audit & history requirements:**
-The Document audit object records the created and updated events, each with a timestamp and the attributed Actor. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Document audit object records the created and updated events, each with a timestamp and the attributed Actor. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -182,4 +182,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.1 | 2026-07-16 | Stu / canon-generate | Initial canon. Generated via live OpenAPI schema (STAGING), a live-fetched real File Document across its Published and Unpublished states (multi-Actor), and source-code research. Documents the Online/File content model, the Draft/Pending/Published/Unpublished state machine (`review`/`publish`/`unpublish`; review and publish each also handle the Unpublished path; publish/republish Operations-only, review Vendor-only, unpublish Vendor-or-Operations), Draft-only Vendor-only deletion with permanent removal of the record and stored file, the required allow-listed language, PDF/Word ≤5 MB file constraint, HTTP-format-only URL validation for Online, and Client read visibility gated to the Published state — the record is hidden from a Client (404) once Unpublished, but the file content remains downloadable by any authenticated Actor (including a Client) that knows the Document ID regardless of state (BR-011; both confirmed empirically by fetching the Document as each Actor in its Published and Unpublished states). ID Prefix PDC added to preamble §5.3. |

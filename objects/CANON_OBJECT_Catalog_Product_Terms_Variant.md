@@ -1,8 +1,8 @@
 # Object Canon: Terms Variant
 
-> **Version:** 0.5
+> **Version:** 0.6
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -157,7 +157,7 @@ No cross-object state effects. A Variant event changes no other object's state �
 Only Draft Variants may be deleted, by the Vendor. Once deleted, permanently removed — no longer retrievable via the API; no Deleted status value is retained. For a File Variant, the stored file is removed as well. Published, Pending, and Unpublished Variants cannot be deleted. The platform does not cascade deletions — deleting the parent [[Terms]] does not remove its Variants (BR-006).
 
 **Audit & history requirements:**
-The Variant audit object records the created and updated events, each with a timestamp and the attributed Actor — state transitions are not recorded as audit sub-keys. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Variant audit object records the created and updated events, each with a timestamp and the attributed Actor — state transitions are not recorded as audit sub-keys. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -183,6 +183,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.6 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.5 | 2026-07-16 | Stu / canon-generate | Full refresh via live OpenAPI schema (STAGING), a live-fetched real Online Variant (multi-Actor), and source-code research. ID Prefix corrected (was "None", is TCV). §3.2 endpoints filled (`review`/`publish`/`unpublish`/`DELETE`), replacing "Unconfirmed"; new T6 transition (Unpublished→Pending via `review`, Vendor). **Significant corrections**: unpublish is Vendor **or** Operations, reversing the v0.3 "Operations-only, Vendor cannot unpublish" claim (only republish — the `publish` action — is Operations-only); `assetUrl` and `languageCode` are immutable after creation (Section 5 previously marked them mutable) — only name and description are mutable (BR-011); `description` is optional, not required (BR-011, Section 5); the platform validates the Online `assetUrl` format (well-formed HTTP/HTTPS, ≤2048), correcting BR-003's "does not validate the URL" (reachability still unchecked); File content constraints added (PDF/Word, ≤5 MB — BR-004); language code is an allow-list value (≤5 chars) — BR-005. BR-006/Section 6/Section 8 reframed to match [[Terms]] canon BR-009a — deleting a Terms is intended to require Variant removal first but is not enforced, orphaning the Variants (no cascade). Variant publishes notification-subsystem events (Section 7). Deletion is permanent (no retained Deleted status); File Variant's stored file removed on delete. Also Known As reduced to "None known" (TCV moved to ID Prefix). |
 | 0.4 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-005 updated: File type Variants always require a language code — multi-language not supported for File type. Section 5: required fields on creation documented, language and file upload requirements noted per type, Revision marked read-only. Section 8: audit uncertainty resolved — Variant uses PlatformObjectAudit (created/updated only). T6 and Section 7.1: hard delete language corrected. Section 10: cleaned up. |
 | 0.3 | 2026-03-09 | Stu | T4 corrected — Vendors cannot unpublish Terms Variants. Unpublish and Republish are Operations-only transitions. Section 2 and Section 7.1 updated accordingly. |

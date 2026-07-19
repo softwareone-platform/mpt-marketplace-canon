@@ -1,8 +1,8 @@
 # Object Canon: Media
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -170,7 +170,7 @@ No cross-object state effects. A Media event changes no other object's state. (R
 A Media object may be deleted by the Vendor (owner) or by Operations only while in Draft state (T7). Once deleted, permanently removed — no longer retrievable via the API; no Deleted status value is retained. Deletion does not cascade — Media is a leaf object. Media beyond Draft state cannot be deleted.
 
 **Audit & history requirements:**
-The Media audit object records the created and updated events, each with a timestamp and the attributed Actor (via the acting API Token). The revision counter provides a change sequence over attribute updates. Every state transition, along with creation, update, and deletion, publishes an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Media audit object records the created and updated events, each with a timestamp and the attributed Actor (via the acting [[API Token]]). The revision counter provides a change sequence over attribute updates. Every state transition, along with creation, update, and deletion, publishes an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -195,6 +195,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.4 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` and `[[API Token]]` references (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.3 | 2026-07-16 | Stu / canon-generate | Major refresh via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. ID Prefix corrected (was "None", is MED). §3.2 Endpoint/Verb column completed with confirmed literal mechanisms (`review`/`publish`/`unpublish`/`DELETE`), replacing "Unconfirmed — pending refresh". **Significant corrections**: submit-for-publication endpoint is `review`, not `submit`; publish and republish (Unpublished→Published) are Operations-only, not Vendor+Operations (T5); new T6 transition (Unpublished→Pending via the same `review` action, Vendor); delete is permitted to Vendor **or** Operations (was Vendor-only) and Media is permanently removed with no cascade (no soft-delete/retained Deleted status); Video url IS format-validated (YouTube/Vimeo only), correcting the prior "not validated" claim (BR-012); url and uploaded file are immutable after creation, correcting Section 5 (were "Yes"); Client record visibility is state-gated to Published while the asset URL stays publicly retrievable (BR-011, Ownership table); file constraints added (JPEG/PNG ≤5MB, always required — BR-013); name/description/displayOrder confirmed as the only mutable fields (BR-016); displayOrder must be positive (BR-010). Media publishes notification-subsystem events on create/update/delete/state-change (Section 7). Section 8 audit filled in (created/updated). |
 | 0.2 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-003 and BR-004 updated: Video type requires a thumbnail file upload in addition to the URL. Section 5: required fields on creation documented, File attribute added, filename/size/contentType notes corrected for both types, Revision marked read-only. Section 8: deletion language cleaned up. Section 9: Video URL failure mode updated. |
 | 0.1 | 2026-03-07 | Stu | Initial canon. Derived from JSON and conversation. |

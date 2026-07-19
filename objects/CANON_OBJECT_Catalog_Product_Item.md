@@ -1,8 +1,8 @@
 # Object Canon: Item
 
-> **Version:** 0.5
+> **Version:** 0.6
 > **Owner:** Stu
-> **Last Updated:** 2026-07-16
+> **Last Updated:** 2026-07-19
 > **Status:** Draft
 
 ---
@@ -177,7 +177,7 @@ SKU.
 An Item may be deleted by the Vendor only while in Draft state. Once deleted, permanently removed — no longer retrievable via the API. Deletion does not cascade. Items beyond Draft state cannot be deleted. Deleting the parent [[Product]] does not remove its Items — Items are independent records.
 
 **Audit & history requirements:**
-The Item audit object records created, updated, pending, published, and unpublished events, each with a timestamp and the attributed Actor. The revision counter provides a change sequence. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: Audit Record canon (pending canonisation).
+The Item audit object records created, updated, pending, published, and unpublished events, each with a timestamp and the attributed Actor. The revision counter provides a change sequence. Creation, update, deletion, and every state transition publish an event to the platform notification subsystem (Catalog module). Full attribute history is retained via the platform Audit Trail — see Audit: [[Audit Record]] canon.
 
 ---
 
@@ -202,6 +202,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.6 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` reference (Section 8) and removed the stale "pending canonisation" qualifier. No behavioural change. |
 | 0.5 | 2026-07-16 | Stu / canon-generate | Full refresh via live OpenAPI schema (STAGING), live-fetched real object (multi-Actor), and source-code research. ID Prefix corrected (was "None", is ITM). §3.2 Endpoint/Verb column filled (`review`/`publish`/`unpublish`/`DELETE`), replacing "Unconfirmed — pending refresh"; new T6 transition (Unpublished→Pending via `review`, Vendor); publish/republish confirmed Operations-only, delete Vendor-only (Draft). **Terms corrections**: `terms.period` now includes `3y` (BR-009 — reverses the prior "3y not a valid period" note); `terms.commitment` now `1m/1y/2y/3y/4y/5y` (BR-010, adds 2y/4y/5y); new BR-011 documents the period↔commitment validity combinations. Unit of Measure is mutable after creation (BR-013, Section 5 — corrects prior "immutable"); Item Group is reassignable. quantityNotApplicable coupling to the usage model reframed as intended-but-unenforced (BR-012). New BR-020 (attributes mutable in all non-terminal states, no publish lock; terms/quantityNotApplicable immutable). Section 5: Audit attribute added; externalIds.operations must be null at creation and is not required to publish (BR-014, corrects a prior failure-mode framing). Section 6: Product deletion does NOT remove Items (Items are independent records) — corrects the prior cascade claim (also corrected in Product canon and preamble Invariant 6). Section 7: Item publishes notification-subsystem events; Price List Items are auto-created on an Item's first review (§7.2). Also Known As reduced to "SKU" (ITM moved to ID Prefix). |
 | 0.4 | 2026-07-16 | Stu / canon-generate | Scoped correction from the Item Group refresh: BR-002 (explicit group required, no auto-assignment) and BR-003 (Item Group multiple/required advisory, not Order-time-enforced). |
 | 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-009 corrected: 3y removed from terms.period (valid for commitment only). BR-010 corrected: one-time removed from terms.commitment (valid for period only), nullable documented. Section 5: required fields on creation noted, terms enums corrected. Section 8: unpublished audit event added, history retention confirmed. Section 10 cleaned up. SD-001 raised in spec discrepancy tracker (name not in required array). |
