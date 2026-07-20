@@ -1,6 +1,6 @@
 # Object Canon: Statement
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
 > **Last Updated:** 2026-07-20
 > **Status:** Draft
@@ -24,10 +24,10 @@
 **ID Prefix:** SOM
 
 **Description:**
-A Statement is the client-facing billing document the platform's billing pipeline produces from a [[Ledger]] (or, for manually-uploaded billing, a Custom Ledger — not yet canonised), scoped to exactly one Commerce: [[Agreement]]. Its net total determines its type — Debit (zero or positive, becoming an ERP Sales Order and, once posted, an Invoice) or Credit (negative, becoming an ERP Credit Memo) — and its per-line detail is exposed as a separate child [[Charge]] collection rather than an embedded array. A Statement can also be a Consolidated grouping — an Operations-created shell that rolls several existing standalone Statements together into a single ERP posting. Clients read their own Statements; every action on a Statement, including its own creation, is restricted to the Operations Actor.
+A Statement is the client-facing billing document the platform's billing pipeline produces from a [[Ledger]] (or, for manually-uploaded billing, a Custom Ledger — not yet canonised), scoped to exactly one Commerce: [[Agreement]]. Its net total determines its type — Debit (zero or positive, becoming an ERP Sales Order and, once posted, an [[Invoice]]) or Credit (negative, becoming an ERP [[Credit Memo]]) — and its per-line detail is exposed as a separate child [[Charge]] collection rather than an embedded array. A Statement can also be a Consolidated grouping — an Operations-created shell that rolls several existing standalone Statements together into a single ERP posting. Clients read their own Statements; every action on a Statement, including its own creation, is restricted to the Operations Actor.
 
 **Also Known As:**
-Billing statement; client statement. Distinct from the downstream ERP Invoice and Credit Memo documents a Statement produces (neither is yet canonised), and from the Custom Ledger (the Operations manual-upload billing path that produces Manual-type Statements, not yet canonised).
+Billing statement; client statement. Distinct from the downstream ERP Invoice and Credit Memo documents a Statement produces, and from the Custom Ledger (the Operations manual-upload billing path that produces Manual-type Statements, not yet canonised).
 
 ---
 
@@ -124,7 +124,7 @@ Billing statement; client statement. Distinct from the downstream ERP Invoice an
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
 | BR-001 | An Automated or Manual Statement is scoped to exactly one Commerce: [[Agreement]]. A Consolidated Statement has no Agreement of its own — it aggregates several underlying Statements, each with its own Agreement. | All | All | The Automated grouping key is the (Journal, Agreement, Buyer) combination — a Journal spanning multiple Buyers on the same Agreement yields one Statement per Buyer, not one per Agreement. |
-| BR-002 | A Statement's net total determines its type: zero or positive produces Debit (an ERP Sales Order, and an Invoice once posted); negative produces Credit (an ERP Credit Memo). | All | All | Negative or return lines are converted to positive equivalents for the ERP import; multiple lines within one Statement net together (e.g. +200 and −150 nets to a single +50 order). |
+| BR-002 | A Statement's net total determines its type: zero or positive produces Debit (an ERP Sales Order, and an [[Invoice]] once posted); negative produces Credit (an ERP [[Credit Memo]]). | All | All | Negative or return lines are converted to positive equivalents for the ERP import; multiple lines within one Statement net together (e.g. +200 and −150 nets to a single +50 order). |
 | BR-003 | Reading a Statement is permitted to the Client and Operations Actors. The Vendor Actor cannot read a Statement at all. | All | All | A Vendor request is refused outright, not merely field-suppressed. |
 | BR-004 | Every Statement action — creation, update, and every state transition in Section 3.2 — is restricted to the Operations Actor, even though the Client Actor is accepted for reads on the same endpoint. | All | Operations | A Client attempt at any mutating action is rejected. |
 | BR-005 | The only Statement an Actor can create directly is an empty Consolidated grouping shell. Automated and Manual Statements arise only as a side effect of accepting the source [[Ledger]] or Custom Ledger. | N/A (creation) | Operations | See T1. |
@@ -161,8 +161,8 @@ Billing statement; client statement. Distinct from the downstream ERP Invoice an
 | processing | Object | Processing summary: total, ready, error, split, skipped, ignored counts. | System | Yes | Operations-only. |
 | statusNotes | Object | A message and parameters describing the current status. | Operations | Yes | The message is required when transitioning to Error. Absent from response when null. |
 | error.code / error.message | Object | Error code and message when in an error condition. | System | Yes | Visible to Client and Operations. Absent from response when null. |
-| creditMemo | Reference | The downstream ERP Credit Memo, once created. | System | No | Populated only for a Credit-type Statement. Not yet canonised. |
-| invoice | Reference | The downstream ERP Sales Order/Invoice, once created. | System | No | Populated only for a Debit-type Statement. Not yet canonised. |
+| creditMemo | Reference | The downstream ERP Credit Memo, once created. | System | No | Populated only for a Credit-type Statement. |
+| invoice | Reference | The downstream ERP Sales Order/Invoice, once created. | System | No | Populated only for a Debit-type Statement. |
 | backup | Object | Status and date of the Statement's data export/backup. | System | Yes | Operations-only. |
 | parent | Reference | The Consolidated parent Statement this Statement is linked to, if any. | System | Yes | Set by add-child, cleared by remove-child or by the parent's own cancel. See T16/T17/T19/T20. |
 | statistics | Object | Counts of distinct child Statements, Products, Agreements, and Licensees — Consolidated parent only. | System | Yes | Client/Operations visible. Recalculated on every add/remove-child. |
@@ -179,6 +179,8 @@ Billing statement; client statement. Distinct from the downstream ERP Invoice an
 | Billing: Charge | Association | Many Charges to one Statement | The per-line billing entries that make up the Statement, retrieved via a child collection rather than an embedded array. | Charges reference the Statement they feed; the reference is cleared if a Charge is later ignored. See BR-015. |
 | Billing: Statement | Association (self) | One Consolidated parent to many child Statements | A Consolidated Statement groups several standalone Statements as children. | Each child is independently created and can exist without ever being consolidated; linkage is added and removed via T16/T17 and reversed in bulk by cancelling the parent (T19/T20). |
 | Billing: Statement Attachment | Child | One Statement to many Attachments | Supporting files (e.g. supplementary billing documentation) attached to the Statement. | No cascade (preamble Invariant 6); the attachment is reachable only via its Statement. |
+| Billing: Invoice | Association | One Statement to zero or one Invoice | The downstream ERP invoice generated from a Debit-type Statement. | Reference only; no cascade. |
+| Billing: Credit Memo | Association | One Statement to zero or one Credit Memo | The downstream ERP credit memo generated from a Credit-type Statement. | Reference only; no cascade. |
 | Commerce: Agreement | Association | Many Statements to one Agreement (Automated/Manual only) | The Agreement the Statement bills. | Reference only; no cascade. Null for a Consolidated shell. |
 | Catalog: Product | Association | Many Statements to one Product | The Product being billed. | Reference only; no cascade. |
 | Accounts: Buyer | Association | Many Statements to one Buyer | The Buyer billed. | Reference only; no cascade. |
@@ -244,4 +246,5 @@ A Statement records a created and updated event plus a per-status event history 
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-20 | Stu / canon-generate-batch | Billing: Invoice and Billing: Credit Memo now canonised — bracket-linked the `[[Invoice]]` and `[[Credit Memo]]` cross-references (Section 1, BR-002), dropped the stale "not yet canonised" notes (Section 1, Section 5), and added Section 6 relationship rows for both. No behavioural change. |
 | 0.1 | 2026-07-20 | Stu / canon-generate | Initial draft generated from the PROD OpenAPI schema, a live multi-Actor PROD fetch (Vendor refused with 403; Operations and Client both readable), an Operations-vs-Client actor-suppression diff, the Statement/Credit-Statement and Statement-object Confluence pages, and Billing source research. Documents the 9-state machine (Generated/Cancelled/Queued/Pending/Issued/Error/Generating/Consolidating/Consolidated), the three creation paths (Automated via Ledger acceptance, Manual via Custom Ledger acceptance, Consolidated via direct Operations creation), the manual-billing-override block-at-creation behaviour, the Operations-only action policy despite Client-readable GETs, the add-child/remove-child consolidated-grouping mechanics, and the Ledger-completion trigger on Issue/Cancel. Confirmed per-line detail is a child Charge collection, not an embedded array. Resolved during review: `retry` lands in Queued (its API description saying "Generated" is stale), and an ERP posting is intercompany when the Authorization owner's Seller differs from the Licensee's Seller (applied in the ERP integration layer, not a Statement field). One open question remains (SOM-003: whether a Manual or Consolidated Statement has any removal path). |
