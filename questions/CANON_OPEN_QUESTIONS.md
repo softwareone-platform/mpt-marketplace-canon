@@ -92,7 +92,22 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | # | Question |
 |---|----------|
 | STA-001 | A Statement Attachment's events carry no owning-account visibility grant in source (no event producer overrides permissions), so — unlike the parent Statement, whose events are granted to the Client Account — its attachment events appear Operations/internal-only. Confirm the effective visibility, since the default event-permission behaviour resolves in a compiled framework base class not visible in source. |
-| STA-002 | Deleting a Statement Attachment is intended to be Operations-only (create and update are), but the platform does not enforce an Operations-only restriction on delete, so a Client request can delete one. The gap is systemic across the billing-attachment family — Invoice and Credit Memo attachments share it. Confirm the intended restriction and whether the missing enforcement is a defect. |
+
+---
+
+## CANON_OBJECT_Billing_Invoice_Attachment.md
+
+| # | Question |
+|---|----------|
+| INA-001 | Do Invoice Attachment events (created, updated, deleted) carry an owning-account visibility grant for the Client Account, or are they Operations/internal-only? No explicit grant appears in the shared lifecycle framework in source (mirroring Statement Attachment's STA-001); the effective visibility resolves in a compiled framework base class not visible in source. |
+
+---
+
+## CANON_OBJECT_Billing_Credit_Memo_Attachment.md
+
+| # | Question |
+|---|----------|
+| CMA-001 | Do Credit Memo Attachment events (created, updated, deleted) carry an owning-account visibility grant for the Client Account, or are they Operations/internal-only? No explicit grant appears in the shared lifecycle framework in source (mirroring Statement Attachment's STA-001 and the sibling Invoice Attachment's INA-001); the effective visibility resolves in a compiled framework base class not visible in source. |
 
 ---
 

@@ -231,6 +231,10 @@ Every platform object has an ID prefix used in all API identifiers for that obje
 | Ledger Attachment | Billing | LEA |
 | Statement | Billing | SOM |
 | Statement Attachment | Billing | STA |
+| Invoice | Billing | INV |
+| Invoice Attachment | Billing | INA |
+| Credit Memo | Billing | CRD |
+| Credit Memo Attachment | Billing | CMA |
 
 The `ALI` prefix is shared: `Commerce: Order Line` reuses the same identifier as the `Commerce: Entitlement` it becomes, because a line's identity is preserved when an Order completes and its lines are promoted into the Agreement.
 
@@ -387,6 +391,7 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.17 | 2026-07-20 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: INV (Invoice), INA (Invoice Attachment), CRD (Credit Memo), CMA (Credit Memo Attachment) added, confirmed from live PROD object IDs. Added while canonising the Billing Invoice/Credit Memo batch. |
 | 2.16 | 2026-07-20 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: SOM (Statement) and STA (Statement Attachment) added, confirmed from live PROD object IDs. Invariant 6 known-exception list: added the `Billing: Journal` reset cascade (resetting a Journal removes its generated Ledgers and their Statements) as a distinct exception from the Journal delete cascade. Added while canonising the Billing Statement/Statement Attachment batch. |
 | 2.15 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BLE (Ledger) and LEA (Ledger Attachment) added, confirmed from live PROD object IDs. Added while canonising the Billing Ledger/Ledger Attachment batch. |
 | 2.14 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BJO (Journal), CHG (Charge), JOA (Journal Attachment) added — the first confirmed Billing prefixes, from live PROD object IDs. Invariant 6 known-exception list: added the `Billing: Journal` delete cascade (deleting a Journal in its pre-review states removes its child Journal Charges and Journal Attachments). Added while canonising the Billing Journal/Charge/Attachment batch. |

@@ -3068,6 +3068,1108 @@
         "enums": {}
       }
     },
+    "CANON_OBJECT_Billing_Credit_Memo.md": {
+      "namespace": "billing",
+      "object": "credit-memos",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "4146cad4efe5189620f50a7fce5195ae9fa21980"
+      ],
+      "specVersion": "5.0.5786-g4e261210",
+      "baselineDate": "2026-07-20",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/billing/credit-memos",
+          "GET /public/v1/billing/credit-memos/{id}",
+          "POST /public/v1/billing/credit-memos"
+        ],
+        "attributes": {
+          "CreditMemoListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CreditMemo>:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "CreditMemo": [
+            "$meta:->PlatformMetadata:opt",
+            "agreement:->AgreementRef:opt",
+            "analytics:->AnalyticsInfo:opt",
+            "attributes:->BillingErpAttributes:opt",
+            "audit:->CreditMemoAuditBag:opt",
+            "buyer:->BuyerRef:opt",
+            "client:->AccountRef:opt",
+            "cloudiqInvoiceReference:string:opt",
+            "cloudiqReportLayout:integer:opt",
+            "countryCode:string:opt",
+            "documentNo:string:opt",
+            "erpData:->CreditMemoErpData:opt",
+            "externalIds:->ErpExternalIds:opt",
+            "id:string:opt",
+            "licensee:->LicenseeRef:opt",
+            "lines:array<CreditMemoLine>:opt",
+            "price:->CreditMemoPriceSummary:opt",
+            "product:->ProductRef:opt",
+            "revision:integer:opt",
+            "seller:->SellerRef:opt",
+            "statement:->StatementRef:opt",
+            "status:->CreditMemoStatus:opt",
+            "vendor:->AccountRef:opt"
+          ],
+          "ErpExternalIds": [
+            "agreement:string:opt",
+            "customer:string:opt",
+            "statement:string:opt"
+          ],
+          "AnalyticsInfo": [
+            "status:->AnalyticsStatus:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "CreditMemoErpData": [
+            "addresses:->ErpAddressList:opt",
+            "appliesToDocNo:string:opt",
+            "currencyCode:string:opt",
+            "documentDate:string:opt",
+            "documentNo:string:opt",
+            "externalDocumentNo2:string:opt",
+            "externalDocumentNo:string:opt",
+            "insideSalesCode:string:opt",
+            "navisionCountryCode:string:opt",
+            "postingDate:string:opt",
+            "responsibilityCenterCode:string:opt",
+            "revision:integer:opt",
+            "rowVersion:integer:opt",
+            "salesPersonCode:string:opt",
+            "shipmentMethodCode:string:opt",
+            "vatRegistrationNo:string:opt",
+            "yourReference:string:opt"
+          ],
+          "SellerRef": [
+            "externalId:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "CreditMemoPriceSummary": [
+            "currency:string:opt",
+            "currencyFactor2:number:opt",
+            "currencyFactor:number:opt",
+            "margin:number:opt",
+            "markup:number:opt",
+            "totalGT:number:opt",
+            "totalPP:number:opt",
+            "totalSP:number:opt",
+            "totalST:number:opt"
+          ],
+          "CreditMemoAuditBag": [
+            "created:->PlatformObjectEvent:opt",
+            "issued:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "BillingErpAttributes": [
+            "documentDate:string:opt",
+            "externalDocumentNo2:string:opt",
+            "externalDocumentNo:string:opt",
+            "postingDate:string:opt",
+            "yourReference:string:opt"
+          ],
+          "StatementRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "AgreementRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AgreementStatus:opt"
+          ],
+          "ProductRef": [
+            "externalIds:->ProductExternalIdBag:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "CreditMemoLine": [
+            "cloudiqTenant:string:opt",
+            "description2:string:opt",
+            "description:string:opt",
+            "documentNo:string:opt",
+            "erpData:->CreditMemoLineErpData:opt",
+            "id:string:opt",
+            "itemNo:string:opt",
+            "lineNo:integer:opt",
+            "period:->DatePeriod:opt",
+            "price:->CreditMemoLinePrice:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "CreditMemoLineErpData": [
+            "contractNo:string:opt",
+            "countryOfUsage:string:opt",
+            "dataOrigin:integer:opt",
+            "externalPositionNo:string:opt",
+            "navisionCountryCode:string:opt",
+            "parentItemNo:string:opt",
+            "primary:->ErpCode:opt",
+            "responsibilityCenterCode:string:opt",
+            "rowVersion:integer:opt",
+            "secondary:->ErpCode:opt",
+            "swoPurchaseOrderNo:string:opt",
+            "type:integer:opt",
+            "unitOfMeasure:string:opt",
+            "varAgreementNo:string:opt",
+            "varPartnerNo:string:opt"
+          ],
+          "DatePeriod": [
+            "end:string:opt",
+            "start:string:opt"
+          ],
+          "LicenseeRef": [
+            "externalId:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "BuyerRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "ErpAddressList": [
+            "billTo:->ErpAddress:opt",
+            "licenseTo:->ErpAddress:opt",
+            "sellTo:->ErpAddress:opt",
+            "shipTo:->ErpAddress:opt"
+          ],
+          "ProductExternalIdBag": [
+            "defaultErpItem:string:opt",
+            "operations:string:opt"
+          ],
+          "ErpCode": [
+            "identifier:string:opt",
+            "value:string:opt",
+            "version:string:opt"
+          ],
+          "CreditMemoLinePrice": [
+            "amount:number:opt",
+            "amountIncludingVat:number:opt",
+            "discountAmount:number:opt",
+            "invoiceDiscountAmount:number:opt",
+            "lineAmount:number:opt",
+            "purchaseCurrencyCode:string:opt",
+            "purchaseCurrencyFactor:number:opt",
+            "purchasePrice:number:opt",
+            "purchasePriceLcy:number:opt",
+            "purchasePriceTotal:number:opt",
+            "purchasePriceTotalLcy:number:opt",
+            "quantity:integer:opt",
+            "salesMargin:number:opt",
+            "salesMarkup:number:opt",
+            "unitPrice:number:opt",
+            "vatBaseAmount:number:opt",
+            "vatCalculationType:integer:opt",
+            "vatPercent:number:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "ErpAddress": [
+            "addressLine1:string:opt",
+            "addressLine2:string:opt",
+            "addressLine3:string:opt",
+            "city:string:opt",
+            "code:string:opt",
+            "contactEmail:string:opt",
+            "contactName:string:opt",
+            "contactNo:string:opt",
+            "contactPhone:string:opt",
+            "country:string:opt",
+            "county:string:opt",
+            "customerNo:string:opt",
+            "email:string:opt",
+            "name2:string:opt",
+            "name:string:opt",
+            "postCode:string:opt"
+          ]
+        },
+        "enums": {
+          "AnalyticsStatus": [
+            "Failed",
+            "Pending",
+            "Ready",
+            "Running"
+          ],
+          "CreditMemoStatus": [
+            "Issued"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ],
+          "AgreementStatus": [
+            "Active",
+            "Deleted",
+            "Draft",
+            "Failed",
+            "New",
+            "Provisioning",
+            "Terminated",
+            "Updating"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Billing_Credit_Memo_Attachment.md": {
+      "namespace": "billing",
+      "object": "attachments",
+      "parent": "credit-memos",
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "4146cad4efe5189620f50a7fce5195ae9fa21980"
+      ],
+      "specVersion": "5.0.5786-g4e261210",
+      "baselineDate": "2026-07-20",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "DELETE /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "DELETE /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "DELETE /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "DELETE /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "DELETE /public/v1/billing/statements/{statementId}/attachments/{id}",
+          "GET /public/v1/billing/credit-memos/{creditMemoId}/attachments",
+          "GET /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "GET /public/v1/billing/custom-ledgers/{customLedgerId}/attachments",
+          "GET /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "GET /public/v1/billing/invoices/{invoiceId}/attachments",
+          "GET /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "GET /public/v1/billing/journals/{journalId}/attachments",
+          "GET /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "GET /public/v1/billing/ledgers/{ledgerId}/attachments",
+          "GET /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "GET /public/v1/billing/statements/{statementId}/attachments",
+          "GET /public/v1/billing/statements/{statementId}/attachments/{id}",
+          "POST /public/v1/billing/credit-memos/{creditMemoId}/attachments",
+          "POST /public/v1/billing/custom-ledgers/{customLedgerId}/attachments",
+          "POST /public/v1/billing/invoices/{invoiceId}/attachments",
+          "POST /public/v1/billing/journals/{journalId}/attachments",
+          "POST /public/v1/billing/ledgers/{ledgerId}/attachments",
+          "POST /public/v1/billing/statements/{statementId}/attachments",
+          "PUT /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "PUT /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "PUT /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "PUT /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "PUT /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "PUT /public/v1/billing/statements/{statementId}/attachments/{id}"
+        ],
+        "attributes": {
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "CreditMemoAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "creditMemo:->CreditMemoRef:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "isExternal:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "StatementAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<StatementAttachment>:opt"
+          ],
+          "JournalAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "journal:->JournalRef:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt",
+            "vendor:->AccountRef:opt"
+          ],
+          "StatementAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "statement:->StatementRef:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "LedgerAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<LedgerAttachment>:opt"
+          ],
+          "InvoiceAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<InvoiceAttachment>:opt"
+          ],
+          "JournalRef": [
+            "dueDate:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "CreditMemoRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "LedgerAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "ledger:->LedgerRef:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "InvoiceAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "invoice:->InvoiceRef:opt",
+            "isDeleted:boolean:opt",
+            "isExternal:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "JournalAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<JournalAttachment>:opt"
+          ],
+          "CreditMemoAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CreditMemoAttachment>:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "StatementRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "InvoiceRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "CustomLedgerAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CustomLedgerAttachment>:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "LedgerRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "CustomLedgerAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "customLedger:->CustomLedgerRef:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "CustomLedgerRef": [
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ]
+        },
+        "enums": {
+          "BillingAttachmentType": [
+            "Attachment",
+            "Input",
+            "Output"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Billing_Invoice.md": {
+      "namespace": "billing",
+      "object": "invoices",
+      "parent": null,
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "4146cad4efe5189620f50a7fce5195ae9fa21980"
+      ],
+      "specVersion": "5.0.5786-g4e261210",
+      "baselineDate": "2026-07-20",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "GET /public/v1/billing/invoices",
+          "GET /public/v1/billing/invoices/{id}",
+          "POST /public/v1/billing/invoices"
+        ],
+        "attributes": {
+          "InvoiceListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<Invoice>:opt"
+          ],
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "Invoice": [
+            "$meta:->PlatformMetadata:opt",
+            "agreement:->AgreementRef:opt",
+            "analytics:->AnalyticsInfo:opt",
+            "attributes:->InvoiceErpAttributes:opt",
+            "audit:->InvoiceAuditBag:opt",
+            "billingType:->BillingType:opt",
+            "buyer:->BuyerRef:opt",
+            "client:->AccountRef:opt",
+            "clientId:string:opt",
+            "cloudiqInvoiceReference:string:opt",
+            "cloudiqReportLayout:integer:opt",
+            "countryCode:string:opt",
+            "documentNo:string:opt",
+            "erpData:->InvoiceErpData:opt",
+            "externalIds:->ErpExternalIds:opt",
+            "id:string:opt",
+            "licensee:->LicenseeRef:opt",
+            "lines:array<InvoiceLine>:opt",
+            "price:->InvoicePrice:opt",
+            "product:->ProductRef:opt",
+            "revision:integer:opt",
+            "seller:->SellerRef:opt",
+            "statement:->StatementRef:opt",
+            "status:->InvoiceStatus:opt",
+            "vendor:->AccountRef:opt"
+          ],
+          "InvoicePrice": [
+            "currency:string:opt",
+            "currencyFactor2:number:opt",
+            "currencyFactor:number:opt",
+            "margin:number:opt",
+            "markup:number:opt",
+            "totalGT:number:opt",
+            "totalPP:number:opt",
+            "totalSP:number:opt",
+            "totalST:number:opt"
+          ],
+          "InvoiceErpData": [
+            "addresses:->ErpAddressList:opt",
+            "balanceDue:number:opt",
+            "countryCode:string:opt",
+            "documentDate:string:opt",
+            "documentNo:string:opt",
+            "dueDate:string:opt",
+            "erpId:string:opt",
+            "externalDocumentNo2:string:opt",
+            "externalDocumentNo:string:opt",
+            "invoiceTotal:number:opt",
+            "payment:->ErpPayment:opt",
+            "postingDate:string:opt",
+            "referenceNumber:->ErpReferenceNumber:opt",
+            "revision:integer:opt",
+            "rowVersion:integer:opt",
+            "yourReference:string:opt"
+          ],
+          "AnalyticsInfo": [
+            "status:->AnalyticsStatus:opt"
+          ],
+          "InvoiceAuditBag": [
+            "created:->PlatformObjectEvent:opt",
+            "issued:->PlatformObjectEvent:opt",
+            "overdue:->PlatformObjectEvent:opt",
+            "paid:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "StatementRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "LicenseeRef": [
+            "externalId:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "AgreementRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AgreementStatus:opt"
+          ],
+          "ErpAddressList": [
+            "billTo:->ErpAddress:opt",
+            "licenseTo:->ErpAddress:opt",
+            "sellTo:->ErpAddress:opt",
+            "shipTo:->ErpAddress:opt"
+          ],
+          "ProductRef": [
+            "externalIds:->ProductExternalIdBag:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:string:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "ErpPayment": [
+            "methodCode:string:opt",
+            "termsCode:string:opt"
+          ],
+          "ErpExternalIds": [
+            "agreement:string:opt",
+            "customer:string:opt",
+            "statement:string:opt"
+          ],
+          "InvoiceErpAttributes": [
+            "documentDate:string:opt",
+            "dueDate:string:opt",
+            "externalDocumentNo2:string:opt",
+            "externalDocumentNo:string:opt",
+            "orderNo:string:opt",
+            "postingDate:string:opt",
+            "quoteNo:string:opt",
+            "yourReference:string:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "BuyerRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "InvoiceLine": [
+            "cloudiqTenant:string:opt",
+            "description2:string:opt",
+            "description:string:opt",
+            "documentNo:string:opt",
+            "erpData:->InvoiceLineErpData:opt",
+            "id:string:opt",
+            "itemNo:string:opt",
+            "lineNo:integer:opt",
+            "period:->DatePeriod:opt",
+            "price:->InvoiceLinePrice:opt"
+          ],
+          "ErpReferenceNumber": [
+            "eInvoiceNo:string:opt",
+            "orderNo:string:opt",
+            "ppqNo:string:opt",
+            "quoteNo:string:opt"
+          ],
+          "SellerRef": [
+            "externalId:string:opt",
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "ErpAddress": [
+            "addressLine1:string:opt",
+            "addressLine2:string:opt",
+            "addressLine3:string:opt",
+            "city:string:opt",
+            "code:string:opt",
+            "contactEmail:string:opt",
+            "contactName:string:opt",
+            "contactNo:string:opt",
+            "contactPhone:string:opt",
+            "country:string:opt",
+            "county:string:opt",
+            "customerNo:string:opt",
+            "email:string:opt",
+            "name2:string:opt",
+            "name:string:opt",
+            "postCode:string:opt"
+          ],
+          "ProductExternalIdBag": [
+            "defaultErpItem:string:opt",
+            "operations:string:opt"
+          ],
+          "InvoiceLinePrice": [
+            "amount:number:opt",
+            "amountIncludingVat:number:opt",
+            "discountAmount:number:opt",
+            "lineAmount:number:opt",
+            "purchaseCurrencyCode:string:opt",
+            "purchaseCurrencyFactor:number:opt",
+            "purchasePrice:number:opt",
+            "purchasePriceLcy:number:opt",
+            "purchasePriceTotal:number:opt",
+            "purchasePriceTotalLcy:number:opt",
+            "quantity:integer:opt",
+            "salesMargin:number:opt",
+            "salesMarkup:number:opt",
+            "unitPrice:number:opt",
+            "vatBaseAmount:number:opt",
+            "vatCalculationType:integer:opt",
+            "vatPercent:number:opt"
+          ],
+          "DatePeriod": [
+            "end:string:opt",
+            "start:string:opt"
+          ],
+          "InvoiceLineErpData": [
+            "contractNo:string:opt",
+            "countryOfUsage:string:opt",
+            "dataOrigin:integer:opt",
+            "externalDocumentNo2:string:opt",
+            "externalDocumentNo:string:opt",
+            "externalPositionNo:string:opt",
+            "msrp:number:opt",
+            "navisionCountryCode:string:opt",
+            "parentItemNo:string:opt",
+            "primary:->ErpCode:opt",
+            "responsibilityCenterCode:string:opt",
+            "rowVersion:integer:opt",
+            "secondary:->ErpCode:opt",
+            "sellToContactNo:string:opt",
+            "swoPurchaseOrderNo:string:opt",
+            "timestamp:integer:opt",
+            "type:integer:opt",
+            "unitOfMeasure:string:opt",
+            "varAgreementNo:string:opt",
+            "varPartnerNo:string:opt",
+            "yourReference:string:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "ErpCode": [
+            "identifier:string:opt",
+            "value:string:opt",
+            "version:string:opt"
+          ]
+        },
+        "enums": {
+          "BillingType": [
+            "Automated",
+            "Consolidated",
+            "Manual"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ],
+          "InvoiceStatus": [
+            "Issued",
+            "Overdue",
+            "Paid"
+          ],
+          "AnalyticsStatus": [
+            "Failed",
+            "Pending",
+            "Ready",
+            "Running"
+          ],
+          "AgreementStatus": [
+            "Active",
+            "Deleted",
+            "Draft",
+            "Failed",
+            "New",
+            "Provisioning",
+            "Terminated",
+            "Updating"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ]
+        }
+      }
+    },
+    "CANON_OBJECT_Billing_Invoice_Attachment.md": {
+      "namespace": "billing",
+      "object": "attachments",
+      "parent": "invoices",
+      "sourceRepoCommits": [
+        "5f6e34daf8aa99e4724d65ca67bb1b7e04e1f0e3",
+        "4146cad4efe5189620f50a7fce5195ae9fa21980"
+      ],
+      "specVersion": "5.0.5786-g4e261210",
+      "baselineDate": "2026-07-20",
+      "driftMetric": "lines-changed",
+      "specFingerprint": {
+        "paths": [
+          "DELETE /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "DELETE /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "DELETE /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "DELETE /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "DELETE /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "DELETE /public/v1/billing/statements/{statementId}/attachments/{id}",
+          "GET /public/v1/billing/credit-memos/{creditMemoId}/attachments",
+          "GET /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "GET /public/v1/billing/custom-ledgers/{customLedgerId}/attachments",
+          "GET /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "GET /public/v1/billing/invoices/{invoiceId}/attachments",
+          "GET /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "GET /public/v1/billing/journals/{journalId}/attachments",
+          "GET /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "GET /public/v1/billing/ledgers/{ledgerId}/attachments",
+          "GET /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "GET /public/v1/billing/statements/{statementId}/attachments",
+          "GET /public/v1/billing/statements/{statementId}/attachments/{id}",
+          "POST /public/v1/billing/credit-memos/{creditMemoId}/attachments",
+          "POST /public/v1/billing/custom-ledgers/{customLedgerId}/attachments",
+          "POST /public/v1/billing/invoices/{invoiceId}/attachments",
+          "POST /public/v1/billing/journals/{journalId}/attachments",
+          "POST /public/v1/billing/ledgers/{ledgerId}/attachments",
+          "POST /public/v1/billing/statements/{statementId}/attachments",
+          "PUT /public/v1/billing/credit-memos/{creditMemoId}/attachments/{id}",
+          "PUT /public/v1/billing/custom-ledgers/{customLedgerId}/attachments/{id}",
+          "PUT /public/v1/billing/invoices/{invoiceId}/attachments/{id}",
+          "PUT /public/v1/billing/journals/{journalId}/attachments/{id}",
+          "PUT /public/v1/billing/ledgers/{ledgerId}/attachments/{id}",
+          "PUT /public/v1/billing/statements/{statementId}/attachments/{id}"
+        ],
+        "attributes": {
+          "ProblemDetails": [
+            "detail:string:opt",
+            "instance:string:opt",
+            "status:integer:opt",
+            "title:string:opt",
+            "type:string:opt"
+          ],
+          "CreditMemoAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "creditMemo:->CreditMemoRef:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "isExternal:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "StatementAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<StatementAttachment>:opt"
+          ],
+          "JournalAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "journal:->JournalRef:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt",
+            "vendor:->AccountRef:opt"
+          ],
+          "StatementAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "statement:->StatementRef:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "LedgerAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<LedgerAttachment>:opt"
+          ],
+          "InvoiceAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<InvoiceAttachment>:opt"
+          ],
+          "JournalRef": [
+            "dueDate:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "CreditMemoRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "ListMetadata": [
+            "omitted:array<string>:opt",
+            "pagination:->PaginationMetadata:opt"
+          ],
+          "LedgerAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "ledger:->LedgerRef:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "InvoiceAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "invoice:->InvoiceRef:opt",
+            "isDeleted:boolean:opt",
+            "isExternal:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "JournalAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<JournalAttachment>:opt"
+          ],
+          "CreditMemoAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CreditMemoAttachment>:opt"
+          ],
+          "PlatformObjectAudit": [
+            "created:->PlatformObjectEvent:opt",
+            "updated:->PlatformObjectEvent:opt"
+          ],
+          "AccountRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "status:->AccountStatus:opt",
+            "type:->AccountType:opt"
+          ],
+          "PaginationMetadata": [
+            "limit:integer:opt",
+            "offset:integer:opt",
+            "total:integer:opt"
+          ],
+          "StatementRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "InvoiceRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "CustomLedgerAttachmentListResponse": [
+            "$meta:->ListMetadata:opt",
+            "data:array<CustomLedgerAttachment>:opt"
+          ],
+          "PlatformMetadata": [
+            "omitted:array<string>:opt"
+          ],
+          "LedgerRef": [
+            "id:string:opt",
+            "revision:integer:opt"
+          ],
+          "CustomLedgerAttachment": [
+            "$meta:->PlatformMetadata:opt",
+            "audit:->PlatformObjectAudit:opt",
+            "contentType:string:opt",
+            "customLedger:->CustomLedgerRef:opt",
+            "description:string:opt",
+            "filename:string:opt",
+            "id:string:opt",
+            "isDeleted:boolean:opt",
+            "name:string:opt",
+            "revision:integer:opt",
+            "size:integer:opt",
+            "type:->BillingAttachmentType:opt"
+          ],
+          "PlatformObjectEvent": [
+            "at:string:opt",
+            "by:->PlatformIdentityRef:opt"
+          ],
+          "CustomLedgerRef": [
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ],
+          "PlatformIdentityRef": [
+            "icon:string:opt",
+            "id:string:opt",
+            "name:string:opt",
+            "revision:integer:opt"
+          ]
+        },
+        "enums": {
+          "BillingAttachmentType": [
+            "Attachment",
+            "Input",
+            "Output"
+          ],
+          "AccountStatus": [
+            "Active",
+            "Disabled",
+            "Enabled"
+          ],
+          "AccountType": [
+            "Client",
+            "Operations",
+            "Vendor"
+          ]
+        }
+      }
+    },
     "CANON_OBJECT_Billing_Journal.md": {
       "namespace": "billing",
       "object": "journals",
