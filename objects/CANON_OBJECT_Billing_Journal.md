@@ -1,8 +1,8 @@
 # Object Canon: Journal
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-07-19
+> **Last Updated:** 2026-07-20
 > **Status:** Draft
 
 ---
@@ -37,7 +37,7 @@ Billing journal. The upload template Vendors normalize their raw data into is re
 | --- | --- | --- | --- | --- | --- |
 | Vendor     | Yes | Yes | Yes | Yes | Creates the Journal, uploads charge data, and submits it to SoftwareOne. Cannot see sell-side pricing (markup, margin, total sale price), the processing summary, or the backup summary. Delete is state-guarded — see BR-011. |
 | Operations | No | Yes | Yes | No | Cannot create or delete a Journal. Reviews and adjudicates a submitted Journal — return to vendor (enquiry), accept, regenerate, recalculate, reset — and may re-upload charge data. Full field visibility. |
-| Client     | No | No | No | No | A Journal is never readable by the Client Actor (BR-015); client-facing billing figures surface downstream via the Statement (not yet canonised), not the Journal. |
+| Client     | No | No | No | No | A Journal is never readable by the Client Actor (BR-015); client-facing billing figures surface downstream via the Statement, not the Journal. |
 
 ---
 
@@ -150,10 +150,10 @@ Billing journal. The upload template Vendors normalize their raw data into is re
 | BR-009 | Reconciling a charge (match, ignore, or reset) requires the Journal to be in Review or Reconciling and moves it to Reconciling; recalculate then re-processes the reconciled charges and returns the Journal to Review. | Review, Reconciling | Operations | Reconciliation actions are performed on the child Charge, not the Journal. |
 | BR-010 | A charge may be matched only to an [[Agreement]], [[Subscription]], or [[Asset]] whose Authorization matches the Journal's Authorization; a [[Subscription]] with split billing enabled cannot be used as a match target. | Reconciling | Operations | Detailed matching semantics belong to the Charge canon. |
 | BR-011 | A Journal may be deleted only in Draft, Validated, Error, or Enquiring, and only by the Vendor Actor. Deletion also permanently removes the Journal's child Charge entries and Attachment files — no longer retrievable via the API. This is a documented exception to Preamble Invariant 6. | Draft, Validated, Error, Enquiring | Vendor | A Journal that has entered Review or any later state cannot be deleted. |
-| BR-012 | Resetting a Journal permanently removes the Ledgers generated from it and those Ledgers' Statements, then returns the Journal to Review. | Generated, Accepted | Operations | On reset failure the Journal reverts to its pre-reset state. |
+| BR-012 | Resetting a Journal permanently removes the Ledgers generated from it and those Ledgers' [[Statement]]s, then returns the Journal to Review. | Generated, Accepted | Operations | On reset failure the Journal reverts to its pre-reset state. |
 | BR-013 | An Operations reviewer may be recorded on the Journal via the assignee field; only the Operations Actor may set it. | All | Operations | — |
 | BR-014 | Sell-side pricing (markup, margin, total sale price) and the processing and backup summaries are visible only to the Operations Actor. | All | All | The Vendor sees purchase-price totals, currency, and the upload summary. See Section 5. |
-| BR-015 | A Journal is never readable by the Client Actor in any state. | All | Client | Client-facing billing surfaces only via the Statement (not yet canonised), never the Journal. |
+| BR-015 | A Journal is never readable by the Client Actor in any state. | All | Client | Client-facing billing surfaces only via the Statement, never the Journal. |
 
 ---
 
@@ -217,7 +217,7 @@ Billing journal. The upload template Vendors normalize their raw data into is re
 | --- | --- | --- | --- | --- | --- |
 | Accept | Billing: Ledger | One [[Ledger]] is created per [[Seller]] with charges in the Journal. | Yes (Operations token context) | Journal in Review. | — |
 | Ledger lifecycle progression | Billing: Journal | The Journal rolls up to Generated → Accepted → Queued → Completed as its [[Ledger]]s progress. | Yes (System) | Driven by the Ledger states. | See BR-008. |
-| Reset | Billing: Ledger, Billing: Statement | The Journal's Ledgers and their Statements are permanently removed. | Yes (Operations token context) | Journal in Generated or Accepted. | See BR-012. |
+| Reset | Billing: Ledger, Billing: Statement | The Journal's [[Ledger]]s and their [[Statement]]s are permanently removed. | Yes (Operations token context) | Journal in Generated or Accepted. | See BR-012. |
 | Delete | Billing: Charge, Billing: Journal Attachment | The Journal's Charge entries and Attachment files are permanently removed. | Yes (Vendor token context) | Journal in Draft, Validated, Error, or Enquiring. | See BR-011. |
 
 ---
@@ -227,7 +227,7 @@ Billing journal. The upload template Vendors normalize their raw data into is re
 **Reversible transitions:**
 - Review → Enquiring → Review is reversible: Operations returns a Journal to the Vendor (enquiry), and the Vendor re-submits (submit). No limit on cycles.
 - Validated / Error / Enquiring → Validating is reversible via re-upload, replacing the Journal's charges.
-- Generated / Accepted → Review is reachable via reset, which permanently removes the generated [[Ledger]]s and their Statements (see BR-012).
+- Generated / Accepted → Review is reachable via reset, which permanently removes the generated [[Ledger]]s and their [[Statement]]s (see BR-012).
 - Completed and Deleted are terminal — neither can be reversed.
 
 **Deletion:**
@@ -243,7 +243,7 @@ The Journal records a created and updated event plus a per-status event history 
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
 | Upload contains charges that fail processing | The Journal moves to Error with an error code and message; the Vendor must correct and re-upload. | Vendor | Medium | The Journal is not submittable to SoftwareOne while in Error. |
-| Reset after Ledgers and Statements exist | Reset permanently removes the generated [[Ledger]]s and their Statements before returning the Journal to Review; downstream Statement data is lost and must be regenerated. | Operations, Client | High | Statement not yet canonised. |
+| Reset after Ledgers and [[Statement]]s exist | Reset permanently removes the generated [[Ledger]]s and their Statements before returning the Journal to Review; downstream Statement data is lost and must be regenerated. | Operations, Client | High | — |
 | Delete removes child records | Deleting a Journal in a deletable state permanently removes its Charges and Attachments. | Vendor | Medium | Guarded once the Journal reaches Review. |
 | Journal enters Queued directly from Generated | Queueing a Ledger sets the Journal to Queued directly, without first passing through Accepted. | Operations | Low | Intended behaviour (BR-008); a Journal may reach Queued from either Generated or Accepted. |
 | Charge matched to a valid but incorrect [[Agreement]] / [[Subscription]] / [[Asset]] | The platform enforces that the match target shares the Journal's Authorization but does not otherwise prevent an incorrect-yet-valid match. | Operations | Medium | Consistent with the platform's permissive-by-default philosophy (Preamble Section 3.1). |
@@ -263,6 +263,7 @@ The Journal records a created and updated event plus a per-status event history 
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-07-20 | Stu / canon-generate-batch | Billing: Statement now canonised — bracket-linked the `[[Statement]]` cross-references (BR-012, Section 7, Section 8, Section 9), bracketed the `[[Ledger]]` mention in the Section 7 Reset row that was missed at v0.2, and dropped the stale "not yet canonised" notes (Section 2, BR-015, Section 9). No behavioural change. |
 | 0.2 | 2026-07-19 | Stu / canon-generate-batch | Billing: Ledger now canonised — bracket-linked the `[[Ledger]]` cross-references (Section 1, BR-007, Section 7, Section 8, Section 9) and dropped the stale "not yet canonised" notes (Section 1, BR-007, Section 6). BJO-005 annotated with the Custom Ledger lead surfaced during the Ledger batch. No behavioural change. |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft generated from the PROD OpenAPI schema, a live multi-Actor PROD fetch, an Actor-suppression diff, and billing source research. Full state machine derived from source (14 states; upload/submit/enquiry/accept/regenerate/recalculate/reset/delete verbs and the automatic Ledger-driven roll-up to Completed). Actor authority, sell-side field suppression, and the delete-removes-Charges-and-Attachments and reset-removes-Ledgers-and-Statements behaviours documented. Client visibility confirmed (Journals are never client-readable), owner Seller confirmed as the Authorization's Seller, re-upload confirmed to fully replace prior charges, and the Generated→Queued roll-up confirmed intended. Delete-removes-child-Charges-and-Attachments recorded as a Preamble Invariant 6 exception. One open question (BJO-005: a possible Operations manual-upload/custom-ledger path). |
 </content>

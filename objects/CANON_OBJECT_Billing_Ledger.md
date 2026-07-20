@@ -1,8 +1,8 @@
 # Object Canon: Ledger
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-19
+> **Last Updated:** 2026-07-20
 > **Status:** Draft
 
 ---
@@ -24,7 +24,7 @@
 **ID Prefix:** BLE
 
 **Description:**
-A Ledger is the per-Seller rating output of the platform's billing pipeline, sitting between the [[Journal]] and the Statement (the pipeline is Journal → Ledger → Statement; Statement is not yet canonised). When the Operations Actor accepts a [[Journal]], the platform generates one Ledger for each [[Seller]] whose [[Charge]] entries appear in that Journal, and rates those charges into the Ledger scoped to that one Seller. A Ledger inherits its [[Authorization]], [[Product]], owning [[Seller]], and currency from its parent Journal; it carries the rated pricing roll-ups and a processing summary for its slice of the Journal's charges. Operations reviews each rated Ledger and accepts it, which produces the client-facing Statements; the Ledger then queues for ERP integration and completes automatically once all of its Statements complete. A Ledger is not created or deleted directly through the API — it exists only as a consequence of its Journal's lifecycle.
+A Ledger is the per-Seller rating output of the platform's billing pipeline, sitting between the [[Journal]] and the [[Statement]] (the pipeline is Journal → Ledger → Statement). When the Operations Actor accepts a [[Journal]], the platform generates one Ledger for each [[Seller]] whose [[Charge]] entries appear in that Journal, and rates those charges into the Ledger scoped to that one Seller. A Ledger inherits its [[Authorization]], [[Product]], owning [[Seller]], and currency from its parent Journal; it carries the rated pricing roll-ups and a processing summary for its slice of the Journal's charges. Operations reviews each rated Ledger and accepts it, which produces the client-facing Statements; the Ledger then queues for ERP integration and completes automatically once all of its Statements complete. A Ledger is not created or deleted directly through the API — it exists only as a consequence of its Journal's lifecycle.
 
 **Also Known As:**
 Billing ledger; seller ledger. Distinct from the Custom Ledger (the Operations manual-upload billing path), which is a separate object with its own lifecycle and is not yet canonised.
@@ -115,7 +115,7 @@ Billing ledger; seller ledger. Distinct from the Custom Ledger (the Operations m
 | BR-002 | A Ledger inherits its parent [[Journal]], [[Authorization]], [[Product]], owning [[Seller]], scoped [[Seller]], and currency; none of these can be changed on the Ledger. | All | All | The Ledger scopes the Journal's data to the one Seller it is generated for. |
 | BR-003 | Reading a Ledger and every Ledger action (accept, queue, recalculate, update) are restricted to the Operations Actor; the Vendor and Client Actors cannot read or act on a Ledger. | All | All | A Vendor or Client request to the Ledger endpoint is refused. See BR-010 for the field-level pricing visibility the schema defines but that this restriction currently makes unreachable. |
 | BR-004 | The only Ledger field a PUT may change is the assignee. The pricing, processing, backup, status, and audit fields are not writable through update. | All | Operations | Status changes only through the Section 3.2 transitions, never by a direct field write. |
-| BR-005 | The `accept` action is permitted only when the Ledger is in Review; it moves the Ledger to Generating and creates its Statements, one per Agreement. | Review | Operations | Statement is not yet canonised. |
+| BR-005 | The `accept` action is permitted only when the Ledger is in Review; it moves the Ledger to Generating and creates its [[Statement]]s, one per Agreement. | Review | Operations | — |
 | BR-006 | The `queue` action is permitted only when the Ledger is in Generated; it moves the Ledger to Queued, pushes its Statements to the ERP, and sets the parent [[Journal]] to its Queued state. | Generated | Operations | ERP integration is the point at which billing data leaves the platform for the finance system. |
 | BR-007 | The `recalculate` action is permitted only when the Ledger is in Review or Error; it re-runs the rating function (Rating), returning the Ledger to Review on success or Error on failure. | Review, Error | Operations | Recalculation re-derives pricing, margins, and totals for the Ledger's charges. |
 | BR-008 | A Ledger rolls up automatically after acceptance: Generating → Generated when all its Statements are created, and Queued → Completed when all its Statements reach a final status. Completing every Ledger of a [[Journal]] completes that Journal. | Generating, Queued | System | Driven by the Statement lifecycle, not by a Ledger endpoint. |
@@ -155,7 +155,7 @@ Billing ledger; seller ledger. Distinct from the Custom Ledger (the Operations m
 | Catalog: Authorization | Association | Many Ledgers to one Authorization | The Authorization the billing is under, inherited from the Journal. | Reference only. |
 | Catalog: Product | Association | Many Ledgers to one Product | The Product being billed, inherited from the Journal. | Reference only. |
 | Billing: Charge | Association | Many Charges to one Ledger | The rated charge entries assigned to this Ledger — the Journal's charges for this Seller. | Charges belong to the Journal; they are removed with the Journal, not independently by the Ledger. |
-| Billing: Statement | Child | One Ledger to many Statements (one per Agreement) | Created when the Ledger is accepted; the Ledger completes when all its Statements complete. | Statements are removed when the parent Journal is reset (see BR-009). Not yet canonised. |
+| Billing: Statement | Child | One Ledger to many Statements (one per Agreement) | Created when the Ledger is accepted; the Ledger completes when all its Statements complete. | Statements are removed when the parent Journal is reset (see BR-009). |
 
 ---
 
@@ -167,14 +167,14 @@ Billing ledger; seller ledger. Distinct from the Custom Ledger (the Operations m
 | --- | --- | --- | --- |
 | Ledger rated | Creation from a [[Journal]] accept, or a `recalculate` action | Operations, System | The rating function computes the Ledger's price and processing roll-ups from its [[Charge]] entries; the Ledger lands in Review (no errors) or Error. |
 | Status changed | Any transition in Section 3.2 | Operations, System | A status-changed event is published to the platform notification bus (see Preamble Section 8) and the corresponding per-status audit event is recorded. |
-| Ledger accepted | `accept` | Operations | The Ledger's Statements are created (one per Agreement) and the Ledger moves to Generating. |
+| Ledger accepted | `accept` | Operations | The Ledger's [[Statement]]s are created (one per Agreement) and the Ledger moves to Generating. |
 | Ledger queued | `queue` | Operations | The Ledger's Statements are pushed to the ERP for integration; the parent [[Journal]] is set to its Queued state. |
 
 ### 7.2 Cross-Object State Effects
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Accept | Billing: Statement | One Statement is created per Agreement in the Ledger. | Yes (Operations token context) | Ledger in Review. | Statement not yet canonised. |
+| Accept | Billing: Statement | One Statement is created per Agreement in the Ledger. | Yes (Operations token context) | Ledger in Review. | — |
 | Statement creation completed | Billing: Journal | The parent Journal rolls up to its Accepted state once all its Ledgers are Generated. | Yes (System) | All of the Journal's Ledgers reached Generated. | See BR-008. |
 | Queue | Billing: Journal | The parent Journal is set to its Queued state, and the Ledger's Statements are pushed to the ERP. | Yes (Operations token context) | Ledger in Generated. | — |
 | Ledger completed | Billing: Journal | The parent Journal completes once all of its Ledgers are Completed. | Yes (System) | Every Ledger of the Journal is Completed. | See BR-008. |
@@ -190,7 +190,7 @@ Billing ledger; seller ledger. Distinct from the Custom Ledger (the Operations m
 - Completed is terminal and cannot be reversed.
 
 **Deletion:**
-A Ledger has no API delete endpoint and cannot be deleted directly by any Actor. A Ledger is removed only as part of resetting its parent [[Journal]] (permitted while the Journal is in its Generated or Accepted state), which permanently removes that Journal's Ledgers and their Statements — no longer retrievable via the API. This removal is the Journal reset operation, not a cascade from deleting the Ledger (the platform never cascades deletions — Preamble Invariant 6).
+A Ledger has no API delete endpoint and cannot be deleted directly by any Actor. A Ledger is removed only as part of resetting its parent [[Journal]] (permitted while the Journal is in its Generated or Accepted state), which permanently removes that Journal's Ledgers and their [[Statement]]s — no longer retrievable via the API. This removal is the Journal reset operation, not a cascade from deleting the Ledger (the platform never cascades deletions — Preamble Invariant 6).
 
 **Audit & history requirements:**
 The Ledger records a created and updated event plus a per-status event history (the timestamp and Actor for the most recent entry into Rating, Error, Review, Generating, Generated, Queued, and Completed). Every transition also publishes a status-changed event to the platform notification bus. The `backup` field records the status and date of the Ledger's data backup taken during Statement generation. Re-running rating replaces the Ledger's pricing and processing roll-ups; prior roll-up values are not retained beyond the audit event trail.
@@ -202,7 +202,7 @@ The Ledger records a created and updated event plus a per-status event history (
 | Scenario | Expected System Behavior | Actor Impacted | Risk Level | Notes |
 | --- | --- | --- | --- | --- |
 | Rating produces one or more charge errors | The Ledger lands in (or returns to) Error with an error code and message; Operations must resolve the underlying charges and recalculate. | Operations | Medium | A Ledger in Error cannot be accepted until recalculated to Review. |
-| Statement creation fails after accept | The Ledger returns from Generating to Review with an error recorded; Operations can re-accept once the cause is resolved. | Operations | Medium | The parent [[Journal]] does not advance to Accepted while any Ledger fails to generate its Statements. |
+| [[Statement]] creation fails after accept | The Ledger returns from Generating to Review with an error recorded; Operations can re-accept once the cause is resolved. | Operations | Medium | The parent [[Journal]] does not advance to Accepted while any Ledger fails to generate its Statements. |
 | Recalculate fails critically | The Ledger is left in Error with a recalculation error recorded. | Operations | Medium | Operations must re-attempt recalculate. |
 | A Ledger stays in Queued because its Statements never reach a final status | The Ledger cannot complete while any Statement is outstanding; the platform periodically re-evaluates queued Ledgers and retries completion once their Statements settle. | Operations, Client | Medium | ERP integration delays surface here — downstream Statement issuance is what drives completion. |
 | All of a [[Journal]]'s Ledgers complete but the Journal stays Queued | The platform periodically re-evaluates such Journals and re-drives the completion roll-up so the Journal reaches Completed. | Operations | Low | A convergence safeguard for concurrent Ledger completions; no Actor action required. |
@@ -220,4 +220,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-07-20 | Stu / canon-generate-batch | Billing: Statement now canonised — bracket-linked the `[[Statement]]` cross-references (Section 1, BR-005, Section 7, Section 8, Section 9) and dropped the stale "not yet canonised" notes (Section 1, BR-005, Section 6, Section 7). No behavioural change. |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft generated from the PROD OpenAPI schema, a live multi-Actor PROD fetch, and Billing source research. Full state machine derived from source (7 states — Review, Error, Rating, Generating, Generated, Queued, Completed; accept/queue/recalculate verbs and the automatic Statement-driven roll-up to Completed). Confirmed the Ledger is generated one-per-Seller from an accepted Journal and is never created or deleted directly via the API (removed only by a Journal reset). Confirmed the Ledger endpoint is Operations-only in PROD (Vendor and Client both refused with 403), documented the confidential markup/margin fields, and recorded the assignee-only update policy. Confirmed intended: Ledger read is Operations-only (Vendor/Client 403 by design), a Ledger lands directly in Review or Error at creation (no Rating state until recalculate), and accept moves the Ledger to Generating (there is no Accepted status). Modelled as a top-level Billing object with a strong dependency on its generating Journal. 0 open questions. |

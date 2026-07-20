@@ -79,6 +79,23 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 ---
 
+## CANON_OBJECT_Billing_Statement.md
+
+| # | Question |
+|---|----------|
+| SOM-003 | Is there any mechanism — direct or cascading — to permanently remove a Manual (Custom Ledger-sourced) or Consolidated Statement? No delete endpoint exists on the Statement itself, and no equivalent "reset" cascade was confirmed for a Custom Ledger or a Consolidated parent within the scope of this research. |
+
+---
+
+## CANON_OBJECT_Billing_Statement_Attachment.md
+
+| # | Question |
+|---|----------|
+| STA-001 | A Statement Attachment's events carry no owning-account visibility grant in source (no event producer overrides permissions), so — unlike the parent Statement, whose events are granted to the Client Account — its attachment events appear Operations/internal-only. Confirm the effective visibility, since the default event-permission behaviour resolves in a compiled framework base class not visible in source. |
+| STA-002 | Deleting a Statement Attachment is intended to be Operations-only (create and update are), but the platform does not enforce an Operations-only restriction on delete, so a Client request can delete one. The gap is systemic across the billing-attachment family — Invoice and Credit Memo attachments share it. Confirm the intended restriction and whether the missing enforcement is a defect. |
+
+---
+
 ## CANON_OBJECT_Audit_EventType.md
 
 | # | Question |
