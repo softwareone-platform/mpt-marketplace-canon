@@ -4,16 +4,15 @@ convert_to_docx.py
 Converts all canon Markdown files to .docx using pandoc.
 
 Usage:
-    python convert_to_docx.py <output_dir>
+    python scripts/convert_to_docx.py <output_dir>
 
 Examples:
-    Windows: python convert_to_docx.py C:/Users/yourname/Desktop/docx
-    macOS:   python convert_to_docx.py ~/Desktop/docx
-    Linux:   python convert_to_docx.py ~/Documents/docx
+    Windows: python scripts/convert_to_docx.py C:/Users/yourname/Desktop/docx
+    macOS:   python scripts/convert_to_docx.py ~/Desktop/docx
+    Linux:   python scripts/convert_to_docx.py ~/Documents/docx
 
 Requirements:
     - pandoc installed and on PATH (https://pandoc.org/installing.html)
-    - Run from the root of the mpt-marketplace-canon repo
 """
 
 import subprocess
@@ -21,7 +20,7 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
-REPO_ROOT = Path(__file__).parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 SOURCE_DIRS = [
     REPO_ROOT / "preamble",
@@ -31,10 +30,10 @@ SOURCE_DIRS = [
 
 # --- Arguments ---
 if len(sys.argv) != 2:
-    print("Usage: python convert_to_docx.py <output_dir>")
-    print("  Windows: python convert_to_docx.py C:/Users/yourname/Desktop/docx")
-    print("  macOS:   python convert_to_docx.py ~/Desktop/docx")
-    print("  Linux:   python convert_to_docx.py ~/Documents/docx")
+    print("Usage: python scripts/convert_to_docx.py <output_dir>")
+    print("  Windows: python scripts/convert_to_docx.py C:/Users/yourname/Desktop/docx")
+    print("  macOS:   python scripts/convert_to_docx.py ~/Desktop/docx")
+    print("  Linux:   python scripts/convert_to_docx.py ~/Documents/docx")
     sys.exit(1)
 
 OUTPUT_DIR = Path(sys.argv[1]).expanduser()
