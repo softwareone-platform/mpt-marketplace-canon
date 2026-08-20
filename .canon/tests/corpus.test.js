@@ -10,7 +10,10 @@ import assert from 'node:assert/strict';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parseRepo } from '../src/parse.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { parseRepo, sliceSections } from '../src/parse.js';
 import { toGraph } from '../src/graph.js';
 import { createKb } from '../src/kb.js';
 import { validate } from '../src/validate.js';
@@ -83,4 +86,56 @@ test('every action-binding step targets a transition', () => {
 
 test('overview row count matches entity count', () => {
   assert.equal(kb.overview().length, kb.list('entity').length);
+});
+
+// ── captured text is complete ──────────────────────────────────────
+//
+// Content-independent: whatever the corpus says, every `- [ ]` line a
+// file has in Section 10 must reach the parsed value. This is what
+// silently truncated to one line, taking canon's own record of its
+// known unknowns with it.
+
+const sectionOf = (md, heading, next) => {
+  const from = md.indexOf(heading);
+  if (from === -1) return null;
+  const to = md.indexOf(next, from);
+  return md.slice(from, to === -1 ? undefined : to);
+};
+
+const countChecklist = (text) =>
+  (text || '').split('\n').filter(l => l.trim().startsWith('- [ ]')).length;
+
+for (const f of parsed.files) {
+  const raw = readFileSync(join(repoRoot, 'objects', f.relPath), 'utf8');
+  const section = sectionOf(raw, '## 10. Open Questions', '## 11.');
+  if (!section) continue;
+  const inFile = countChecklist(section);
+  if (inFile === 0) continue;
+
+  test(`open questions survive parsing — ${f.relPath}`, () => {
+    assert.equal(countChecklist(f.data.open_questions?.open_questions), inFile);
+  });
+}
+
+// The rule between two sections belongs to neither of them. Asserted
+// over the real corpus at the slicing layer, where the guarantee is —
+// a handful of descriptions legitimately contain a `---` mid-body, so
+// the invariant is about how a body ENDS, not what it contains.
+test('no section body ends with a separator', () => {
+  const offenders = [];
+  for (const f of parsed.files) {
+    const raw = readFileSync(join(repoRoot, 'objects', f.relPath), 'utf8');
+    const { head, sections } = sliceSections(raw);
+    const endsWithRule = (body) => {
+      const lines = body.split('\n');
+      let end = lines.length;
+      while (end > 0 && lines[end - 1].trim() === '') end--;
+      return end > 0 && lines[end - 1].trim() === '---';
+    };
+    if (endsWithRule(head)) offenders.push(`${f.relPath}:<head>`);
+    for (const sec of sections) {
+      if (endsWithRule(sec.body)) offenders.push(`${f.relPath}:${sec.heading}`);
+    }
+  }
+  assert.deepEqual(offenders, []);
 });

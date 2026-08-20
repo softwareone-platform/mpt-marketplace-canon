@@ -14,6 +14,8 @@ Templates assume the source MD follows the format below. Originals that don't co
 - Section 7 is split into `### 7.1 Internal Events` and `### 7.2 Cross-Object State Effects`.
 - Section 3 is split into `### 3.1 States`, `### 3.2 Transitions`, `### 3.3 State Diagram`. The diagram in 3.3 is not parsed (it is derived from 3.2).
 - Empty sections use the literal sentinel `_None._` on its own line — never absence.
+- The `---` rule between two sections belongs to neither. The slicer removes the whole trailing run of rules and blank lines from every section body (and from the file header), keeping one newline — a table row is anchored by the line break after it. Sections may still contain a `---` mid-body; only the trailing one is formatting.
+- **A template file's own trailing newline is not part of the format.** It is dropped at compile time, so a capture that ends a template runs to the end of its section instead of stopping at the first line break. Write templates with or without it; both compile identically. The whitespace *inside* an `#each` body is a different matter — it is what separates one row from the next, and is never dropped.
 
 ### Tables
 
