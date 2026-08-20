@@ -192,8 +192,24 @@ const uncommentTags = (template) => template
   .replace(directiveLine('#each\\s+'), '$1$2')
   .replace(directiveLine('#annotate\\s+'), '$1$2');
 
+// A template file ends with a newline, like every other text file.
+// That newline is the file ending, not part of the format — but as a
+// trailing literal it does two damaging things: it becomes the
+// terminator of a capture that precedes it, cutting a multi-line value
+// at its first line break, and it has to be matched, which fails when
+// the section body ends exactly at its content. Drop it once, here.
+// Only at the top level and only at the very end: a whitespace literal
+// inside an `#each` body is what separates one row from the next.
+const dropTrailingFileNewline = (tokens) => {
+  const last = tokens[tokens.length - 1];
+  if (last && last.type === 'literal' && last.text.trim() === '') {
+    return tokens.slice(0, -1);
+  }
+  return tokens;
+};
+
 const compile = (templateString) => {
-  const tokens = tokenize(uncommentTags(templateString));
+  const tokens = dropTrailingFileNewline(tokenize(uncommentTags(templateString)));
   const ast = buildAst(tokens);
   validate(ast);
   validateKeys(ast);

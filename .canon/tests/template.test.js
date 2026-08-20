@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { compile, match } from '../src/template.js';
+import { sliceSections } from '../src/parse.js';
 
 // ── compile errors ─────────────────────────────────────────────────
 
@@ -163,12 +164,98 @@ for (const [label, tpl, input, pick, expected] of canonShapeCases) {
 // ── match: error path ──────────────────────────────────────────────
 
 test('failed match captures committed before the failing point survive', () => {
-  // first capture succeeds; second fails its terminator (no \n)
-  const r = match(compile('A: { a } B: { b }\n'), 'A: one B: two');
+  // first capture succeeds; second fails its terminator (no ' END')
+  const r = match(compile('A: { a } B: { b } END'), 'A: one B: two');
   assert.equal(r.captures.length, 1);
+});
+
+// ── a template's own trailing newline is the file ending ───────────
+//
+// It used to be compiled as a literal, which made it the terminator of
+// any capture that ended a template — cutting multi-line values at
+// their first line break — and something the input then had to match.
+
+test('a capture at the end of a template runs past the first line break', () => {
+  const r = match(compile('## Q\n\n{ q }\n'), '## Q\n\n- one\n- two\n- three\n');
+  assert.equal(r.ok, true);
+  assert.equal(r.data.q, '- one\n- two\n- three');
+});
+
+test('a template with no trailing newline behaves identically', () => {
+  const withNl = match(compile('## Q\n\n{ q }\n'), '## Q\n\n- one\n- two\n');
+  const without = match(compile('## Q\n\n{ q }'), '## Q\n\n- one\n- two\n');
+  assert.deepEqual(withNl.data, without.data);
+});
+
+test('a real terminator still bounds a capture', () => {
+  const r = match(compile('A:\n{ a }\n\nB:\n{ b }\n'), 'A:\none\n\nB:\ntwo\n');
+  assert.equal(r.data.a, 'one');
+  assert.equal(r.data.b, 'two');
+});
+
+// The whitespace literal INSIDE an each body is what separates one row
+// from the next, and is not dropped.
+test('a table still matches every row, including the last', () => {
+  const tpl = '| H |\n| --- |\n{ #each r in rs }\n| { r.v } |\n{ /each }\n';
+  const r = match(compile(tpl), '| H |\n| --- |\n| 1 |\n| 2 |\n| 3 |\n');
+  assert.equal(r.ok, true);
+  assert.equal(r.data.rs.length, 3);
+});
+
+test('a table whose input ends flush after its last row keeps that row', () => {
+  const tpl = '| H |\n| --- |\n{ #each r in rs }\n| { r.v } |\n{ /each }\n';
+  const r = match(compile(tpl), '| H |\n| --- |\n| 1 |\n| 2 |\n');
+  assert.equal(r.data.rs.length, 2);
 });
 
 test('failed match error message describes what was not found', () => {
   const r = match(compile('A: { a }\nB: { b }\n'), 'A: one\nC: two\n');
   assert.match(r.error, /not found/);
+});
+
+// ── the `---` between sections belongs to neither ──────────────────
+//
+// A section is sliced from its heading to the next one, which sweeps
+// up the rule that separates them. Left in the body, it ends up inside
+// whichever field the section ends with.
+
+const sectionBody = (md, heading) =>
+  sliceSections(md).sections.find(x => x.heading === heading)?.body;
+
+const IDENTITY_MD = [
+  '## 1. Identity',
+  '',
+  '**Also Known As:**',
+  'None known.',
+  '',
+  '---',
+  '',
+  '## 2. Ownership & Visibility',
+  '',
+].join('\n');
+
+test('a section body does not carry the rule that follows it', () => {
+  const body = sectionBody(IDENTITY_MD, '## 1. Identity');
+  assert.ok(!body.split('\n').some(l => l.trim() === '---'), body);
+  assert.match(body, /None known\.\n$/);
+});
+
+// three files in the corpus carry a doubled rule
+test('a doubled rule is stripped in full', () => {
+  const md = IDENTITY_MD.replace('---\n\n## 2.', '---\n\n---\n\n## 2.');
+  const body = sectionBody(md, '## 1. Identity');
+  assert.ok(!body.split('\n').some(l => l.trim() === '---'), body);
+});
+
+test('the file header is trimmed the same way', () => {
+  const md = '# Object Canon: X\n\n> **Status:** Draft\n\n---\n\n## 1. Identity\n\n';
+  const { head } = sliceSections(md);
+  assert.ok(!head.split('\n').some(l => l.trim() === '---'), head);
+});
+
+// the newline that survives is load-bearing: it anchors the last row
+test('a body keeps exactly one trailing newline', () => {
+  const md = '## 5. Key Attributes\n\n| A |\n| --- |\n| x |\n\n---\n\n## 6. X\n';
+  const body = sectionBody(md, '## 5. Key Attributes');
+  assert.match(body, /\| x \|\n$/);
 });

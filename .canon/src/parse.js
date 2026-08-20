@@ -65,6 +65,30 @@ const dispatchSection = (heading) => {
 
 const SECTION_HEADER_RE = /^(## |### )/;
 
+// A section runs from its heading to the next one, which sweeps up the
+// `---` rule that separates them. That rule is document formatting, not
+// anyone's content, and leaving it in the body is what made a capture
+// at the end of a template swallow it. Dropped here, once, so every
+// section sees a body that ends where its content ends.
+// Strips the whole trailing run, not one rule: three files in the
+// corpus carry a doubled `---`, and a parser that removed only the last
+// one would hand the other to whichever field ends the section.
+//
+// The single trailing newline is kept: a table row is anchored by the
+// line break after it, and a body that ends flush against its last row
+// loses that row.
+const dropTrailingSeparator = (body) => {
+  const lines = body.split('\n');
+  let end = lines.length;
+  const dropBlanks = () => { while (end > 0 && lines[end - 1].trim() === '') end--; };
+  dropBlanks();
+  while (end > 0 && lines[end - 1].trim() === '---') {
+    end--;
+    dropBlanks();
+  }
+  return lines.slice(0, end).join('\n') + '\n';
+};
+
 const sliceSections = (content) => {
   const lines = content.split('\n');
   const sections = [];
@@ -74,7 +98,8 @@ const sliceSections = (content) => {
 
   const flush = (endLine) => {
     if (!current) return;
-    current.body = lines.slice(current.startLine - 1, endLine).join('\n');
+    current.body = dropTrailingSeparator(
+      lines.slice(current.startLine - 1, endLine).join('\n'));
     sections.push(current);
     current = null;
   };
@@ -125,7 +150,7 @@ const sliceSections = (content) => {
   }
   flush(lines.length);
 
-  const head = lines.slice(0, headEnd).join('\n');
+  const head = dropTrailingSeparator(lines.slice(0, headEnd).join('\n'));
   return { head, sections, unknown };
 };
 
