@@ -75,6 +75,93 @@ const checkPointer = (ref, role, ptrSpec, val, byId, errors) => {
   }
 };
 
+// ── bindings ───────────────────────────────────────────────────────
+
+// The schema can say an `implements` ref points at a term. It cannot
+// say it points at a term OF THE ABSTRACTION THIS DOCUMENT REALISES,
+// and that is the whole content of the type: a binding to somewhere
+// else is not a weaker binding, it is a different claim. Three things
+// are checked, all of them about where a pointer lands rather than
+// what shape it has:
+//
+//   implements-abstraction-unresolved — the document names an
+//     abstraction canon does not have. Unlike an unresolved Parent
+//     Object, this cannot degrade to a `future:` stub: with no
+//     abstraction there is nothing for the element bindings to be
+//     checked against, so every one of them would pass vacuously.
+//   implements-outside-abstraction — the row binds a real element of
+//     some other subject.
+//   implements-type-mismatch — a rule bound to a term, or a term to a
+//     rule. Both are nodes, so the pointer check lets it through.
+//
+// Nothing here is checked about what is NOT bound. An element the
+// abstraction declares and no row names is not an error — it is the
+// answer to "what about B?", and it is reported by `coverage`, not by
+// validate.
+const ancestorsOf = (id, parentOf) => {
+  const seen = new Set();
+  let cur = parentOf.get(id);
+  while (cur && !seen.has(cur)) {
+    seen.add(cur);
+    cur = parentOf.get(cur);
+  }
+  return seen;
+};
+
+const checkImplements = (nodes, refs, byId, errors) => {
+  const parentOf = new Map();
+  for (const r of refs) {
+    if (r.type === 'parent' && r.owner && r.pointers?.parent) {
+      parentOf.set(r.owner, r.pointers.parent);
+    }
+  }
+
+  // owner id → the abstraction its document realises
+  const abstractionOf = new Map();
+  for (const r of refs) {
+    if (r.type !== 'implements') continue;
+    const owner = byId.get(r.owner);
+    if (owner?.type !== 'implementation') continue;
+    const target = r.pointers?.target;
+    if (isFuture(target) || (typeof target === 'string' && !byId.has(target))) {
+      errors.push({ kind: 'implements-abstraction-unresolved', node: r.owner, target });
+      continue;
+    }
+    abstractionOf.set(r.owner, target);
+  }
+
+  for (const r of refs) {
+    if (r.type !== 'implements') continue;
+    const owner = byId.get(r.owner);
+    if (!owner || owner.type === 'implementation') continue;
+
+    const root = [...ancestorsOf(owner.id, parentOf)]
+      .find(a => byId.get(a)?.type === 'implementation');
+    if (!root) {
+      errors.push({ kind: 'implements-outside-implementation', node: owner.id });
+      continue;
+    }
+    const abstraction = abstractionOf.get(root);
+    if (!abstraction) continue;   // already reported at document level
+
+    const target = byId.get(r.pointers?.target);
+    if (!target) continue;        // already reported by the pointer check
+    if (target.type !== owner.type) {
+      errors.push({
+        kind: 'implements-type-mismatch',
+        node: owner.id, target: target.id,
+        ownerType: owner.type, targetType: target.type,
+      });
+    }
+    if (target.id !== abstraction && !ancestorsOf(target.id, parentOf).has(abstraction)) {
+      errors.push({
+        kind: 'implements-outside-abstraction',
+        node: owner.id, target: target.id, abstraction,
+      });
+    }
+  }
+};
+
 // ── walk ───────────────────────────────────────────────────────────
 
 const validate = (graph) => {
@@ -168,6 +255,8 @@ const validate = (graph) => {
       }
     }
   }
+
+  checkImplements(nodes, refs, byId, errors);
 
   return errors;
 };

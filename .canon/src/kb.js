@@ -299,9 +299,63 @@ const pathsOf = (idx) => (sourceId, targetId, opts = {}) => {
   return found;
 };
 
+// ── coverage ───────────────────────────────────────────────────────
+
+// What an implementation actually binds, and what it leaves alone.
+//
+// The unbound list is the point. An element the abstraction declares
+// and this implementation does not name is reported as unbound and
+// nothing more: canon cannot tell "deliberately not implemented" from
+// "nobody has written it down", and inventing a distinction it does
+// not have would be worse than the gap. An implementation that means
+// the first states it — a row naming the element whose value says so
+// — and that row then shows up as bound.
+const coverageOf = (idx) => (implId) => {
+  const impl = idx.byId.get(implId);
+  if (!impl || impl.type !== 'implementation') return null;
+
+  const _descendants = descendantsOf(idx);
+  const abstractionId = (idx.fromOwner.get(implId) || [])
+    .find(r => r.type === 'implements')?.pointers?.target;
+  const abstraction = abstractionId ? idx.byId.get(abstractionId) : undefined;
+
+  const boundBy = new Map();   // abstraction element id → binding node id
+  const own = [];
+  for (const n of _descendants(implId, { node: ['term', 'rule'] })) {
+    const target = (idx.fromOwner.get(n.id) || [])
+      .find(r => r.type === 'implements')?.pointers?.target;
+    if (target) boundBy.set(target, n.id);
+    else own.push({ id: n.id, type: n.type, name: n.name });
+  }
+
+  const declared = abstraction
+    ? _descendants(abstractionId, { node: ['term', 'rule'] })
+    : [];
+  const row = (n) => ({ id: n.id, type: n.type, name: n.name });
+
+  return {
+    id: implId,
+    name: impl.name,
+    abstraction: abstractionId || null,
+    abstractionResolved: !!abstraction,
+    bound: declared.filter(n => boundBy.has(n.id))
+      .map(n => ({ ...row(n), boundBy: boundBy.get(n.id) })),
+    unbound: declared.filter(n => !boundBy.has(n.id)).map(row),
+    own,
+  };
+};
+
 // ── overview ───────────────────────────────────────────────────────
 
-const overviewOf = (idx) => () => (idx.byType.get('entity') || []).map(e => {
+// Entities, then concepts, then implementations. Neither of the latter
+// two has a namespace or a state machine by definition, so both come
+// back null / false rather than being omitted — one row shape covers
+// all three, and `type` is what tells them apart.
+const overviewOf = (idx) => () => [
+  ...(idx.byType.get('entity') || []),
+  ...(idx.byType.get('concept') || []),
+  ...(idx.byType.get('implementation') || []),
+].map(e => {
   const childCounts = {};
   for (const r of idx.toTarget.get(e.id) || []) {
     if (r.type !== 'parent') continue;
@@ -313,6 +367,7 @@ const overviewOf = (idx) => () => (idx.byType.get('entity') || []).map(e => {
 
   return {
     id: e.id,
+    type: e.type,
     name: e.name,
     namespace: e.meta?.namespace || null,
     hasStateMachine: !!e.meta?.hasStateMachine,
@@ -340,6 +395,7 @@ const createKb = (graph) => {
     impact: impactOf(idx),
     paths: pathsOf(idx),
     overview: overviewOf(idx),
+    coverage: coverageOf(idx),
   });
 };
 

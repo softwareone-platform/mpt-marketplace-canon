@@ -10,6 +10,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = join(here, '..', 'templates');
 
 const TEMPLATE_NAMES = {
+  concept_header: 'concept-header.md',
+  concept_identity: 'concept-identity.md',
+  concept_key_concepts: 'concept-key-concepts.md',
+  implementation_header: 'implementation-header.md',
+  implementation_identity: 'implementation-identity.md',
+  implementation_key_concepts: 'implementation-key-concepts.md',
+  implementation_business_rules: 'implementation-business-rules.md',
   header: 'header.md',
   identity: 'identity.md',
   ownership: 'ownership.md',
@@ -377,4 +384,179 @@ const renderEntity = (kb, entityId) => {
   return parts.join('\n\n---\n\n') + '\n';
 };
 
-export { renderEntity, renderTemplate };
+// ── concept ────────────────────────────────────────────────────────
+//
+// A concept document is a partial of an object one, so most of this is
+// the object's own builders reused. Sections 2, 3, 6 and 8 are not
+// skipped for want of data — they are absent because a concept has no
+// ownership matrix, no observable lifecycle, and nothing the platform
+// creates or deletes.
+
+const CONCEPT_INVARIANTS_BLOCK =
+  '## Platform Invariants\n\n' +
+  '**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. ' +
+  'Invariants 1–3 — Actor attribution, Actor-contextual automation, and ' +
+  'Actor-attributable audit — apply to this concept without exception. ' +
+  'The remaining invariants govern objects; where one bears on this ' +
+  'concept it does so through an object, in that object\'s canon.';
+
+const parentConceptDisplay = (kb, concept) => {
+  const parentId = kb.from(concept.id, 'parent')[0]?.pointers?.parent;
+  const qualifier = concept.meta?.parentConceptNote;
+  if (!parentId || parentId === 'marketplace') {
+    return qualifier ? `None — ${qualifier}` : 'None.';
+  }
+  const base = kb.get(parentId)?.name || parentId;
+  return qualifier ? `${base} (${qualifier})` : base;
+};
+
+const buildConceptHeaderData = (concept) => ({
+  concept_name: concept.name,
+  version: concept.meta?.version || '0.1',
+  owner: concept.meta?.owner || 'Unassigned',
+  last_updated: concept.meta?.lastUpdated || 'unknown',
+  status: concept.meta?.status || 'Draft',
+});
+
+const buildConceptIdentityData = (kb, concept) => ({
+  concept_name: concept.name,
+  parent_concept: parentConceptDisplay(kb, concept),
+  description: concept.description || '',
+  aliases: (concept.aliases && concept.aliases.length > 0)
+    ? concept.aliases.join(', ')
+    : 'None known.',
+});
+
+const buildConceptKeyConceptsData = (kb, conceptId) => ({
+  concepts: kb.descendants(conceptId, { node: ['term'] })
+    .filter(n => n.meta?.kind === 'key-concept')
+    .map(n => ({
+      name: n.name,
+      description: orDash(n.description),
+      notes: orDash(n.meta?.notes),
+    })),
+});
+
+const renderConcept = (kb, conceptId) => {
+  const concept = kb.get(conceptId);
+  if (!concept || concept.type !== 'concept') return null;
+
+  const parts = [];
+  parts.push(renderTemplate(TPL.concept_header, buildConceptHeaderData(concept)).trim());
+  parts.push(CONCEPT_INVARIANTS_BLOCK);
+  parts.push(renderTemplate(TPL.concept_identity, buildConceptIdentityData(kb, concept)).trim());
+  parts.push(renderTemplate(TPL.business_rules, buildBusinessRulesData(kb, conceptId)).trim());
+  parts.push(renderTemplate(TPL.concept_key_concepts, buildConceptKeyConceptsData(kb, conceptId)).trim());
+
+  // §7 is a container, exactly as for an object
+  parts.push('## 7. Lifecycle Events & Side Effects');
+  parts.push(renderTemplate(TPL.internal_events, buildInternalEventsData(kb, conceptId)).trim());
+  parts.push(renderTemplate(TPL.cross_effects, buildCrossEffectsData(kb, conceptId)).trim());
+
+  parts.push(renderTemplate(TPL.failure_modes, buildFailureModesData(kb, conceptId)).trim());
+  parts.push(renderTemplate(TPL.open_questions, buildOpenQuestionsData(kb, conceptId)).trim());
+  parts.push('## 11. Changelog\n\n' +
+    '| Version | Date | Author | Notes |\n' +
+    '| --- | --- | --- | --- |\n' +
+    `| ${concept.meta?.version || '0.1'} | auto | render.js | Auto-generated from graph. |`);
+
+  return parts.join('\n\n---\n\n') + '\n';
+};
+
+// ── implementation ─────────────────────────────────────────────────
+//
+// The concept renderer with an `Implements` column threaded through §4
+// and §5. An unbound row renders `—`, which on re-parse is an empty
+// cell again: "this row is the implementation's own" and "canon does
+// not say" are the same mark, because they are the same fact.
+
+const IMPLEMENTATION_INVARIANTS_BLOCK =
+  '## Platform Invariants\n\n' +
+  '**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. ' +
+  'Invariants 1–3 — Actor attribution, Actor-contextual automation, and ' +
+  'Actor-attributable audit — apply to this implementation without ' +
+  'exception. Everything this document does not bind is unbound: the ' +
+  'abstraction still declares it, and canon does not distinguish ' +
+  '"not implemented here" from "not recorded here".';
+
+const implementsDisplay = (kb, impl) => {
+  const targetId = kb.from(impl.id, 'implements')[0]?.pointers?.target;
+  const qualifier = impl.meta?.implementsNote;
+  if (!targetId) return qualifier ? `Unknown — ${qualifier}` : 'Unknown.';
+  const base = kb.get(targetId)?.name || targetId;
+  return qualifier ? `${base} (${qualifier})` : base;
+};
+
+// The bound element's full id, which is what the author wrote and what
+// the parser needs back — not its display name, which does not resolve.
+const boundTarget = (kb, nodeId) =>
+  orDash(kb.from(nodeId, 'implements')[0]?.pointers?.target);
+
+const buildImplementationHeaderData = (impl) => ({
+  implementation_name: impl.name,
+  version: impl.meta?.version || '0.1',
+  owner: impl.meta?.owner || 'Unassigned',
+  last_updated: impl.meta?.lastUpdated || 'unknown',
+  status: impl.meta?.status || 'Draft',
+});
+
+const buildImplementationIdentityData = (kb, impl) => ({
+  implementation_name: impl.name,
+  implements: implementsDisplay(kb, impl),
+  description: impl.description || '',
+  aliases: (impl.aliases && impl.aliases.length > 0)
+    ? impl.aliases.join(', ')
+    : 'None known.',
+});
+
+const withBindings = (kb, data, key, idOf) => ({
+  [key]: data[key].map(row => ({ ...row, implements: boundTarget(kb, idOf(row)) })),
+});
+
+const renderImplementation = (kb, implId) => {
+  const impl = kb.get(implId);
+  if (!impl || impl.type !== 'implementation') return null;
+
+  const ruleIdOf = (row) => kb.descendants(implId, { node: ['rule'] })
+    .find(n => n.meta?.canonId === row.id)?.id;
+  const termIdOf = (row) => kb.descendants(implId, { node: ['term'] })
+    .find(n => n.name === row.name)?.id;
+
+  const parts = [];
+  parts.push(renderTemplate(TPL.implementation_header, buildImplementationHeaderData(impl)).trim());
+  parts.push(IMPLEMENTATION_INVARIANTS_BLOCK);
+  parts.push(renderTemplate(TPL.implementation_identity, buildImplementationIdentityData(kb, impl)).trim());
+  parts.push(renderTemplate(TPL.implementation_business_rules,
+    withBindings(kb, buildBusinessRulesData(kb, implId), 'rules', ruleIdOf)).trim());
+  parts.push(renderTemplate(TPL.implementation_key_concepts,
+    withBindings(kb, buildConceptKeyConceptsData(kb, implId), 'concepts', termIdOf)).trim());
+
+  parts.push('## 7. Lifecycle Events & Side Effects');
+  parts.push(renderTemplate(TPL.internal_events, buildInternalEventsData(kb, implId)).trim());
+  parts.push(renderTemplate(TPL.cross_effects, buildCrossEffectsData(kb, implId)).trim());
+
+  parts.push(renderTemplate(TPL.failure_modes, buildFailureModesData(kb, implId)).trim());
+  parts.push(renderTemplate(TPL.open_questions, buildOpenQuestionsData(kb, implId)).trim());
+  parts.push('## 11. Changelog\n\n' +
+    '| Version | Date | Author | Notes |\n' +
+    '| --- | --- | --- | --- |\n' +
+    `| ${impl.meta?.version || '0.1'} | auto | render.js | Auto-generated from graph. |`);
+
+  return parts.join('\n\n---\n\n') + '\n';
+};
+
+// Callers hold an id, not a type.
+const RENDERERS = {
+  concept: renderConcept,
+  implementation: renderImplementation,
+};
+
+const renderNode = (kb, id) => {
+  const node = kb.get(id);
+  if (!node) return null;
+  return (RENDERERS[node.type] || renderEntity)(kb, id);
+};
+
+export {
+  renderEntity, renderConcept, renderImplementation, renderNode, renderTemplate,
+};

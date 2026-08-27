@@ -2,13 +2,15 @@
 
 One template per canonical section, written in the matcher DSL from `../src/template.js`. The parser slices an MD by section markers (level-2 headers `## N. <Title>` and the file header before section 1) and runs each slice through its template. A successful match yields a structured object; the parser merges these objects into the canonical graph (nodes + refs).
 
+The unprefixed templates describe an **object**. The three `concept-*.md` templates describe the only parts of a **Concept** that differ — a concept document is a partial of an object one and reuses `business-rules.md`, `internal-events.md`, `cross-effects.md`, `failure-modes.md` and `open-questions.md` unchanged. The four `implementation-*.md` templates are the concept's again, with an `Implements` column added to §4 and §5. Which kind a document is comes from its own first line (`# Object Canon:` / `# Concept Canon:` / `# Implementation Canon:`), never from the directory it sits in. Everything under "Strict format requirements" applies to all three.
+
 ## Strict format requirements
 
 Templates assume the source MD follows the format below. Originals that don't comply are aligned in `.patches/align-format/`, never in place.
 
 ### File-level
 
-- File starts with `# Object Canon: <Name>` (literal prefix mandatory).
+- File starts with `# Object Canon: <Name>` — or `# Concept Canon: <Name>`, or `# Implementation Canon: <Name>`. The prefix is mandatory and is what declares the document's kind.
 - Followed by a blockquote with four lines: Version, Owner, Last Updated, Status.
 - Sections appear in numeric order, each headed `## N. <Title>` with a blank line before and after the header.
 - Section 7 is split into `### 7.1 Internal Events` and `### 7.2 Cross-Object State Effects`.
@@ -124,3 +126,91 @@ Or the literal `_None._` if there are no open questions.
 ### Changelog (11)
 
 Not parsed. The renderer regenerates it from version metadata, but the parser ignores changelog content.
+
+---
+
+## Concept sections (`concept-*.md`)
+
+A concept document carries sections **1, 4, 5, 7, 9, 10, 11** — and no others. Sections 2, 3, 6 and 8 are absent because they presume the platform owns the subject. Only §1 and §5 need their own template.
+
+### File-level
+
+- File starts with `# Concept Canon: <Name>`.
+- Same four-line blockquote header as an object. Unlike an object's, these reach the graph as concept `meta`, so a concept round-trips its own header instead of having one synthesised.
+
+### Identity (1)
+
+```
+**Concept Name:** <Name>
+
+**Parent Concept:** <"None — top-level concept." or "<Concept>">
+
+**Description:**
+<prose>
+
+**Also Known As:**
+<comma-separated names, or "None known.">
+```
+
+No Namespace and no ID Prefix: a Concept sits outside the namespace model and the platform issues it no identifier. `Parent Concept` resolves through the same name index an object's `Parent Object` uses, and points at the domain or at a broader concept — never at an entity.
+
+### Key Concepts table (5)
+
+```
+| Concept | Description | Notes |
+```
+
+Occupies the slot an object's Key Attributes does, and for the analogous reason: §5 is what the subject exposes. An object exposes fields; a concept exposes the entities it introduces, so the columns that presume ownership — "Set By", "Mutable After Creation?" — are gone. Each row becomes a `term` node with `meta.kind: 'key-concept'`, individually addressable, so a platform object references one by full id: `[[erp-system:identifier]]`. Description is mandatory — it is the node's description, and unlike an object's §5 it **is** `[[WikiLink]]`-scanned: grounding a term on the platform entity it is defined against is the point of the section. The Notes column is not scanned for a term — only rules have their notes scanned — so a link there is inert.
+
+### Lifecycle Events & Side Effects (7)
+
+`internal-events.md` and `cross-effects.md`, unchanged, under the same `## 7.` container and the same `### 7.1` / `### 7.2` sub-headings. Both halves are kept: a Concept *has* an inside, canon simply does not claim to know all of it, so 7.1 records the significant confirmed part — an internal event cycle, an upstream system the concept draws data from — and 7.2 records what that causes in the domain. In 7.1 "Permitted Actor(s)" is usually `—`, because these are the concept's own workings and no platform Actor performs them.
+
+### Business Rules (4), Failure Modes (9), Open Questions (10)
+
+The object templates, unchanged, parsed by the object emitters. A concept writes `N/A` in "Applies In State(s)" — which the object template already prescribes for a stateless subject, so no variant is needed.
+
+---
+
+## Implementation sections (`implementation-*.md`)
+
+An implementation document carries the same sections a concept does — **1, 4, 5, 7, 9, 10, 11** — because it is the same shape. What differs is one column in §4 and §5, and what §1 names.
+
+### File-level
+
+- File starts with `# Implementation Canon: <Name>`.
+- Same four-line blockquote header, reaching the graph as implementation `meta`.
+- Loaded from `implementations/`, which need not exist until the first document.
+
+### Identity (1)
+
+```
+**Implementation Name:** <Name>
+
+**Implements:** <Concept or object name>
+
+**Description:**
+<prose>
+
+**Also Known As:**
+<comma-separated names, or "None known.">
+```
+
+`Implements` resolves through the same name index as `Parent Object` and `Parent Concept`, but it is a different edge and a different ref type: `parent` is containment and always points at the domain here, `implements` is realisation. Exactly one, and — unlike the other two — an unresolved value is a validation error rather than a `future:` stub, because bindings cannot be checked against an abstraction that does not exist.
+
+### Business Rules (4) and Key Concepts (5)
+
+The concept's tables with one column added before Notes:
+
+```
+| Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Implements | Notes |
+| Concept | Description | Implements | Notes |
+```
+
+`Implements` holds the **full id** of an element of the abstraction — `integration:br-004`, `integration:actor-credential` — or is empty. A bare name is not accepted, for the same reason `[[mentions]]` refuse bare child names: they collide across subjects. `validate.js` checks that the target is inside the named abstraction's own subtree and that the types match; an empty cell is not checked at all, because it says the row is this implementation's own.
+
+An element of the abstraction that no row names is **unbound**, and that is reported by `canon coverage <id>` rather than by the validator — canon cannot tell "not implemented" from "not recorded", and neither is an error.
+
+### Lifecycle Events (7), Failure Modes (9), Open Questions (10)
+
+The object templates, unchanged, exactly as for a concept. None of them binds: their rows become anonymous refs with no id, so there is nothing for an `Implements` column to point at. A correspondence to an event of the abstraction goes in Notes as prose.

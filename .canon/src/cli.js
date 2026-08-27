@@ -8,7 +8,7 @@ import { parseRepo } from './parse.js';
 import { toGraph } from './graph.js';
 import { createKb } from './kb.js';
 import { validate, summarize } from './validate.js';
-import { renderEntity } from './render.js';
+import { renderNode } from './render.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..');
@@ -28,7 +28,8 @@ const cmds = {
     const { parsed, graph } = load(options);
     const parseErrs = parsed.files.flatMap(f => f.errors);
     const ve = validate(graph);
-    const scope = patchId ? `objects/ + .patches/${patchId}/` : 'objects/';
+    const corpora = 'objects/ + concepts/ + implementations/';
+    const scope = patchId ? `${corpora} + .patches/${patchId}/` : corpora;
     console.log(`Scope: ${scope}`);
     console.log(`Files: ${parsed.files.length}`);
     console.log(`Parse errors:    ${parseErrs.length}`);
@@ -49,7 +50,10 @@ const cmds = {
     for (const e of kb.overview()) {
       const childPart = Object.entries(e.children)
         .map(([t, c]) => `${t}=${c}`).join(', ');
-      console.log(`${e.id.padEnd(40)} ns=${(e.namespace || '?').padEnd(14)} sm=${e.hasStateMachine ? '✓' : ' '} refs=${String(e.refs).padStart(3)}  ${childPart}`);
+      // '—' says "not applicable", not "unknown": neither a concept
+      // nor an implementation sits in the namespace model at all.
+      const ns = e.type === 'entity' ? (e.namespace || '?') : '—';
+      console.log(`${e.id.padEnd(40)} ${e.type.padEnd(14)} ns=${ns.padEnd(14)} sm=${e.hasStateMachine ? '✓' : ' '} refs=${String(e.refs).padStart(3)}  ${childPart}`);
     }
   },
 
@@ -122,11 +126,28 @@ const cmds = {
     for (const [t, c] of Object.entries(byType)) console.log(`  ${t}: ${c}`);
   },
 
-  render: (id) => {
-    if (!id) { console.error('usage: canon render <entity-id>'); process.exit(2); }
+  coverage: (id) => {
+    if (!id) { console.error('usage: canon coverage <implementation-id>'); process.exit(2); }
     const { kb } = load();
-    const md = renderEntity(kb, id);
-    if (!md) { console.error(`entity not found: ${id}`); process.exit(1); }
+    const c = kb.coverage(id);
+    if (!c) { console.error(`not an implementation: ${id}`); process.exit(1); }
+    console.log(`${c.id}  →  ${c.abstraction || '(none)'}${c.abstractionResolved ? '' : '   [UNRESOLVED]'}`);
+    const show = (label, rows, extra = () => '') => {
+      console.log(`\n${label} (${rows.length})`);
+      for (const r of rows) console.log(`  ${r.type.padEnd(5)} ${r.id.padEnd(50)}${extra(r)}`);
+    };
+    show('Bound', c.bound, r => `← ${r.boundBy}`);
+    // Not a defect list. Canon cannot tell "not implemented" from
+    // "not recorded", and prints the pair as one thing on purpose.
+    show('Unbound — not implemented, or not recorded', c.unbound);
+    show('Own — introduced by this implementation', c.own);
+  },
+
+  render: (id) => {
+    if (!id) { console.error('usage: canon render <entity-id|concept-id|implementation-id>'); process.exit(2); }
+    const { kb } = load();
+    const md = renderNode(kb, id);
+    if (!md) { console.error(`nothing renderable at: ${id}`); process.exit(1); }
     process.stdout.write(md);
   },
 
@@ -178,15 +199,16 @@ const help = () => {
   console.log('usage: canon <command> [args]');
   console.log('');
   console.log('Commands:');
-  console.log('  validate [patch-id]       — parse + validate; without arg, objects/ only; with arg, overlays that patch');
-  console.log('  overview                  — list every entity, summary line');
+  console.log('  validate [patch-id]       — parse + validate the whole corpus; with an arg, overlays that patch');
+  console.log('  overview                  — list every entity, concept and implementation, summary line');
   console.log('  find <query>              — substring search');
   console.log('  get <id>                  — node + parent + children');
   console.log('  reveal <id> [depth]       — outgoing refs + neighbors');
   console.log('  impact <id> [depth]       — incoming refs');
   console.log('  paths <a> <b> [depth]     — shortest paths between two nodes');
-  console.log('  describe <entity-id>      — full graph slice for one entity');
-  console.log('  render <entity-id>        — render entity as canonical MD on stdout');
+  console.log('  describe <id>             — full graph slice for one entity, concept or implementation');
+  console.log('  coverage <id>             — what an implementation binds of its abstraction, and what it leaves unbound');
+  console.log('  render <id>               — render an entity, concept or implementation as canonical MD on stdout');
   console.log('  align                     — re-run align.js (regenerate .patches/align-format/)');
   console.log('  reindex                   — rebuild RAG index from sources (slow first run)');
   console.log('  discover <query...>       — RAG semantic search; runs reindex if no cached index');

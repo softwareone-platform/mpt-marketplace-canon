@@ -22,6 +22,11 @@ mpt-marketplace-canon/
     CANON_OBJECT_Catalog_Product.md
     CANON_OBJECT_Catalog_PriceList.md
     ...                               # One file per platform object
+  concepts/
+    CANON_CONCEPT_Integration.md
+    ...                               # One file per Concept — see below
+  implementations/
+    ...                               # One file per named realisation of a Concept — see below
   platform/
     CANON_PLATFORM_MarkdownRenderer.md
     ...                               # System behaviour not tied to a specific object
@@ -29,6 +34,8 @@ mpt-marketplace-canon/
     CANON_OPEN_QUESTIONS.md           # Known unknowns awaiting resolution
   templates/
     CANON_OBJECT_TEMPLATE.md          # Standard template for object canon documents
+    CANON_CONCEPT_TEMPLATE.md         # Standard template for concept canon documents
+    CANON_IMPLEMENTATION_TEMPLATE.md  # Standard template for implementation canon documents
     CANON_AUTHORING_SESSION.md        # LLM session prompt for canon authoring
   scripts/
     convert_to_docx.py                # Convert canon Markdown files to .docx
@@ -36,6 +43,57 @@ mpt-marketplace-canon/
     extract_canon_schema.py           # Extract paths and schemas for a specific object from the OpenAPI spec
   .canon/                             # MCP runtime — see .canon/README.md
 ```
+
+---
+
+## Objects, Concepts and Implementations
+
+Canon holds three kinds of document. Ownership separates the first two; generality separates the second from the third.
+
+An **Object** is a thing the platform owns: an API collection, an ID prefix, a lifecycle, an Actor who creates it. `objects/` is one file per object.
+
+A **Concept** is a thing the platform does *not* own but must still reason about — an integration, an ERP system, a vendor's own platform. A Concept *has* an inside; canon simply does not claim to know all of it, so it records the entities the concept introduces, the significant part of its workings that is confirmed, and what it causes in the domain. `concepts/` is one file per Concept.
+
+A Concept document is a **partial of an object document** — it uses only section numbers the object template already defines, and means by them what the object means:
+
+```
+  1. Identity                     reduced: no Namespace, no ID Prefix
+  4. Business Rules               unchanged; "Applies In State(s)" is N/A
+  5. Key Concepts                 the slot where an object lists Key Attributes
+  7. Lifecycle Events & Side Effects    unchanged, 7.1 and 7.2 both
+  9. Failure Modes & Edge Cases   unchanged
+ 10. Open Questions               unchanged
+ 11. Changelog                    unchanged
+```
+
+The gaps are the point. Sections 2, 3, 6 and 8 are absent because a Concept has no ownership matrix, no observable state machine, no relationships of its own to declare, and nothing the platform creates or deletes — and a reader who knows the object template sees that immediately.
+
+Two sections are worth spelling out:
+
+- **§5 Key Concepts** occupies the slot where an object lists its Key Attributes, and for the same reason: §5 is what the subject exposes. A Concept exposes *introduced entities* rather than fields — an ERP system introduces the notion of an identifier — and each becomes an addressable node, so a platform object references it from the object's own canon (`[[erp-system:identifier]]`). That direction matters: a Concept never enumerates the platform. That `Accounts: ErpLink` exists is the platform's fact about itself, not the ERP's fact about the platform.
+- **§7 keeps both halves.** 7.1 records what is confirmed about the concept's own workings — an internal event cycle, an upstream system it draws data from. That is internal and significant, and it is not an effect. 7.2 records what the concept causes in the domain, and is the one place a Concept document names platform objects: the acting subject describing its own effects, exactly as an object's 7.2 does.
+
+**Hierarchy is the exception.** A Concept is an arrow pointing out of the domain. When one genuinely narrows another, the narrower is its own document naming the broader as `Parent Concept`, and it *further attributes* the parent rather than replacing it. Where a relationship holds for any instance, refer to the parent; where it is specific to a kind, refer to the child.
+
+An **Implementation** is one named realisation of an abstraction canon already records — Microsoft's integration, this ERP product, that vendor's marketplace. `implementations/` is one file per Implementation, and the directory need not exist until the first one is written.
+
+Where a Concept *declares*, an Implementation *binds*. It is the Concept shape again with one column added to §4 and §5, naming the element of the abstraction each row realises:
+
+```
+| Concept   | Description                | Implements                   | Notes |
+| Tenant id | The directory tenant used. | integration:actor-credential |       |
+| Sku map   | Vendor-specific mapping.   |                              |       |
+```
+
+The first row says *this is what the abstraction's actor credential turns out to be here*. The second introduces something the abstraction has no notion of, which is the other half of what an Implementation is for.
+
+**What is not bound is unbound, and canon says no more than that.** An element the abstraction declares and no row names is reported as unbound — not as missing, not as unimplemented, because canon genuinely cannot tell "this realisation does not do that" from "nobody has written it down". `canon coverage <id>` prints the three lists: bound, unbound, and own. An implementation that *knows* an element does not apply says so by binding it and letting the value state that there is nothing to state.
+
+Bindings reach §4 rules and §5 concepts only — those are the sections whose rows become addressable nodes. Events, effects and failure modes are emitted as anonymous refs with no id to point at, so an implementation states its own and notes the correspondence in prose.
+
+**Narrowing and realising are different edges.** "Back-office ERP integration" is a *Concept* that narrows "Integration", because it is still a kind: it declares a contract without saying which ERP product holds up its end. "NetSuite" is an *Implementation*, because it is one thing. Narrowing uses `Parent Concept`; realising uses `Implements`.
+
+**Which kind a document is comes from its own first line** — `# Object Canon:`, `# Concept Canon:` or `# Implementation Canon:` — not from the directory it sits in. A file that moves does not change meaning, and a file with no banner fails to parse rather than being guessed at.
 
 ---
 
@@ -87,7 +145,7 @@ Restart Codex after installing if the servers do not appear.
 
 ### Patch flow
 
-The agent never edits source files directly. Edits land under `.patches/<id>/` as whole-file replacements; you commit them deliberately:
+The agent never edits source files directly. Edits land under `.patches/<id>/` as whole-file replacements, mirroring the source directories (`objects/`, `concepts/`, `implementations/`, `platform/`, `preamble/`, `questions/`); you commit them deliberately:
 
 ```bash
 npm run apply <patch-id>            # validate (objects/ + that patch) + write into objects/

@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { parseRepo, sliceSections } from '../src/parse.js';
-import { toGraph } from '../src/graph.js';
+import { toGraph, ROOT_TYPES } from '../src/graph.js';
 import { createKb } from '../src/kb.js';
 import { validate } from '../src/validate.js';
 
@@ -84,8 +84,14 @@ test('every action-binding step targets a transition', () => {
 
 // ── overview ───────────────────────────────────────────────────────
 
-test('overview row count matches entity count', () => {
-  assert.equal(kb.overview().length, kb.list('entity').length);
+test('overview covers every root type and nothing else', () => {
+  assert.equal(kb.overview().length,
+    ROOT_TYPES.reduce((a, t) => a + kb.list(t).length, 0));
+});
+
+test('overview rows carry a root type', () => {
+  const untyped = kb.overview().filter(r => !ROOT_TYPES.includes(r.type));
+  assert.deepEqual(untyped, []);
 });
 
 // ── captured text is complete ──────────────────────────────────────
@@ -105,8 +111,11 @@ const sectionOf = (md, heading, next) => {
 const countChecklist = (text) =>
   (text || '').split('\n').filter(l => l.trim().startsWith('- [ ]')).length;
 
+// `f.dir` — a file is no longer necessarily under objects/
+const sourceOf = (f) => readFileSync(join(repoRoot, f.dir, f.relPath), 'utf8');
+
 for (const f of parsed.files) {
-  const raw = readFileSync(join(repoRoot, 'objects', f.relPath), 'utf8');
+  const raw = sourceOf(f);
   const section = sectionOf(raw, '## 10. Open Questions', '## 11.');
   if (!section) continue;
   const inFile = countChecklist(section);
@@ -124,8 +133,8 @@ for (const f of parsed.files) {
 test('no section body ends with a separator', () => {
   const offenders = [];
   for (const f of parsed.files) {
-    const raw = readFileSync(join(repoRoot, 'objects', f.relPath), 'utf8');
-    const { head, sections } = sliceSections(raw);
+    const raw = sourceOf(f);
+    const { head, sections } = sliceSections(raw, undefined);
     const endsWithRule = (body) => {
       const lines = body.split('\n');
       let end = lines.length;
@@ -138,4 +147,75 @@ test('no section body ends with a separator', () => {
     }
   }
   assert.deepEqual(offenders, []);
+});
+
+// ── concepts ───────────────────────────────────────────────────────
+//
+// A concept document is a partial of an object one. These pin the
+// parts that are deliberately absent, so removing one later is a
+// decision rather than an accident.
+
+test('every concept has a parent ref', () => {
+  const orphans = kb.list('concept').filter(c => kb.parent(c.id) === null);
+  assert.deepEqual(orphans, []);
+});
+
+test('a concept parents only the domain or another concept', () => {
+  const wrong = kb.list('concept')
+    .map(c => kb.parent(c.id))
+    .filter(p => p.type !== 'domain' && p.type !== 'concept');
+  assert.deepEqual(wrong, []);
+});
+
+test('no concept carries states, transitions or actions', () => {
+  const wrong = kb.list('concept').flatMap(c =>
+    kb.descendants(c.id, { node: ['state', 'transition', 'action'] }));
+  assert.deepEqual(wrong, []);
+});
+
+test('every concept-owned term is a §5 key concept', () => {
+  const stray = kb.list('concept')
+    .flatMap(c => kb.descendants(c.id, { node: ['term'] }))
+    .filter(t => t.meta?.kind !== 'key-concept');
+  assert.deepEqual(stray, []);
+});
+
+// ── implementations ────────────────────────────────────────────────
+//
+// The corpus carries none yet — the type landed before the first
+// vendor document. These pin the invariants now, so the first one to
+// arrive is checked on the way in rather than after the fact.
+
+test('every implementation names an abstraction that exists', () => {
+  const dangling = kb.list('implementation')
+    .filter(i => !kb.get(kb.from(i.id, 'implements')[0]?.pointers?.target));
+  assert.deepEqual(dangling, []);
+});
+
+test('every implementation is parented to the domain', () => {
+  const wrong = kb.list('implementation').filter(i => kb.parent(i.id)?.type !== 'domain');
+  assert.deepEqual(wrong, []);
+});
+
+test('no implementation carries states, transitions or actions', () => {
+  const wrong = kb.list('implementation').flatMap(i =>
+    kb.descendants(i.id, { node: ['state', 'transition', 'action'] }));
+  assert.deepEqual(wrong, []);
+});
+
+// A binding that points somewhere else is not a weaker binding, it is
+// a different claim — and validate refuses it. This says the corpus
+// has none, which is a different statement from validate having a
+// check.
+test('every element binding lands inside its own abstraction', () => {
+  const stray = kb.list('implementation').flatMap(i => {
+    const abstraction = kb.from(i.id, 'implements')[0]?.pointers?.target;
+    return kb.descendants(i.id, { node: ['term', 'rule'] })
+      .flatMap(n => kb.from(n.id, 'implements'))
+      .filter(r => {
+        const t = r.pointers?.target;
+        return t !== abstraction && !kb.ancestors(t).some(a => a.id === abstraction);
+      });
+  });
+  assert.deepEqual(stray, []);
 });

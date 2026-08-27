@@ -1,6 +1,7 @@
 // RAG bootstrap + persistence.
 //
-// Index source = patched `objects/*.md` (same merge the parser sees).
+// Index source = the same corpus directories the parser reads
+// (`objects/`, `concepts/`), with the same patch merge.
 // Stored at `.canon/dist/rag.jsonl` as one JSON-per-line, full rebuild
 // only (no incremental).
 //
@@ -13,15 +14,18 @@ import { join } from 'node:path';
 
 import { createRag } from './index.js';
 import { loadMdSet } from '../load.js';
+import { CORPUS_DIRS } from '../parse.js';
 
 const INDEX_FILE = '.canon/dist/rag.jsonl';
 
 // ── sources ────────────────────────────────────────────────────────
 
 const sourcesFor = (repoRoot) =>
-  loadMdSet(repoRoot, 'objects').map(({ relPath, content }) => ({
-    name: relPath, content,
-  }));
+  CORPUS_DIRS.flatMap(dir =>
+    loadMdSet(repoRoot, dir).map(({ relPath, content }) => ({
+      name: relPath, content,
+    }))
+  );
 
 // ── persistence ────────────────────────────────────────────────────
 

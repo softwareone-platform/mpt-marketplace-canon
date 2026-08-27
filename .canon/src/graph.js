@@ -5,10 +5,19 @@
 //   webhook:enabled-to-disabled       transition
 //   webhook:disable-webhook           action
 //   webhook:url                       term
+//   marketplace:integration           concept — a sibling of an entity
+//   integration:correlation-identifier term (a §5 key concept)
+//   marketplace:microsoft             implementation — also a sibling
+//   microsoft:tenant-id               term, bound to a concept's term
 // Unresolved cross-refs become marketplace:future:<kebab> stubs so the
 // graph stays referentially intact.
 
 const DOMAIN_ID = 'marketplace';
+
+// The three kinds that own a document, an id prefix, and therefore a
+// subtree of child nodes. Everything else hangs off one of them.
+const ROOT_TYPES = ['entity', 'concept', 'implementation'];
+const isRoot = (n) => ROOT_TYPES.includes(n.type);
 
 // ── ids ────────────────────────────────────────────────────────────
 
@@ -23,6 +32,23 @@ const kebab = (s) => String(s)
 
 const entityIdFromFile = (relPath) => {
   const m = relPath.match(/^CANON_OBJECT_[A-Za-z]+_(.+)\.md$/);
+  return m ? `${DOMAIN_ID}:${kebab(m[1])}` : null;
+};
+
+// No namespace segment: a concept sits outside the namespace model,
+// and every concept — including one that narrows another — is a
+// top-level document with a top-level id. Narrowing is expressed by
+// the parent ref, not by nesting the id.
+const conceptIdFromFile = (relPath) => {
+  const m = relPath.match(/^CANON_CONCEPT_(.+)\.md$/);
+  return m ? `${DOMAIN_ID}:${kebab(m[1])}` : null;
+};
+
+// Same reasoning as a concept's: an implementation is a top-level
+// document with a top-level id. What it realises is the `implements`
+// ref, never the id.
+const implementationIdFromFile = (relPath) => {
+  const m = relPath.match(/^CANON_IMPLEMENTATION_(.+)\.md$/);
   return m ? `${DOMAIN_ID}:${kebab(m[1])}` : null;
 };
 
@@ -44,6 +70,18 @@ const resolveParentRef = (rawValue, nameIndex) => {
 const cell = (s) => {
   const v = String(s || '').trim();
   return v === '—' || v === '-' ? '' : v;
+};
+
+// An `Implements` cell names one element of the abstraction by full id
+// (`integration:actor-credential`) — never by bare name, for the same
+// reason `[[mentions]]` refuse bare child names: they collide across
+// subjects. An empty cell is not an error; it means the row is this
+// implementation's own. The id is pushed verbatim so a typo surfaces as
+// pointer-target-not-found rather than becoming a `future:` stub.
+const pushImplements = (refs, ownerId, row) => {
+  const target = cell(row.implements);
+  if (!target) return;
+  refs.push({ type: 'implements', owner: ownerId, pointers: { target } });
 };
 
 const splitList = (s) =>
@@ -276,8 +314,8 @@ const emitOwnership = (entityId, parsed) => {
 // Parent ref attaches the rule to its owning entity. `[[mentions]]`
 // inside the statement / notes resolve against the rule node — not
 // the entity — so impact/paths can target a single rule.
-const emitBusinessRules = (entityId, parsed) => {
-  const rows = parsed.business_rules?.rules || [];
+const emitBusinessRules = (entityId, parsed, sectionKey = 'business_rules') => {
+  const rows = parsed[sectionKey]?.rules || [];
   const nodes = [];
   const refs = [];
   for (const row of rows) {
@@ -303,6 +341,7 @@ const emitBusinessRules = (entityId, parsed) => {
       },
     });
     refs.push({ type: 'parent', owner: id, pointers: { parent: entityId } });
+    pushImplements(refs, id, row);
   }
   return { nodes, refs };
 };
@@ -477,6 +516,110 @@ const emitProse = (entityId, prose) => {
   return { refs };
 };
 
+// ── concept emitters ───────────────────────────────────────────────
+
+// Only two: a concept document is a partial of an object one, so §4,
+// §7 and §9–10 go through the very same emitters an object's do. What
+// is genuinely its own is §1 (no namespace, no id prefix) and §5.
+
+const emitConcept = (id, parsed, nameIndex) => {
+  const ident = parsed.concept_identity || {};
+  const header = parsed.concept_header || {};
+  const parentSplit = splitIdentityValue(ident.parent_concept);
+
+  const node = {
+    id,
+    type: 'concept',
+    name: ident.concept_name,
+    description: ident.description || '',
+    aliases: splitAliases(ident.aliases),
+    meta: {
+      version: header.version || null,
+      owner: header.owner || null,
+      lastUpdated: header.last_updated || null,
+      status: header.status || null,
+      parentConceptNote: parentSplit.qualifier || undefined,
+    },
+  };
+
+  // "None — top-level concept." lands on the domain, exactly as a
+  // top-level object's Parent Object does. Anything else names the
+  // broader concept this one narrows.
+  const parentRef = {
+    type: 'parent',
+    owner: id,
+    pointers: { parent: resolveParentRef(parentSplit.value || ident.parent_concept, nameIndex) },
+  };
+  return { node, parentRef };
+};
+
+// §5 Key Concepts — the entities a concept introduces: the contact
+// surface, not fields. Same slot and same node type as an object's Key
+// Attributes, because §5 is what the subject exposes either way; a
+// platform object then references one the way it references any other
+// child node, by full id — `[[erp-system:identifier]]`.
+const emitKeyConcepts = (conceptId, parsed, sectionKey = 'concept_key_concepts') => {
+  const rows = parsed[sectionKey]?.concepts || [];
+  const nodes = [];
+  const refs = [];
+  for (const row of rows) {
+    if (!row.name) continue;
+    const id = childId(conceptId, row.name);
+    nodes.push({
+      id,
+      type: 'term',
+      name: row.name,
+      description: cell(row.description) || '',
+      meta: {
+        kind: 'key-concept',
+        notes: cell(row.notes),
+      },
+    });
+    refs.push({ type: 'parent', owner: id, pointers: { parent: conceptId } });
+    pushImplements(refs, id, row);
+  }
+  return { nodes, refs };
+};
+
+// ── implementation emitters ────────────────────────────────────────
+
+// One: everything else an implementation document holds goes through
+// the concept's emitters, which are the object's. What is its own is
+// §1 — where a concept names the broader concept it narrows, an
+// implementation names the abstraction it realises, and that is a
+// different edge.
+const emitImplementation = (id, parsed, nameIndex) => {
+  const ident = parsed.implementation_identity || {};
+  const header = parsed.implementation_header || {};
+  const implSplit = splitIdentityValue(ident.implements);
+
+  const node = {
+    id,
+    type: 'implementation',
+    name: ident.implementation_name,
+    description: ident.description || '',
+    aliases: splitAliases(ident.aliases),
+    meta: {
+      version: header.version || null,
+      owner: header.owner || null,
+      lastUpdated: header.last_updated || null,
+      status: header.status || null,
+      implementsNote: implSplit.qualifier || undefined,
+    },
+  };
+
+  // Containment and realisation are separate edges: an implementation
+  // is a top-level document (parent = domain) that realises something
+  // else (implements = the abstraction).
+  const parentRef = { type: 'parent', owner: id, pointers: { parent: DOMAIN_ID } };
+  const implementsRef = {
+    type: 'implements',
+    owner: id,
+    pointers: { target: resolveParentRef(implSplit.value || ident.implements, nameIndex) },
+  };
+  return { node, parentRef, implementsRef };
+};
+
 // ── name index ─────────────────────────────────────────────────────
 
 // indexes Object Name + filename-path words + aliases against entity
@@ -490,6 +633,22 @@ const buildNameIndex = (parsedFiles) => {
   };
 
   for (const f of parsedFiles) {
+    const implId = implementationIdFromFile(f.relPath);
+    if (implId) {
+      const ii = f.data.implementation_identity || {};
+      if (ii.implementation_name) add(ii.implementation_name, implId);
+      for (const a of splitAliases(ii.aliases)) add(a, implId);
+      continue;
+    }
+
+    const conceptId = conceptIdFromFile(f.relPath);
+    if (conceptId) {
+      const ci = f.data.concept_identity || {};
+      if (ci.concept_name) add(ci.concept_name, conceptId);
+      for (const a of splitAliases(ci.aliases)) add(a, conceptId);
+      continue;
+    }
+
     const id = entityIdFromFile(f.relPath);
     if (!id) continue;
     const ident = f.data.identity || {};
@@ -523,7 +682,7 @@ const buildMentionIndex = (nodes) => {
   const idx = new Map();
   for (const n of nodes) idx.set(n.id.toLowerCase(), n.id);
   for (const n of nodes) {
-    if (n.type !== 'entity') continue;
+    if (!isRoot(n)) continue;
     if (n.name) {
       const k = n.name.toLowerCase();
       if (!idx.has(k)) idx.set(k, n.id);
@@ -565,9 +724,12 @@ const findMentionsInText = (text, mentionIndex) => {
 // mentioning its own parent entity is not a useful edge.
 const extractMentions = (nodes, refs) => {
   const mentionIndex = buildMentionIndex(nodes);
+  // Roots that own child ids. Concepts and implementations are roots
+  // too — each is its own document, including one that narrows or
+  // realises another.
   const entityIdsByPrefix = new Map();
   for (const n of nodes) {
-    if (n.type !== 'entity') continue;
+    if (!isRoot(n)) continue;
     const prefix = n.id.split(':').slice(-1)[0];
     entityIdsByPrefix.set(prefix, n.id);
   }
@@ -598,7 +760,7 @@ const extractMentions = (nodes, refs) => {
 
   for (const n of nodes) {
     const ownerEntity = owningEntity(n.id);
-    const owner = n.type === 'entity' ? ownerEntity : n.id;
+    const owner = isRoot(n) ? ownerEntity : n.id;
     if (!owner) continue;
     scan(n.description, owner, ownerEntity, { kind: 'node', id: n.id, field: 'description' });
     scan(n.name, owner, ownerEntity, { kind: 'node', id: n.id, field: 'name' });
@@ -639,6 +801,54 @@ const toGraph = (parsedFiles) => {
   const nameIndex = buildNameIndex(parsedFiles);
 
   for (const file of parsedFiles) {
+    const implId = implementationIdFromFile(file.relPath);
+    if (implId) {
+      if (!file.data.implementation_identity?.implementation_name) continue;
+      const { node: impl, parentRef, implementsRef } =
+        emitImplementation(implId, file.data, nameIndex);
+      nodes.push(impl);
+      refs.push(parentRef, implementsRef);
+
+      // §4 and §5 are the concept sections with one column added; the
+      // rest is untouched.
+      for (const sec of [
+        emitKeyConcepts(impl.id, file.data, 'implementation_key_concepts'),
+        emitBusinessRules(impl.id, file.data, 'implementation_business_rules'),
+        emitInternalEvents(impl.id, file.data),
+        emitCrossEffects(impl.id, file.data, nameIndex),
+        emitFailureModes(impl.id, file.data),
+        emitOpenQuestions(impl.id, file.data),
+        emitProse(impl.id, file.prose),
+      ]) {
+        if (sec.nodes) nodes.push(...sec.nodes);
+        if (sec.refs) refs.push(...sec.refs);
+      }
+      continue;
+    }
+
+    const conceptId = conceptIdFromFile(file.relPath);
+    if (conceptId) {
+      if (!file.data.concept_identity?.concept_name) continue;
+      const { node: concept, parentRef } = emitConcept(conceptId, file.data, nameIndex);
+      nodes.push(concept);
+      refs.push(parentRef);
+
+      // §4, §7 and §9–10 are the object emitters, unchanged
+      for (const sec of [
+        emitKeyConcepts(concept.id, file.data),
+        emitBusinessRules(concept.id, file.data),
+        emitInternalEvents(concept.id, file.data),
+        emitCrossEffects(concept.id, file.data, nameIndex),
+        emitFailureModes(concept.id, file.data),
+        emitOpenQuestions(concept.id, file.data),
+        emitProse(concept.id, file.prose),
+      ]) {
+        if (sec.nodes) nodes.push(...sec.nodes);
+        if (sec.refs) refs.push(...sec.refs);
+      }
+      continue;
+    }
+
     const entityId = entityIdFromFile(file.relPath);
     if (!entityId || !file.data.identity?.object_name) continue;
     const { node: entity, parentRef } = emitEntity(entityId, file.data, nameIndex);
@@ -673,4 +883,7 @@ const toGraph = (parsedFiles) => {
   return { nodes, refs, mentionErrors };
 };
 
-export { toGraph, kebab, entityIdFromFile, childId, DOMAIN_ID };
+export {
+  toGraph, kebab, entityIdFromFile, conceptIdFromFile, implementationIdFromFile,
+  childId, DOMAIN_ID, ROOT_TYPES,
+};

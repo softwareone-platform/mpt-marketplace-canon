@@ -8,7 +8,7 @@ import { discover as ragDiscover, buildIndex } from '../rag/bootstrap.js';
 
 const tools = (kb, repoRoot) => ({
   overview: {
-    description: 'List every Canon entity with namespace, child counts by type, and ref counts. Start here to see the full domain at a glance.',
+    description: 'List every Canon entity, Concept and Implementation with type, namespace, child counts by type, and ref counts. Start here to see the full domain at a glance. A Concept is something outside the platform that the domain nonetheless contacts (an integration, an external system): canon records the surface it presents and nothing behind it, so it has no namespace and no state machine and those come back null/false. An Implementation is one named realisation of a Concept or object — it binds that abstraction\'s elements to concrete values and may add its own; what it does not bind is unbound, and canon does not distinguish "not implemented" from "not recorded".',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     handler: () => kb.overview(),
   },

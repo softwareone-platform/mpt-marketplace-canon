@@ -1,15 +1,15 @@
 # SoftwareOne Marketplace — Platform Canon Preamble
 
-> **Version:** 2.10
+> **Version:** 2.18
 > **Owner:** Stu
-> **Last Updated:** 2026-07-17
+> **Last Updated:** 2026-08-27
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
 
 ## Purpose
 
-This document captures the foundational design principles, invariants, and philosophy of the SoftwareOne Marketplace platform. It is the authoritative preamble for all Object canon documents and should be read before reasoning about any individual object.
+This document captures the foundational design principles, invariants, and philosophy of the SoftwareOne Marketplace platform. It is the authoritative preamble for every canon document — Object, Concept and Implementation — and should be read before reasoning about any individual subject. Sections written in terms of objects govern objects; where one bears on a Concept or an Implementation it does so through an object, in that object's canon.
 
 When a principle here appears to conflict with an object canon, the conflict must be flagged and resolved explicitly. Principles here are not overridden silently.
 
@@ -83,7 +83,7 @@ Vendor-specific and Client-specific business logic is not implemented in the cor
 
 - A single Extension acts as exactly one permission-bearing Actor.
 - Extensions implement the business logic specific to their Actor's domain (e.g. an Order fulfilment extension acts as a Vendor; an SAP purchasing plugin acts as a Client).
-- The canon documents in this repository describe core platform primitives only — not any Extension's implementation of them.
+- **Object canon describes core platform primitives only** — never a particular Extension's implementation of them. An Extension's own realisation, where canon records it at all, is a separate Implementation document: it speaks for that Extension, binds the elements of the abstraction it realises, and never states a platform fact on the platform's behalf.
 
 *This architecture is why the platform API is public and unified — Extensions are first-class consumers of the same API surface available to human users.*
 
@@ -391,6 +391,7 @@ The `icon` field is a nullable string. For jdenticon-capable objects, it is neve
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 2.18 | 2026-08-27 | Marcerito | Section 2.3 third bullet rewritten: object canon still describes platform primitives only, but an Extension's own realisation now has a home — a separate Implementation document — rather than being excluded from the repository outright. Purpose widened accordingly: the preamble governs Object, Concept and Implementation documents, and sections written in terms of objects govern objects. No invariant is touched. Note the header version read 2.10 while this table's newest row was 2.17 — seven versions of lag, pre-existing; 2.18 continues from the table, not from the header. |
 | 2.17 | 2026-07-20 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: INV (Invoice), INA (Invoice Attachment), CRD (Credit Memo), CMA (Credit Memo Attachment) added, confirmed from live PROD object IDs. Added while canonising the Billing Invoice/Credit Memo batch. |
 | 2.16 | 2026-07-20 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: SOM (Statement) and STA (Statement Attachment) added, confirmed from live PROD object IDs. Invariant 6 known-exception list: added the `Billing: Journal` reset cascade (resetting a Journal removes its generated Ledgers and their Statements) as a distinct exception from the Journal delete cascade. Added while canonising the Billing Statement/Statement Attachment batch. |
 | 2.15 | 2026-07-19 | Stu / canon-generate-batch | Section 5.3 ID Prefixes: BLE (Ledger) and LEA (Ledger Attachment) added, confirmed from live PROD object IDs. Added while canonising the Billing Ledger/Ledger Attachment batch. |

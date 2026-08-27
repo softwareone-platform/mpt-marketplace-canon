@@ -7,7 +7,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { compile, match } from '../src/template.js';
-import { sliceSections } from '../src/parse.js';
+import { sliceSections, parseSections, parseFile, detectKind } from '../src/parse.js';
+import { toGraph } from '../src/graph.js';
+import { createKb } from '../src/kb.js';
+import { renderImplementation } from '../src/render.js';
 
 // ── compile errors ─────────────────────────────────────────────────
 
@@ -258,4 +261,249 @@ test('a body keeps exactly one trailing newline', () => {
   const md = '## 5. Key Attributes\n\n| A |\n| --- |\n| x |\n\n---\n\n## 6. X\n';
   const body = sectionBody(md, '## 5. Key Attributes');
   assert.match(body, /\| x \|\n$/);
+});
+
+// ── document kinds ─────────────────────────────────────────────────
+//
+// Objects and concepts share section numbers and mean different things
+// by §1. The banner on the document's own first line is what decides
+// which it is — not the directory it came from, so moving a file never
+// silently changes its meaning.
+
+const CONCEPT_MD = [
+  '# Concept Canon: Integration',
+  '',
+  '> **Version:** 0.1',
+  '> **Owner:** Unassigned',
+  '> **Last Updated:** 2026-08-19',
+  '> **Status:** Draft',
+  '',
+  '---',
+  '',
+  '## 1. Identity',
+  '',
+  '**Concept Name:** Integration',
+  '',
+  '**Parent Concept:** None — top-level concept.',
+  '',
+  '**Description:**',
+  'A system outside the platform.',
+  '',
+  '**Also Known As:**',
+  'Connector',
+  '',
+  '---',
+  '',
+  '## 5. Key Concepts',
+  '',
+  '| Concept | Description | Notes |',
+  '| --- | --- | --- |',
+  '| Correlation identifier | Its own identifier for a platform object. | — |',
+  '',
+  '---',
+  '',
+  '## 7. Lifecycle Events & Side Effects',
+  '',
+  '### 7.1 Internal Events',
+  '',
+  '| Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |',
+  '| --- | --- | --- | --- |',
+  '| Upstream read | Work for a consuming Account | — | Values originate outside the platform. |',
+  '',
+].join('\n');
+
+const bannerCases = [
+  ['# Object Canon: Webhook',      'object'],
+  ['# Concept Canon: Integration', 'concept'],
+  ['#  Concept Canon: Spaced',     'concept'],
+  ['# Implementation Canon: Microsoft', 'implementation'],
+  ['# Platform Canon: Renderer',   null],
+  ['Just some prose',              null],
+  ['',                             null],
+];
+
+for (const [first, expected] of bannerCases) {
+  test(`detectKind(${JSON.stringify(first.slice(0, 28))}) === ${expected}`, () => {
+    assert.equal(detectKind(first + '\n\nbody'), expected);
+  });
+}
+
+test('a concept parses off its own banner, with no kind supplied', () => {
+  const r = parseSections(CONCEPT_MD, '<concept>');
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.data._kind, 'concept');
+  assert.equal(r.data.concept_identity.concept_name, 'Integration');
+  assert.equal(r.data.concept_key_concepts.concepts.length, 1);
+  // §7 is the object's own template, reused unchanged
+  assert.equal(r.data.internal_events.events.length, 1);
+});
+
+test('a document with no banner fails loudly instead of being guessed at', () => {
+  const r = parseSections('## 1. Identity\n\n**Object Name:** Nope\n', '<none>');
+  assert.equal(r.errors.length, 1);
+  assert.equal(r.errors[0].section, 'banner');
+  assert.match(r.errors[0].error, /Object Canon.*Concept Canon.*Implementation Canon/);
+});
+
+test('an explicit kind still overrides detection, and the wrong one does not silently succeed', () => {
+  const r = parseSections(CONCEPT_MD, '<concept>', 'object');
+  assert.ok(r.errors.length > 0);
+});
+
+test('an unknown kind throws rather than guessing', () => {
+  assert.throws(() => parseSections(CONCEPT_MD, '<c>', 'platform'), /unknown document kind/);
+});
+
+// filename and banner are two independent statements of the same fact
+test('a filename that disagrees with the banner is reported', () => {
+  const r = parseFile('objects', { relPath: 'CANON_OBJECT_Catalog_Thing.md', source: 'original', content: CONCEPT_MD });
+  const mismatch = r.errors.filter(e => /filename declares/.test(e.error));
+  assert.equal(mismatch.length, 1);
+});
+
+test('a filename that agrees with the banner is not reported', () => {
+  const r = parseFile('concepts', { relPath: 'CANON_CONCEPT_Integration.md', source: 'original', content: CONCEPT_MD });
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.kind, 'concept');
+  assert.equal(r.dir, 'concepts');
+});
+
+// ── implementation ─────────────────────────────────────────────────
+//
+// The concept shape with one column added to §4 and §5. These prove
+// the column survives the whole loop — MD → graph → MD → graph —
+// because a binding that renders as prose and re-parses as nothing is
+// worse than no binding at all.
+
+const IMPLEMENTATION_MD = [
+  '# Implementation Canon: Microsoft',
+  '',
+  '> **Version:** 0.1',
+  '> **Owner:** Unassigned',
+  '> **Last Updated:** 2026-08-21',
+  '> **Status:** Draft',
+  '',
+  '---',
+  '',
+  '## 1. Identity',
+  '',
+  '**Implementation Name:** Microsoft',
+  '',
+  '**Implements:** Integration',
+  '',
+  '**Description:**',
+  'One named realisation.',
+  '',
+  '**Also Known As:**',
+  'None known.',
+  '',
+  '---',
+  '',
+  '## 4. Business Rules',
+  '',
+  '| Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Implements | Notes |',
+  '| --- | --- | --- | --- | --- | --- |',
+  '| BR-001 | Tokens expire after 90 days. | N/A | Vendor | integration:br-004 | — |',
+  '| BR-002 | Quota is per tenant. | N/A | Vendor | — | — |',
+  '',
+  '---',
+  '',
+  '## 5. Key Concepts',
+  '',
+  '| Concept | Description | Implements | Notes |',
+  '| --- | --- | --- | --- |',
+  '| Tenant id | The Entra tenant. | integration:actor-credential | — |',
+  '| Sku map | Vendor-specific catalogue mapping. | — | — |',
+  '',
+  '---',
+  '',
+  '## 7. Lifecycle Events & Side Effects',
+  '',
+  '### 7.1 Internal Events',
+  '',
+  '| Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |',
+  '| --- | --- | --- | --- |',
+  '| OAuth flow | First connect | — | A token is issued. |',
+  '',
+].join('\n');
+
+test('an implementation parses off its own banner', () => {
+  const r = parseSections(IMPLEMENTATION_MD, '<impl>');
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.data._kind, 'implementation');
+  assert.equal(r.data.implementation_identity.implementation_name, 'Microsoft');
+  assert.equal(r.data.implementation_identity.implements, 'Integration');
+  assert.equal(r.data.implementation_business_rules.rules.length, 2);
+  assert.equal(r.data.implementation_key_concepts.concepts[0].implements,
+    'integration:actor-credential');
+  // §7 is the object template, inherited through the concept dispatch
+  assert.equal(r.data.internal_events.events.length, 1);
+});
+
+test('an implementation filename that agrees with the banner is not reported', () => {
+  const r = parseFile('implementations', {
+    relPath: 'CANON_IMPLEMENTATION_Microsoft.md', source: 'original', content: IMPLEMENTATION_MD,
+  });
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.kind, 'implementation');
+  assert.equal(r.dir, 'implementations');
+});
+
+test('a concept filename over an implementation banner is reported', () => {
+  const r = parseFile('concepts', {
+    relPath: 'CANON_CONCEPT_Microsoft.md', source: 'original', content: IMPLEMENTATION_MD,
+  });
+  assert.equal(r.errors.filter(e => /filename declares/.test(e.error)).length, 1);
+});
+
+const implFixture = () => {
+  const impl = parseFile('implementations', {
+    relPath: 'CANON_IMPLEMENTATION_Microsoft.md', source: 'original', content: IMPLEMENTATION_MD,
+  });
+  const abstraction = {
+    relPath: 'CANON_CONCEPT_Integration.md', dir: 'concepts', kind: 'concept', prose: {},
+    data: {
+      concept_identity: { concept_name: 'Integration', parent_concept: 'None — top-level concept.' },
+      concept_key_concepts: {
+        concepts: [{ name: 'Actor credential', description: 'A token.', notes: '—' }],
+      },
+      business_rules: {
+        rules: [{ id: 'BR-004', statement: 'Credentials expire.', states: 'N/A', actor_scope: 'Vendor', notes: '—' }],
+      },
+    },
+  };
+  return [abstraction, impl];
+};
+
+test('render → parse returns the same bindings', () => {
+  const kb = createKb(toGraph(implFixture()));
+  const md = renderImplementation(kb, 'marketplace:microsoft');
+  const back = parseSections(md, '<rendered>');
+  assert.deepEqual(back.errors, []);
+  assert.equal(back.data._kind, 'implementation');
+  assert.equal(back.data.implementation_identity.implements, 'Integration');
+
+  const byName = Object.fromEntries(
+    back.data.implementation_key_concepts.concepts.map(c => [c.name, c.implements]));
+  assert.equal(byName['Tenant id'], 'integration:actor-credential');
+  assert.equal(byName['Sku map'], '—');
+
+  const byId = Object.fromEntries(
+    back.data.implementation_business_rules.rules.map(r => [r.id, r.implements]));
+  assert.equal(byId['BR-001'], 'integration:br-004');
+  assert.equal(byId['BR-002'], '—');
+});
+
+// The graph is the thing that has to survive, not the bytes.
+test('render → parse → graph preserves the implements refs', () => {
+  const first = toGraph(implFixture());
+  const md = renderImplementation(createKb(first), 'marketplace:microsoft');
+  const reparsed = parseFile('implementations', {
+    relPath: 'CANON_IMPLEMENTATION_Microsoft.md', source: 'original', content: md,
+  });
+  const second = toGraph([implFixture()[0], reparsed]);
+
+  const binds = (g) => g.refs.filter(r => r.type === 'implements')
+    .map(r => `${r.owner} → ${r.pointers.target}`).sort();
+  assert.deepEqual(binds(second), binds(first));
 });

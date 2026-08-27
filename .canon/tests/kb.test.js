@@ -244,3 +244,65 @@ test('overview hasStateMachine flag mirrors entity meta', () => {
   const foo = kb.overview().find(r => r.id === 'marketplace:foo');
   assert.equal(foo.hasStateMachine, true);
 });
+
+// ── coverage ───────────────────────────────────────────────────────
+
+// The query the Implementation type exists for: what did this
+// realisation actually bind, and what did it leave alone.
+
+const coverageKb = () => createKb({
+  nodes: [
+    { id: 'marketplace', type: 'domain', name: 'Marketplace' },
+    { id: 'marketplace:integration', type: 'concept', name: 'Integration' },
+    { id: 'integration:actor-credential', type: 'term', name: 'Actor credential', description: 'A.' },
+    { id: 'integration:instance', type: 'term', name: 'Instance', description: 'B.' },
+    { id: 'integration:br-004', type: 'rule', name: 'BR-004', description: 'C.' },
+    { id: 'marketplace:microsoft', type: 'implementation', name: 'Microsoft' },
+    { id: 'microsoft:tenant-id', type: 'term', name: 'Tenant id', description: 'D.' },
+    { id: 'microsoft:sku-map', type: 'term', name: 'Sku map', description: 'E.' },
+  ],
+  refs: [
+    { type: 'parent', owner: 'marketplace:integration', pointers: { parent: 'marketplace' } },
+    { type: 'parent', owner: 'integration:actor-credential', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration:instance', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration:br-004', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'marketplace:microsoft', pointers: { parent: 'marketplace' } },
+    { type: 'implements', owner: 'marketplace:microsoft', pointers: { target: 'marketplace:integration' } },
+    { type: 'parent', owner: 'microsoft:tenant-id', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'microsoft:tenant-id', pointers: { target: 'integration:actor-credential' } },
+    { type: 'parent', owner: 'microsoft:sku-map', pointers: { parent: 'marketplace:microsoft' } },
+  ],
+});
+
+test('coverage separates bound, unbound and own', () => {
+  const c = coverageKb().coverage('marketplace:microsoft');
+  assert.deepEqual(c.bound.map(r => r.id), ['integration:actor-credential']);
+  assert.equal(c.bound[0].boundBy, 'microsoft:tenant-id');
+  assert.deepEqual(c.unbound.map(r => r.id).sort(), ['integration:br-004', 'integration:instance']);
+  assert.deepEqual(c.own.map(r => r.id), ['microsoft:sku-map']);
+});
+
+test('coverage is null for anything that is not an implementation', () => {
+  const kb = coverageKb();
+  assert.equal(kb.coverage('marketplace:integration'), null);
+  assert.equal(kb.coverage('nope'), null);
+});
+
+// With no abstraction there is nothing declared to be unbound
+// against — the flag says so rather than the empty list implying
+// full coverage.
+test('coverage flags an unresolved abstraction', () => {
+  const kb = createKb({
+    nodes: [
+      { id: 'marketplace', type: 'domain', name: 'Marketplace' },
+      { id: 'marketplace:microsoft', type: 'implementation', name: 'Microsoft' },
+    ],
+    refs: [
+      { type: 'parent', owner: 'marketplace:microsoft', pointers: { parent: 'marketplace' } },
+      { type: 'implements', owner: 'marketplace:microsoft', pointers: { target: 'marketplace:future:integration' } },
+    ],
+  });
+  const c = kb.coverage('marketplace:microsoft');
+  assert.equal(c.abstractionResolved, false);
+  assert.deepEqual(c.unbound, []);
+});
