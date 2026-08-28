@@ -14,9 +14,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { parseRepo, sliceSections } from '../src/parse.js';
-import { toGraph, ROOT_TYPES } from '../src/graph.js';
+import { toGraph, ROOT_TYPES, entityIdFromFile, conceptIdFromFile, implementationIdFromFile } from '../src/graph.js';
 import { createKb } from '../src/kb.js';
 import { validate } from '../src/validate.js';
+import { renderNode } from '../src/render.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const parsed = parseRepo(repoRoot);
@@ -192,9 +193,29 @@ test('every implementation names an abstraction that exists', () => {
   assert.deepEqual(dangling, []);
 });
 
-test('every implementation is parented to the domain', () => {
-  const wrong = kb.list('implementation').filter(i => kb.parent(i.id)?.type !== 'domain');
+test('every implementation is parented to the domain or to another implementation', () => {
+  const wrong = kb.list('implementation')
+    .filter(i => !['domain', 'implementation'].includes(kb.parent(i.id)?.type));
   assert.deepEqual(wrong, []);
+});
+
+// A realisation too large for one document is written as a family:
+// an umbrella and one part per contract it holds. A part realises a
+// STRICTLY narrower abstraction than its umbrella, which is what
+// makes the split a structure rather than a filing habit — you cannot
+// give a part its own document without naming the kind it is about.
+// Two parts may realise the same abstraction as siblings; neither may
+// realise its umbrella's own.
+test("every part implementation strictly narrows its umbrella's abstraction", () => {
+  const abstractionOf = (id) => kb.from(id, 'implements')[0]?.pointers?.target;
+  const wrong = kb.list('implementation').filter((i) => {
+    const parent = kb.parent(i.id);
+    if (parent?.type !== 'implementation') return false;
+    const own = abstractionOf(i.id);
+    const umbrella = abstractionOf(parent.id);
+    return own === umbrella || !kb.ancestors(own).some(a => a.id === umbrella);
+  });
+  assert.deepEqual(wrong.map(i => i.id), []);
 });
 
 test('no implementation carries states, transitions or actions', () => {
@@ -208,14 +229,57 @@ test('no implementation carries states, transitions or actions', () => {
 // has none, which is a different statement from validate having a
 // check.
 test('every element binding lands inside its own abstraction', () => {
-  const stray = kb.list('implementation').flatMap(i => {
-    const abstraction = kb.from(i.id, 'implements')[0]?.pointers?.target;
+  // The ground a row may bind into is its own document's abstraction
+  // plus everything that abstraction narrows, domain excluded — a
+  // narrower concept further attributes its parent rather than
+  // restating it, so its elements are declared at the parent.
+  const groundFor = (implId) => {
+    const abstraction = kb.from(implId, 'implements')[0]?.pointers?.target;
+    return new Set([
+      abstraction,
+      ...kb.ancestors(abstraction).filter(a => a.type !== 'domain').map(a => a.id),
+    ]);
+  };
+  const stray = kb.list('implementation').flatMap((i) => {
+    const ground = groundFor(i.id);
     return kb.descendants(i.id, { node: ['term', 'rule'] })
+      // a part's own rows are checked against the part's abstraction,
+      // not against its umbrella's
+      .filter(n => kb.ancestors(n.id).find(a => a.type === 'implementation')?.id === i.id)
       .flatMap(n => kb.from(n.id, 'implements'))
       .filter(r => {
         const t = r.pointers?.target;
-        return t !== abstraction && !kb.ancestors(t).some(a => a.id === abstraction);
+        return !ground.has(t) && !kb.ancestors(t).some(a => ground.has(a.id));
       });
   });
   assert.deepEqual(stray, []);
+});
+
+
+// A §7.2 Affected Object is written "Namespace: Object" in a concept
+// or an implementation, and a row's three cells are packed into one
+// description string separated by colons. Rendering back used to cut
+// at the first colon and turn "Commerce: Order" into a namespace cell
+// and an effect beginning "Order:". Compared against the source cells
+// across the whole corpus, so the packing stays reversible.
+test('every rendered cross-effect keeps its Affected Object cell intact', () => {
+  const damaged = [];
+  for (const f of parsed.files) {
+    const rows = f.data?.cross_effects?.effects;
+    if (!rows || rows.length === 0) continue;
+    const id = entityIdFromFile(f.relPath)
+      || conceptIdFromFile(f.relPath)
+      || implementationIdFromFile(f.relPath);
+    const md = renderNode(kb, id);
+    if (!md) continue;
+    const rendered = (md.split('### 7.2')[1] || '').split('\n## ')[0]
+      .split('\n')
+      .filter(l => l.startsWith('| ') && !l.startsWith('| ---') && !l.startsWith('| Triggering'))
+      .map(l => l.split(' | ')[1]);
+    const source = rows.filter(r => r.trigger).map(r => r.affected);
+    if (rendered.join('\u0000') !== source.join('\u0000')) {
+      damaged.push({ id, rendered, source });
+    }
+  }
+  assert.deepEqual(damaged, []);
 });

@@ -24,9 +24,12 @@ mpt-marketplace-canon/
     ...                               # One file per platform object
   concepts/
     CANON_CONCEPT_Integration.md
+    CANON_CONCEPT_Integration_Validation.md
     ...                               # One file per Concept — see below
   implementations/
-    ...                               # One file per named realisation of a Concept — see below
+    CANON_IMPLEMENTATION_Adobe.md
+    CANON_IMPLEMENTATION_Adobe_Validation.md
+    ...                               # One file per named realisation, or per part of one — see below
   platform/
     CANON_PLATFORM_MarkdownRenderer.md
     ...                               # System behaviour not tied to a specific object
@@ -73,7 +76,7 @@ Two sections are worth spelling out:
 - **§5 Key Concepts** occupies the slot where an object lists its Key Attributes, and for the same reason: §5 is what the subject exposes. A Concept exposes *introduced entities* rather than fields — an ERP system introduces the notion of an identifier — and each becomes an addressable node, so a platform object references it from the object's own canon (`[[erp-system:identifier]]`). That direction matters: a Concept never enumerates the platform. That `Accounts: ErpLink` exists is the platform's fact about itself, not the ERP's fact about the platform.
 - **§7 keeps both halves.** 7.1 records what is confirmed about the concept's own workings — an internal event cycle, an upstream system it draws data from. That is internal and significant, and it is not an effect. 7.2 records what the concept causes in the domain, and is the one place a Concept document names platform objects: the acting subject describing its own effects, exactly as an object's 7.2 does.
 
-**Hierarchy is the exception.** A Concept is an arrow pointing out of the domain. When one genuinely narrows another, the narrower is its own document naming the broader as `Parent Concept`, and it *further attributes* the parent rather than replacing it. Where a relationship holds for any instance, refer to the parent; where it is specific to a kind, refer to the child.
+**Narrowing is inheritance, and the test is generality.** A Concept is an arrow pointing out of the domain, and one Concept narrows another whenever it names a genuine *kind*: a sentence about the narrower must hold for every system of that kind, whoever built it. If it is only true of one, it belongs in that system's Implementation. The narrower is its own document naming the broader as `Parent Concept`, and it *further attributes* the parent rather than replacing it. Where a relationship holds for any instance, refer to the parent; where it is specific to a kind, refer to the child. Two things narrow a Concept and both are legitimate: the **counterparty** on the other end (a back-office ERP integration narrows an integration) and the **aspect** of the contract in question (validating an order narrows contacting the platform at all). The test above is the same on either axis.
 
 An **Implementation** is one named realisation of an abstraction canon already records — Microsoft's integration, this ERP product, that vendor's marketplace. `implementations/` is one file per Implementation, and the directory need not exist until the first one is written.
 
@@ -92,6 +95,18 @@ The first row says *this is what the abstraction's actor credential turns out to
 Bindings reach §4 rules and §5 concepts only — those are the sections whose rows become addressable nodes. Events, effects and failure modes are emitted as anonymous refs with no id to point at, so an implementation states its own and notes the correspondence in prose.
 
 **Narrowing and realising are different edges.** "Back-office ERP integration" is a *Concept* that narrows "Integration", because it is still a kind: it declares a contract without saying which ERP product holds up its end. "NetSuite" is an *Implementation*, because it is one thing. Narrowing uses `Parent Concept`; realising uses `Implements`.
+
+**A realisation too large for one document is written as a family.** An integration that validates orders, fulfils them, maintains a catalogue and serves an interface holds four different contracts with the platform, each with its own timing, its own failure modes and its own body of rules — and one file carrying all four scales exactly as badly as one file carrying the whole platform canon would. So an Implementation may name another as `Parent Implementation`: an umbrella document holding what is true of the realisation as a whole, and one document per contract beneath it.
+
+```
+Integration                     Adobe                 implements Integration
+├── Validation Integration      ├── Adobe Validation   implements Validation Integration
+└── Fulfilment Integration      └── Adobe Fulfilment   implements Fulfilment Integration
+```
+
+The split is driven by the abstraction, never by file size: a part's `Implements` must be **strictly below** its umbrella's, so giving a part its own document means being able to name the narrower kind it is about — and that kind is a Concept, authored first, from which every other realisation of it benefits. This is less confining than it sounds, because the two trees are not one-to-one: several parts may realise the same abstraction as siblings, so material can be lifted out of a document before anyone can say what makes it a different kind, and re-parented when they can. The depth of a family therefore reads as how well its abstraction is understood.
+
+An umbrella never enumerates its parts, exactly as a parent Concept never enumerates the concepts that narrow it — parts name the umbrella, and `canon coverage <umbrella-id>` reports the whole family's bindings while `canon coverage <part-id>` reports one part's.
 
 **Which kind a document is comes from its own first line** — `# Object Canon:`, `# Concept Canon:` or `# Implementation Canon:` — not from the directory it sits in. A file that moves does not change meaning, and a file with no banner fails to parse rather than being guessed at.
 

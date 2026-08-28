@@ -281,3 +281,104 @@ test('an implementation may bind an object as its abstraction', () => {
   assert.ok(!kinds.includes('wrong-pointer-target-type'));
   assert.ok(kinds.includes('implements-outside-abstraction'));   // the term still binds Integration
 });
+
+// ── families ───────────────────────────────────────────────────────
+
+// One realisation may be too large for one document — an integration
+// that validates orders, fulfils them and maintains a catalogue is
+// three contracts, not one. A part document is contained in the
+// umbrella (parent) and realises a narrower abstraction than the
+// umbrella does (implements). The two trees are held together by the
+// second half of that sentence, and it is what these tests pin.
+
+const familyGraph = () => {
+  const g = implGraph();
+  g.nodes.push(
+    { id: 'marketplace:integration-validation', type: 'concept', name: 'Validation Integration' },
+    { id: 'integration-validation:draft-order', type: 'term', name: 'Draft order', description: 'The order handed over.' },
+    { id: 'marketplace:microsoft-validation', type: 'implementation', name: 'Microsoft Validation' },
+    { id: 'microsoft-validation:endpoint', type: 'term', name: 'Endpoint', description: 'The served path.' },
+  );
+  g.refs.push(
+    { type: 'parent', owner: 'marketplace:integration-validation', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration-validation:draft-order', pointers: { parent: 'marketplace:integration-validation' } },
+    { type: 'parent', owner: 'marketplace:microsoft-validation', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'marketplace:microsoft-validation', pointers: { target: 'marketplace:integration-validation' } },
+    { type: 'parent', owner: 'microsoft-validation:endpoint', pointers: { parent: 'marketplace:microsoft-validation' } },
+    { type: 'implements', owner: 'microsoft-validation:endpoint', pointers: { target: 'integration-validation:draft-order' } },
+  );
+  return g;
+};
+
+test('a part implementation under an umbrella validates', () => {
+  assert.deepEqual(validate(familyGraph()), []);
+});
+
+// A narrower concept further attributes its parent rather than
+// restating it, so the parent's elements are the part's to realise
+// too. Refusing them would force every aspect concept to copy the
+// vocabulary it inherits.
+test('a part may bind an element its abstraction inherits', () => {
+  const g = familyGraph();
+  g.refs.find(r => r.owner === 'microsoft-validation:endpoint' && r.type === 'implements')
+    .pointers.target = 'integration:actor-credential';
+  assert.deepEqual(validate(g), []);
+});
+
+// The domain is not part of the inherited ground — otherwise every
+// binding anywhere in the corpus would be "inside" every abstraction.
+test('inheritance does not reach past the domain into another subject', () => {
+  const g = familyGraph();
+  g.nodes.push({ id: 'marketplace:erp', type: 'concept', name: 'ERP' });
+  g.nodes.push({ id: 'erp:identifier', type: 'term', name: 'Identifier', description: 'Which ERP.' });
+  g.refs.push({ type: 'parent', owner: 'marketplace:erp', pointers: { parent: 'marketplace' } });
+  g.refs.push({ type: 'parent', owner: 'erp:identifier', pointers: { parent: 'marketplace:erp' } });
+  g.refs.find(r => r.owner === 'microsoft-validation:endpoint' && r.type === 'implements')
+    .pointers.target = 'erp:identifier';
+  const e = validate(g).find(x => x.kind === 'implements-outside-abstraction');
+  assert.equal(e.abstraction, 'marketplace:integration-validation');
+});
+
+// Strict, and deliberately so: a part that realises exactly what its
+// umbrella realises has not said what it is about. The remedy is not
+// a looser check but a sibling — same umbrella, same abstraction as
+// its sibling — until the narrower kind can be named.
+test('a part realising its umbrella\'s own abstraction is refused', () => {
+  const g = familyGraph();
+  g.refs.find(r => r.type === 'implements' && r.owner === 'marketplace:microsoft-validation')
+    .pointers.target = 'marketplace:integration';
+  const e = validate(g).find(x => x.kind === 'implements-not-narrower-than-parent');
+  assert.equal(e.node, 'marketplace:microsoft-validation');
+  assert.equal(e.parentAbstraction, 'marketplace:integration');
+});
+
+test('two parts may realise the same abstraction as siblings', () => {
+  const g = familyGraph();
+  g.nodes.push({ id: 'marketplace:microsoft-commitments', type: 'implementation', name: 'Microsoft Commitments' });
+  g.refs.push(
+    { type: 'parent', owner: 'marketplace:microsoft-commitments', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'marketplace:microsoft-commitments', pointers: { target: 'marketplace:integration-validation' } },
+  );
+  assert.deepEqual(validate(g), []);
+});
+
+test('a part realising an abstraction unrelated to its umbrella\'s is refused', () => {
+  const g = familyGraph();
+  g.nodes.push({ id: 'marketplace:erp', type: 'concept', name: 'ERP' });
+  g.refs.push({ type: 'parent', owner: 'marketplace:erp', pointers: { parent: 'marketplace' } });
+  g.refs.find(r => r.type === 'implements' && r.owner === 'marketplace:microsoft-validation')
+    .pointers.target = 'marketplace:erp';
+  const kinds = validate(g).map(e => e.kind);
+  assert.ok(kinds.includes('implements-not-narrower-than-parent'));
+});
+
+// Containment among implementations is the only thing Parent
+// Implementation means. Pointing it at the abstraction would say the
+// document is part of the thing it realises.
+test('an implementation parented to a concept is refused', () => {
+  const g = familyGraph();
+  g.refs.find(r => r.type === 'parent' && r.owner === 'marketplace:microsoft-validation')
+    .pointers.parent = 'marketplace:integration-validation';
+  const e = validate(g).find(x => x.kind === 'implementation-parent-not-implementation');
+  assert.equal(e.parentType, 'concept');
+});

@@ -32,10 +32,12 @@ const NODES = Object.freeze({
   // but nothing here binds is, deliberately, indistinguishable between
   // "not implemented" and "canon does not know" — the two are the same
   // state of knowledge and canon does not pretend otherwise.
-  // `parent` is always the domain: an implementation is a top-level
-  // document. `implements` is the realisation edge, kept separate from
-  // `parent` so "what realises X" and "what is contained in X" stay
-  // different questions.
+  // `parent` is the domain, or — when this document is one part of a
+  // larger realisation — the umbrella implementation it belongs to,
+  // whose abstraction it must then strictly narrow. `implements` is
+  // the realisation edge, kept separate from `parent` so "what
+  // realises X" and "what is contained in X" stay different
+  // questions; a part document needs both answers at once.
   implementation: {
     fields: { name: 'string!', description: 'string', aliases: 'string[]' },
     refs: { parent: { min: 1, max: 1 }, implements: { min: 1, max: 1 } },

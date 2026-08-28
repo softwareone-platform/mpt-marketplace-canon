@@ -22,7 +22,7 @@
 | 7. Lifecycle Events & Side Effects | **yes**, verbatim | A Concept *has* an inside — canon simply does not claim to know all of it. 7.1 records the significant, confirmed part; 7.2 what it causes in the domain |
 | 8. Reversibility & Data Retention | no | Nothing here is created or deleted by the platform |
 | 9. Failure Modes & Edge Cases | **yes**, verbatim | What happens at the boundary when the other side misbehaves is nobody else's to document |
-| 10. Open Questions | **yes**, verbatim | Question IDs take a three-letter concept prefix (`INT-001`) |
+| 10. Open Questions | **yes**, verbatim | Question IDs take a short prefix of the concept's own (`INT-001`, `VAL-001`) |
 | 11. Changelog | **yes**, verbatim | |
 
 The numbering gaps are deliberate. They are the shape of what a Concept is not, and they are visible at a glance to anyone who knows the object template.
@@ -35,15 +35,9 @@ The numbering gaps are deliberate. They are the shape of what a Concept is not, 
 
 If it has an API collection, an ID prefix and a lifecycle, it is an object — use `CANON_OBJECT_TEMPLATE.md`. If it is platform-wide behaviour rather than a thing (a renderer, a query language), it goes in `platform/` as free prose — and note that `platform/` is not parsed into the graph.
 
-**File naming:** `concepts/CANON_CONCEPT_<Name>.md`. No namespace segment.
+**File naming:** `concepts/CANON_CONCEPT_<Name>.md`, or `concepts/CANON_CONCEPT_<Parent>_<Name>.md` for a concept that narrows another. No namespace segment. The parent's word in the filename groups the family on disk and nothing more — narrowing is stated by **Parent Concept**, and the id stays top-level either way.
 
 *Delete this whole section when you author a real document.*
-
----
-
-## Platform Invariants
-
-**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. Invariants 1–3 — Actor attribution, Actor-contextual automation, and Actor-attributable audit — apply to this concept without exception. The remaining invariants govern objects; where one bears on this concept it does so through an object, in that object's canon.
 
 ---
 
@@ -51,7 +45,7 @@ If it has an API collection, an ID prefix and a lifecycle, it is an object — u
 
 **Concept Name:** [The name canon uses. Prefer a term that does not already name a platform object, so the two cannot be confused.]
 
-**Parent Concept:** [Almost always "None — top-level concept." A Concept is an arrow pointing out of the domain, and hierarchy is the exception. Name a parent only when this concept genuinely *narrows* a broader one — see below.]
+**Parent Concept:** ["None — top-level concept.", or the broader Concept this one *narrows* — see below. Narrowing is how a subject too large for one document is divided — but it is not a filing device, so name a parent only when this concept is a genuine kind of that one.]
 
 **Description:**
 [2–4 sentences. What is this thing from the platform's point of view, and why does the platform have a relationship with it? Say what canon records about it and what it does not attempt — a Concept is a partial account by construction.]
@@ -60,6 +54,12 @@ If it has an API collection, an ID prefix and a lifecycle, it is an object — u
 [Alternative names in engineering, support, or vendor usage. Do **not** list a name that also names a platform object — an alias claims that name in `[[WikiLink]]` resolution and would silently redirect every cross-reference here. Where a word genuinely names both, say so in the Description.]
 
 > **On Parent Concept.** Narrowing works like inheritance, not like containment: the child is its own document with its own top-level id, and it *further attributes* the parent rather than replacing it. That is what makes the choice of level meaningful — where the platform's relationship holds for any instance, refer to the parent; where it is specific to one kind, refer to the child. Never enumerate children in the parent; a child declares itself here.
+>
+> **Two things narrow a concept, and both are legitimate.** A concept may be narrowed by **counterparty** — the kind of system on the other end, as a back-office ERP integration narrows an integration — or by **aspect**: the part of the contract in question, as validating an order narrows contacting the platform at all. An aspect concept is a real kind and not a filing device, and the test is the same one as always: a sentence about it must hold for *every* system that does that thing, whoever wrote it. If the sentence is only true of one vendor, it belongs in that vendor's Implementation.
+>
+> Narrowing by aspect is what lets a large realisation be written as several documents instead of one — see the *When one document is not enough* section of `CANON_IMPLEMENTATION_TEMPLATE.md`. Write the aspect concept first: an Implementation cannot be split along a joint that the abstraction does not have.
+>
+> A concept may be narrowed on both axes at once, and the two do not have to meet in one tree. Nothing forces a single hierarchy, and a concept has exactly one parent — so where an aspect and a counterparty genuinely cross, pick the narrowing that carries the contract and state the other in the Description.
 
 ---
 
@@ -72,7 +72,6 @@ If it has an API collection, an ID prefix and a lifecycle, it is an object — u
 > **Guidance:**
 > - Same `BR-NNN` ids and the same rules as an object's Section 4. "Applies In State(s)" is `N/A` throughout — a Concept has no states.
 > - A rule here is an obligation or property of **the concept**, not of the platform. "The platform records a failed attempt" is the platform's rule and belongs in the relevant object's canon; "an Integration answering a validation callout answers synchronously" is this concept's.
-> - Reserve one rule for the epistemic limit: that canon records only the confirmed and significant part of this concept, and that nothing beyond §7.1 may be inferred about how it works. It is the rule a later editor is most likely to breach in good faith.
 
 ---
 

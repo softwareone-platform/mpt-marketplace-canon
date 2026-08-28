@@ -83,6 +83,7 @@ const orDash = (v) => {
   return s === '' ? '—' : s;
 };
 
+const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const yesNo = (v) => v ? 'Yes' : 'No';
 const joinList = (a) => Array.isArray(a) ? a.join(', ') : (a || '');
 
@@ -255,13 +256,19 @@ const buildCrossEffectsData = (kb, entityId) => {
   const refs = kb.from(entityId, 'note').filter(r => r.meta?.kind === 'cross-effect');
   return {
     effects: refs.map(r => {
-      // description format from emitCrossEffects: "<trigger> → <affected>: <effect>"
+      // description format from emitCrossEffects: "<trigger> → <affected>: <effect>".
+      // The affected cell may itself contain a colon ("Accounts: ErpLink"),
+      // so it is read from meta and only its length used to split the
+      // description. Older graphs without it fall back to the first colon.
       const desc = String(r.description || '');
-      const m = desc.match(/^(.+?)\s*→\s*([^:]+?):\s*(.+)$/);
+      const affected = String(r.meta?.affected || '');
+      const m = affected
+        ? desc.match(new RegExp(`^(.+?)\\s*→\\s*${escapeRe(affected)}:\\s*(.+)$`))
+        : desc.match(/^(.+?)\s*→\s*([^:]+?):\s*(.+)$/);
       return {
         trigger: m ? m[1].trim() : desc,
-        affected: m ? m[2].trim() : '—',
-        effect: m ? m[3].trim() : '—',
+        affected: m ? (affected || m[2]).trim() : '—',
+        effect: m ? (affected ? m[2] : m[3]).trim() : '—',
         automated: yesNo(r.meta?.automated),
         condition: orDash(r.meta?.condition),
         notes: orDash(r.meta?.notes),
@@ -392,23 +399,22 @@ const renderEntity = (kb, entityId) => {
 // ownership matrix, no observable lifecycle, and nothing the platform
 // creates or deletes.
 
-const CONCEPT_INVARIANTS_BLOCK =
-  '## Platform Invariants\n\n' +
-  '**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. ' +
-  'Invariants 1–3 — Actor attribution, Actor-contextual automation, and ' +
-  'Actor-attributable audit — apply to this concept without exception. ' +
-  'The remaining invariants govern objects; where one bears on this ' +
-  'concept it does so through an object, in that object\'s canon.';
-
-const parentConceptDisplay = (kb, concept) => {
-  const parentId = kb.from(concept.id, 'parent')[0]?.pointers?.parent;
-  const qualifier = concept.meta?.parentConceptNote;
+// A parent ref that landed on the domain is the "None" case: for a
+// concept that reads "top-level concept", for an implementation "top-
+// level implementation". Same shape, different note key, so the one
+// function serves both.
+const parentDisplay = (kb, node, noteKey) => {
+  const parentId = kb.from(node.id, 'parent')[0]?.pointers?.parent;
+  const qualifier = node.meta?.[noteKey];
   if (!parentId || parentId === 'marketplace') {
     return qualifier ? `None — ${qualifier}` : 'None.';
   }
   const base = kb.get(parentId)?.name || parentId;
   return qualifier ? `${base} (${qualifier})` : base;
 };
+
+const parentConceptDisplay = (kb, concept) =>
+  parentDisplay(kb, concept, 'parentConceptNote');
 
 const buildConceptHeaderData = (concept) => ({
   concept_name: concept.name,
@@ -443,7 +449,6 @@ const renderConcept = (kb, conceptId) => {
 
   const parts = [];
   parts.push(renderTemplate(TPL.concept_header, buildConceptHeaderData(concept)).trim());
-  parts.push(CONCEPT_INVARIANTS_BLOCK);
   parts.push(renderTemplate(TPL.concept_identity, buildConceptIdentityData(kb, concept)).trim());
   parts.push(renderTemplate(TPL.business_rules, buildBusinessRulesData(kb, conceptId)).trim());
   parts.push(renderTemplate(TPL.concept_key_concepts, buildConceptKeyConceptsData(kb, conceptId)).trim());
@@ -470,15 +475,6 @@ const renderConcept = (kb, conceptId) => {
 // cell again: "this row is the implementation's own" and "canon does
 // not say" are the same mark, because they are the same fact.
 
-const IMPLEMENTATION_INVARIANTS_BLOCK =
-  '## Platform Invariants\n\n' +
-  '**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. ' +
-  'Invariants 1–3 — Actor attribution, Actor-contextual automation, and ' +
-  'Actor-attributable audit — apply to this implementation without ' +
-  'exception. Everything this document does not bind is unbound: the ' +
-  'abstraction still declares it, and canon does not distinguish ' +
-  '"not implemented here" from "not recorded here".';
-
 const implementsDisplay = (kb, impl) => {
   const targetId = kb.from(impl.id, 'implements')[0]?.pointers?.target;
   const qualifier = impl.meta?.implementsNote;
@@ -503,6 +499,7 @@ const buildImplementationHeaderData = (impl) => ({
 const buildImplementationIdentityData = (kb, impl) => ({
   implementation_name: impl.name,
   implements: implementsDisplay(kb, impl),
+  parent_implementation: parentDisplay(kb, impl, 'parentImplementationNote'),
   description: impl.description || '',
   aliases: (impl.aliases && impl.aliases.length > 0)
     ? impl.aliases.join(', ')
@@ -524,7 +521,6 @@ const renderImplementation = (kb, implId) => {
 
   const parts = [];
   parts.push(renderTemplate(TPL.implementation_header, buildImplementationHeaderData(impl)).trim());
-  parts.push(IMPLEMENTATION_INVARIANTS_BLOCK);
   parts.push(renderTemplate(TPL.implementation_identity, buildImplementationIdentityData(kb, impl)).trim());
   parts.push(renderTemplate(TPL.implementation_business_rules,
     withBindings(kb, buildBusinessRulesData(kb, implId), 'rules', ruleIdOf)).trim());

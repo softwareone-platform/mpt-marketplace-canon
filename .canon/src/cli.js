@@ -208,6 +208,7 @@ const help = () => {
   console.log('  paths <a> <b> [depth]     — shortest paths between two nodes');
   console.log('  describe <id>             — full graph slice for one entity, concept or implementation');
   console.log('  coverage <id>             — what an implementation binds of its abstraction, and what it leaves unbound');
+  console.log('                              (an umbrella id covers its whole family; a part id covers that part alone)');
   console.log('  render <id>               — render an entity, concept or implementation as canonical MD on stdout');
   console.log('  align                     — re-run align.js (regenerate .patches/align-format/)');
   console.log('  reindex                   — rebuild RAG index from sources (slow first run)');

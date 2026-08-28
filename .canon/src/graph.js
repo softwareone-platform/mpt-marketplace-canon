@@ -423,6 +423,12 @@ const emitCrossEffects = (entityId, parsed, nameIndex) => {
       },
       meta: {
         kind: 'cross-effect',
+        // The description packs three cells into one string, and
+        // "Accounts: ErpLink" carries a colon of its own — so which
+        // colon separates the affected object from the effect cannot
+        // be recovered by reading it back. Kept verbatim here so the
+        // renderer never has to guess.
+        affected: row.affected || '',
         automated: yesNo(row.automated),
         condition: row.condition || '',
         notes: row.notes || '',
@@ -592,6 +598,7 @@ const emitImplementation = (id, parsed, nameIndex) => {
   const ident = parsed.implementation_identity || {};
   const header = parsed.implementation_header || {};
   const implSplit = splitIdentityValue(ident.implements);
+  const parentSplit = splitIdentityValue(ident.parent_implementation);
 
   const node = {
     id,
@@ -605,13 +612,21 @@ const emitImplementation = (id, parsed, nameIndex) => {
       lastUpdated: header.last_updated || null,
       status: header.status || null,
       implementsNote: implSplit.qualifier || undefined,
+      parentImplementationNote: parentSplit.qualifier || undefined,
     },
   };
 
-  // Containment and realisation are separate edges: an implementation
-  // is a top-level document (parent = domain) that realises something
-  // else (implements = the abstraction).
-  const parentRef = { type: 'parent', owner: id, pointers: { parent: DOMAIN_ID } };
+  // Containment and realisation are separate edges, and one subject
+  // needs both: an aspect document is contained in the umbrella
+  // implementation it is part of (parent) while realising a narrower
+  // abstraction than the umbrella does (implements). "None" lands on
+  // the domain, which is the shape every implementation had before
+  // families existed.
+  const parentRef = {
+    type: 'parent',
+    owner: id,
+    pointers: { parent: resolveParentRef(parentSplit.value || ident.parent_implementation, nameIndex) },
+  };
   const implementsRef = {
     type: 'implements',
     owner: id,

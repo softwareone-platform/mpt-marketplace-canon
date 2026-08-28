@@ -391,6 +391,8 @@ const IMPLEMENTATION_MD = [
   '',
   '**Implements:** Integration',
   '',
+  '**Parent Implementation:** None — top-level implementation.',
+  '',
   '**Description:**',
   'One named realisation.',
   '',

@@ -13,7 +13,7 @@
 
 | Concept section | In an Implementation | Difference |
 |---|---|---|
-| 1. Identity | **yes** | **Implements:** replaces **Parent Concept:** — it names the abstraction this document realises |
+| 1. Identity | **yes** | **Implements:** replaces **Parent Concept:** — it names the abstraction this document realises. **Parent Implementation:** is additional — it names the umbrella this document is one part of, when it is one |
 | 4. Business Rules | **yes**, + column | An `Implements` column. A rule may bind a rule of the abstraction, or stand alone |
 | 5. Key Concepts | **yes**, + column | An `Implements` column. A concept may bind a concept of the abstraction, or stand alone |
 | 7. Lifecycle Events & Side Effects | **yes**, verbatim | No binding — see *What cannot be bound* below |
@@ -33,9 +33,34 @@ Three questions, in order:
 
 Question 2 is the one that gets answered wrongly. "Back-office ERP integration" is a Concept even though it is narrower than "Integration", because it is still a *kind*: it declares a contract without saying which ERP product holds up its end. Beware the near miss: "vendor system integration" looks like the same shape and is not one, because a vendor registers whichever declared channels it needs and what it operates is a deployment unit, not a kind. Narrowing between Concepts is inheritance, and it happens through **Parent Concept**. Instantiation is a different edge and it happens here, through **Implements**.
 
-**File naming:** `implementations/CANON_IMPLEMENTATION_<Name>.md`. No namespace segment. The directory need not exist until the first document creates it.
+**File naming:** `implementations/CANON_IMPLEMENTATION_<Name>.md`, or `implementations/CANON_IMPLEMENTATION_<Umbrella>_<Part>.md` for one part of a larger realisation. No namespace segment. The directory need not exist until the first document creates it.
 
 *Delete this whole section when you author a real document.*
+
+---
+
+## When one document is not enough
+
+A large realisation is several contracts, not one. An integration that validates orders, fulfils them, maintains a catalogue and serves an interface holds four different relationships with the platform, each with its own timing, its own failure modes and its own body of rules — and a single file that carries all four scales exactly as badly as a single file carrying the whole platform canon would.
+
+So a realisation may be split across a **family**: one umbrella document and one document per part.
+
+```
+Integration                     Adobe                 implements Integration
+├── Validation Integration      ├── Adobe Validation   implements Validation Integration
+└── Fulfilment Integration      └── Adobe Fulfilment   implements Fulfilment Integration
+```
+
+**The split is driven by the abstraction, never by file size.** To give a part its own document you must be able to name the narrower *kind* of thing it is about — and that kind is a Concept, authored first, from which every other implementation of it benefits. This is what canon checks:
+
+- **Parent Implementation** names the umbrella. It is containment, and it may only name another implementation — never the abstraction, which is the other edge.
+- A part's **Implements** must be **strictly below** its umbrella's. `implements-not-narrower-than-parent` is the error when it is not.
+
+That rule is less confining than it sounds, because the two trees are not one-to-one: **several parts may realise the same abstraction as siblings.** If you need to lift a body of rules out of `Adobe Fulfilment` before you can name what makes it a different kind, the new document goes *beside* it under the same umbrella, realising the same abstraction. When the narrower concept is eventually written, re-parent it. The depth of a family is therefore a reading of how well its abstraction is understood, which is a fact worth having rather than a bureaucratic obstacle.
+
+**The umbrella carries what is true of the whole realisation** — its credential, its deployment, its ownership, the identifiers it correlates by — and it never enumerates its parts, exactly as a parent Concept never enumerates the concepts that narrow it. Parts name the umbrella; the umbrella does not know them.
+
+`canon coverage <umbrella-id>` reports the **family's** bindings against the abstraction and everything narrowing it; `canon coverage <part-id>` reports that part alone.
 
 ---
 
@@ -46,7 +71,7 @@ A binding is a claim that a row here **is** the abstraction's element, made conc
 Three things are checked, and a document that fails any of them does not validate:
 
 - the abstraction named in §1 exists — an implementation of nothing cannot have its bindings checked at all, so unlike an unresolved **Parent Object** this does not degrade quietly to a `future:` stub;
-- every bound element belongs to **that** abstraction's own subtree;
+- every bound element belongs to **that** abstraction's subtree, or to the subtree of a concept it narrows — a narrower Concept further attributes its parent rather than restating it, so an implementation of `Validation Integration` realises `integration:actor-credential` at `Integration`, where it is declared;
 - types match — a rule binds a rule, a concept binds a concept.
 
 **An empty `Implements` cell is not an omission.** It says the row is this implementation's own: a concept the abstraction never declared, a rule that applies to this realisation and no other. Extending the abstraction is half of what an Implementation is for.
@@ -67,17 +92,13 @@ So an implementation states its own §7 events and its own §9 failures, and can
 
 ---
 
-## Platform Invariants
-
-**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. Invariants 1–3 — Actor attribution, Actor-contextual automation, and Actor-attributable audit — apply to this implementation without exception. Everything this document does not bind is unbound: the abstraction still declares it, and canon does not distinguish "not implemented here" from "not recorded here".
-
----
-
 ## 1. Identity
 
 **Implementation Name:** [The name canon uses for this one realisation. Usually the vendor or product name — "Microsoft", "Adobe", "NetSuite".]
 
-**Implements:** [The abstraction, by name — "Integration", "Vendor System Integration", "Commerce: Order". Exactly one, and it must already exist in canon.]
+**Implements:** [The abstraction, by name — "Integration", "Validation Integration", "Commerce: Order". Exactly one, and it must already exist in canon. Where a Concept for the subject exists, name the Concept and not the platform object: the relationship to the platform's own notion is stated once, at the level of the abstraction.]
+
+**Parent Implementation:** ["None — top-level implementation." or the name of the umbrella this document is one part of.]
 
 **Description:**
 [2–4 sentences. What is this particular thing, who runs it, and what does the platform's relationship with it consist of? Say what canon has established about it and how — a named implementation attracts hearsay, and this is where you mark the line between what was verified and what was reported.]
@@ -149,7 +170,7 @@ So an implementation states its own §7 events and its own §9 failures, and can
 
 ## 10. Open Questions
 
-> Question IDs use a three-letter prefix for the implementation (e.g. `MSF-001`), distinct from the abstraction's. Track them in `CANON_OPEN_QUESTIONS.md`.
+> Question IDs use a short prefix that is unique to **this document** (e.g. `MSF-001`, `MSFVAL-001`) — distinct from the abstraction's and from every sibling's in the family. A family does not share one sequence: two parts edited in parallel would both take the next number.
 
 - [ ] [XXX-001]: [Question statement.]
 

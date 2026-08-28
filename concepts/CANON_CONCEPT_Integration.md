@@ -1,15 +1,9 @@
 # Concept Canon: Integration
 
-> **Version:** 0.3
+> **Version:** 0.4
 > **Owner:** Unassigned
-> **Last Updated:** 2026-08-27
+> **Last Updated:** 2026-08-28
 > **Status:** Draft
-
----
-
-## Platform Invariants
-
-**Platform Invariants:** See `PLATFORM_CANON_PREAMBLE.md`. Invariants 1–3 — Actor attribution, Actor-contextual automation, and Actor-attributable audit — apply to this concept without exception. The remaining invariants govern objects; where one bears on this concept it does so through an object, in that object's canon.
 
 ---
 
@@ -20,7 +14,13 @@
 **Parent Concept:** None — top-level concept.
 
 **Description:**
-An Integration is a system outside the SoftwareOne Marketplace that acts on the platform, or is acted on by it, across a contract. The platform core is Vendor-agnostic and Client-agnostic (preamble §2.3): it provides universal primitives, and every Vendor-specific or Client-specific behaviour is implemented in an Integration rather than in the core — so an Integration is the platform's intended mechanism for specific business logic, not a peripheral case. Canon records the entities an Integration introduces, what is confirmed about its workings, and what it causes in the domain; it does not claim to describe the whole of what an Integration is. The word "extension" is used across the platform's sources both for this relationship and for the registered platform object that is one way of holding it; canon uses **Extension** for the object only, and **Integration** for the relationship. Narrower kinds — one serving a vendor's own system, one serving a back-office ERP — hold materially different contracts and belong in their own Concept documents naming this one as parent.
+An Integration is a system outside the SoftwareOne Marketplace that acts on the platform, or is acted on by it,
+across a contract. The platform core is Vendor-agnostic and Client-agnostic (preamble §2.3): it provides universal
+primitives, and every Vendor-specific or Client-specific behaviour is implemented in an Integration rather than in
+the core — so an Integration is the platform's intended mechanism for specific business logic, not a peripheral
+case. The word "extension" is used across the platform's sources both for this relationship and for the registered
+platform object that is one way of holding it. **Extension** names that object; **Integration** names the
+relationship.
 
 **Also Known As:**
 Connector, Plugin, ISV integration.
@@ -36,9 +36,7 @@ Connector, Plugin, ISV integration.
 | BR-003 | Registration with the platform is optional. An Integration that does not register presents the same contact surface minus everything declared, and leaves no record that it exists. | N/A | All | The absence of a registration is therefore not evidence that no Integration is present. |
 | BR-004 | A registered Integration declares its contract as data, and receives from the platform only what that declaration names. | N/A | All | Covers served API paths, event subscriptions, scheduled triggers, user interface plugs and webhook handlers. |
 | BR-005 | An Integration is multi-tenant. It serves each consuming [[Account]] under configuration held separately for that Account, and acts for one Account at a time. | N/A | All | The consenting unit is the Account's installation of the Integration, not the Integration itself. |
-| BR-006 | An Integration that answers a validation callout answers it synchronously, and the platform applies its response as a mutation to the object that triggered the event. | N/A | All | The platform calls the first matching handler, not every one of them. |
 | BR-007 | An Integration correlates platform objects with its own records through an identifier it stores on the object and alone assigns meaning to. Identifiers are partitioned per Actor, and an Integration reads and writes only its own. | N/A | All | Two Integrations may therefore hold different identifiers for the same object without conflict. |
-| BR-008 | Canon records only the confirmed and significant part of an Integration's workings. An Integration has no states and no transitions in canon, and nothing beyond what Section 7.1 states may be inferred about how it works internally. | N/A | All | This is what distinguishes a Concept from an object: the account is partial by construction, not by omission. |
 
 ---
 
@@ -63,12 +61,10 @@ Connector, Plugin, ISV integration.
 
 ### 7.1 Internal Events
 
-> What is confirmed about an Integration's own workings. Not a complete account — the significant part, and no more.
-
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
 | Instance connects | The Integration deploys, restarts, or recovers from a dropped connection | — | The instance opens a channel outward to the platform and holds it open. The platform never dials in, so an Integration it cannot reach is one whose instance has not connected. |
-| Upstream read | Work the Integration performs for a consuming [[Account]] | — | Values a vendor Integration writes into the platform originate in that vendor's own system. Their correctness, availability and rules belong to that system, not to the platform and not to canon. |
+| Upstream read | Work the Integration performs for a consuming [[Account]] | — | Values a vendor Integration writes into the platform originate in that vendor's own system. Their correctness, availability and rules belong to that system, not to the platform. |
 | Scheduled run | A schedule the Integration declares, expressed as a cron expression | — | Work begins with no Actor acting and no platform event preceding it. |
 | Reconfiguration | A change to the Integration's declared contract or to its running version | — | What the platform routes to the Integration changes. The platform learns the new contract from the instance, not the reverse. |
 | Health report | The Integration's own reporting interval | — | The platform's only evidence that an Integration is alive. Silence is indistinguishable from a lost channel. |
@@ -77,8 +73,6 @@ Connector, Plugin, ISV integration.
 
 | Triggering Event | Affected Object | Effect on Affected Object | Automated? | Condition | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Validation callout answered | Commerce: Order | The Integration's response is applied as a mutation to the [[Order]] that triggered the event | Yes | A [[Webhook]] of an Order-family type is Enabled and its criteria match | The platform calls the first matching handler only. |
-| Fulfilment write | Commerce: Subscription | Provisioning outcomes arrive as ordinary API writes on the [[Subscription]] | No | The Integration serves the [[Product]] the Subscription was bought under | Nothing in the object distinguishes them from a human Actor's writes. |
 | Reconciliation run | Accounts: ErpLink | [[ErpLink]] records are created and removed as the back-office system reconciles a [[Buyer]]'s set of [[Seller]]s | Yes | Always, for the ERP sync | No Actor creates or deletes one through the API. |
 | Correlation write | Commerce: Agreement | The Integration's own identifier for the contract is stored under its Actor's key on the [[Agreement]] | No | The writing Actor owns that key | The platform validates neither the value nor its continued correctness. |
 | Any authenticated call | Audit: Audit Record | A record is written against the Actor whose credential authenticated the call | Yes | Always | There is no anonymous Integration and no Integration Actor. |
@@ -94,7 +88,7 @@ Connector, Plugin, ISV integration.
 | The credential the Integration holds is deleted or disabled | Authentication stops immediately and the Integration fails until it is re-keyed. | Vendor, Operations, Client | Medium | Disabling an [[API Token]] is reversible; deleting it is not. |
 | The Integration writes a correlation identifier that no longer matches anything on its own side | The platform accepts it, validating neither the value nor its continued correctness. | Vendor, Client | Low | Permissive by default, per preamble §3.1. |
 | The Integration is decommissioned without being uninstalled or having its credential revoked | Its credential and its records outlive it. An unregistered Integration leaves the platform no signal at all that the system behind it is gone. | Operations | Medium | A registered Integration at least stops reporting health. |
-| A vendor programme is presented to users as an "extension" but holds no registration | The platform behaves consistently. The mismatch is one of vocabulary, and it misleads anyone reasoning from the public documentation back to the object model. | Operations, Client | Low | See Section 1 for the distinction canon holds to. |
+| A vendor programme is presented to users as an "extension" but holds no registration | The platform behaves consistently. The mismatch is one of vocabulary, and it misleads anyone reasoning from the public documentation back to the object model. | Operations, Client | Low | See Section 1. |
 
 ---
 
@@ -104,7 +98,7 @@ Connector, Plugin, ISV integration.
 - [ ] [INT-002]: What becomes of a declared event, schedule or served API path when no instance of the Integration is connected — is it queued, dropped, or failed back to the caller?
 - [ ] [INT-003]: When an Integration acts for a consuming [[Account]] rather than the [[Account]] that owns it, whose authority applies — its own credential's, or the consuming Account's?
 - [ ] [INT-004]: Which of the vendor programmes published under "Extensions" in the platform's public documentation hold a platform registration, and which are Integrations by other means?
-- [ ] [INT-005]: Which narrower Integrations warrant their own Concept documents parented to this one? A back-office ERP Integration is the candidate the evidence supports. A vendor-system Integration is not: one codebase registers whichever of the declared channels it needs, so what a named vendor operates is a deployment unit rather than a kind, and the narrowing it appeared to justify was an aspect of the contact surface instead.
+- [ ] [INT-005]: Does a back-office ERP Integration hold a contract materially different from this one? What is specific to that counterparty has not been established.
 - [ ] [INT-006]: Is there any element of the contact surface through which an Integration can act without an Actor-attributed credential? BR-002 asserts there is not, on the strength of the platform invariants rather than an exhaustive audit of the API.
 - [ ] [INT-007]: What does the platform defer to an Integration through a declared deferrable, and when? The registration carries a path, a method and a waiting time, and nothing establishes what kind of work travels that way. The extension SDK implements no support for it.
 
@@ -114,6 +108,7 @@ Connector, Plugin, ISV integration.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.4 | 2026-08-28 | Anton | Narrowed to what holds of any Integration. BR-008, which stated how much of an Integration canon claims to record rather than anything about an Integration, is removed along with its counterpart sentence in Section 1; its number is retired. BR-006 and the two Section 7.2 rows it governed moved to the Validation Integration and Fulfilment Integration concepts, which narrow this one by aspect; BR-006's number is retired rather than reused, since a rule id is an address. INT-005 reduced to the counterparty question that remains open. |
 | 0.3 | 2026-08-27 | Marcerito | Section 5 terms grounded on the platform entities they are defined against, now that the section is wikilinked. |
 | 0.2 | 2026-08-26 | Marcerito | Section 5's single Declared contract term split into the six channels the platform's own registration declares, so that each is addressable and an implementation can bind the ones it uses. INT-007 opened on deferrables. |
 | 0.1 | 2026-08-19 | Anton | Initial draft. First Concept canon document: the relationship between the platform and any system outside it, of which a registered Extension is one way of holding it rather than the whole of it. |

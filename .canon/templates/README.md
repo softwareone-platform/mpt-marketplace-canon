@@ -152,7 +152,7 @@ A concept document carries sections **1, 4, 5, 7, 9, 10, 11** — and no others.
 <comma-separated names, or "None known.">
 ```
 
-No Namespace and no ID Prefix: a Concept sits outside the namespace model and the platform issues it no identifier. `Parent Concept` resolves through the same name index an object's `Parent Object` uses, and points at the domain or at a broader concept — never at an entity.
+No Namespace and no ID Prefix: a Concept sits outside the namespace model and the platform issues it no identifier. `Parent Concept` resolves through the same name index an object's `Parent Object` uses, and points at the domain or at a broader concept — never at an entity. A narrowing concept's filename may carry the parent's word (`CANON_CONCEPT_Integration_Validation.md`) to group the family on disk; that only lengthens the id, which stays top-level — the hierarchy itself is the parent ref.
 
 ### Key Concepts table (5)
 
@@ -189,6 +189,8 @@ An implementation document carries the same sections a concept does — **1, 4, 
 
 **Implements:** <Concept or object name>
 
+**Parent Implementation:** <"None — top-level implementation." or "<Implementation>">
+
 **Description:**
 <prose>
 
@@ -196,7 +198,9 @@ An implementation document carries the same sections a concept does — **1, 4, 
 <comma-separated names, or "None known.">
 ```
 
-`Implements` resolves through the same name index as `Parent Object` and `Parent Concept`, but it is a different edge and a different ref type: `parent` is containment and always points at the domain here, `implements` is realisation. Exactly one, and — unlike the other two — an unresolved value is a validation error rather than a `future:` stub, because bindings cannot be checked against an abstraction that does not exist.
+`Implements` resolves through the same name index as `Parent Object` and `Parent Concept`, but it is a different edge and a different ref type: `parent` is containment, `implements` is realisation. Exactly one, and — unlike the other two — an unresolved value is a validation error rather than a `future:` stub, because bindings cannot be checked against an abstraction that does not exist.
+
+`Parent Implementation` is that containment edge, and one document needs both answers at once: a realisation too large for a single file is written as an umbrella plus one part per contract it holds, where each part is *contained in* the umbrella and *realises* something narrower than the umbrella does. "None" lands on the domain, which is the shape every implementation had before families existed. `validate.js` refuses a parent that is not itself an implementation (`implementation-parent-not-implementation`) and a part whose abstraction is not strictly below its umbrella's (`implements-not-narrower-than-parent`) — several parts may realise the same abstraction as siblings, but none may realise its umbrella's own.
 
 ### Business Rules (4) and Key Concepts (5)
 
@@ -207,7 +211,7 @@ The concept's tables with one column added before Notes:
 | Concept | Description | Implements | Notes |
 ```
 
-`Implements` holds the **full id** of an element of the abstraction — `integration:br-004`, `integration:actor-credential` — or is empty. A bare name is not accepted, for the same reason `[[mentions]]` refuse bare child names: they collide across subjects. `validate.js` checks that the target is inside the named abstraction's own subtree and that the types match; an empty cell is not checked at all, because it says the row is this implementation's own.
+`Implements` holds the **full id** of an element of the abstraction — `integration:br-004`, `integration:actor-credential` — or is empty. A bare name is not accepted, for the same reason `[[mentions]]` refuse bare child names: they collide across subjects. `validate.js` checks that the target is inside the named abstraction's subtree *or the subtree of a concept it narrows* — a narrower concept further attributes its parent rather than restating it, so its elements are declared at the parent and are the part's to realise; the chain stops below the domain. Types must match. An empty cell is not checked at all, because it says the row is this implementation's own.
 
 An element of the abstraction that no row names is **unbound**, and that is reported by `canon coverage <id>` rather than by the validator — canon cannot tell "not implemented" from "not recorded", and neither is an error.
 

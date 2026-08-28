@@ -309,6 +309,11 @@ test('a concept cross-effect points at the object it affects', () => {
   assert.equal(note.owner, 'marketplace:integration');
   assert.equal(note.pointers.about, 'marketplace:webhook');
   assert.equal(note.meta.automated, true);
+  // The description packs trigger, affected and effect into one
+  // string separated by colons, and "Notifications: Webhook" has a
+  // colon of its own — so which colon is the separator is not
+  // recoverable by reading the description back. Kept verbatim.
+  assert.equal(note.meta.affected, 'Notifications: Webhook');
 });
 
 // §4 is not a concept-specific emitter — it is the object's, unchanged.
