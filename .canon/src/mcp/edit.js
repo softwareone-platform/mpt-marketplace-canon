@@ -11,10 +11,10 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync, statSy
 import { join } from 'node:path';
 
 import { parseRepo } from '../parse.js';
-import { toGraph } from '../graph.js';
+import { toGraph, ROOT_TYPES } from '../graph.js';
 import { createKb } from '../kb.js';
 import { validate, summarize } from '../validate.js';
-import { renderEntity } from '../render.js';
+import { renderNode } from '../render.js';
 import { tools as readTools } from './read.js';
 
 const PATCHES = '.patches';
@@ -157,42 +157,41 @@ const writeTools = (repoRoot, ctx) => ({
   },
 
   patch_render: {
-    description: 'Render every entity in the current graph as canonical MD. Use to bootstrap a new patch from graph state, OR to inspect what render.js produces for an entity. Returns one file per entity (path + content).',
+    description: 'Render every entity, Concept and Implementation in the current graph as canonical MD. Use to bootstrap a new patch from graph state, OR to inspect what render.js produces. Returns one file per node (path + content) — entities under objects/, concepts under concepts/, implementations under implementations/.',
     inputSchema: {
       type: 'object',
       properties: {
         ids: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Optional list of entity ids. If omitted, renders every entity.',
+          description: 'Optional list of entity, concept or implementation ids. If omitted, renders all of them.',
         },
       },
       additionalProperties: false,
     },
     handler: ({ ids } = {}) => {
       const kb = ctx.state.kb;
-      const entities = ids
-        ? ids.map(id => kb.get(id)).filter(n => n && n.type === 'entity')
-        : kb.list('entity');
-      const files = entities.map(e => {
-        // Recover original filename from kb metadata if available; else
-        // synthesize from id.
-        const path = `objects/${filenameFor(e)}.md`;
-        return { path, content: renderEntity(kb, e.id) };
-      });
+      const renderable = ids
+        ? ids.map(id => kb.get(id)).filter(n => n && ROOT_TYPES.includes(n.type))
+        : ROOT_TYPES.flatMap(t => kb.list(t));
+      const files = renderable.map(n => ({
+        path: pathFor(n),
+        content: renderNode(kb, n.id),
+      }));
       return { files };
     },
   },
 });
 
-const filenameFor = (entity) => {
-  // Reverse of the parse-side filename derivation. We don't keep the
-  // original file mapping on the entity, so synthesize a stable
-  // form from namespace + id-tail in PascalCase.
-  const ns = entity.meta?.namespace || 'Catalog';
-  const tail = entity.id.split(':').slice(-1)[0]
+// Reverse of the parse-side filename derivation. We don't keep the
+// original file mapping on the node, so synthesize a stable form.
+const pathFor = (node) => {
+  const tail = node.id.split(':').slice(-1)[0]
     .split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-  return `CANON_OBJECT_${ns}_${tail}`;
+  if (node.type === 'concept') return `concepts/CANON_CONCEPT_${tail}.md`;
+  if (node.type === 'implementation') return `implementations/CANON_IMPLEMENTATION_${tail}.md`;
+  const ns = node.meta?.namespace || 'Catalog';
+  return `objects/CANON_OBJECT_${ns}_${tail}.md`;
 };
 
 const createEditServer = (repoRoot, { name = 'canon-edit', version = '0.1.0' } = {}) => {

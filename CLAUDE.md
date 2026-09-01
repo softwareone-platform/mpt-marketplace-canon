@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-This is not application code — it's a versioned knowledge base. `objects/`, `platform/`, and `preamble/` are the authoritative source-of-truth Markdown describing the SoftwareOne Marketplace platform's objects, state machines, business rules, and invariants. Everything else in the repo (`.canon/`, `scripts/`, `.claude/skills/`) exists to produce, validate, or query that Markdown — it is tooling in service of the content, not the point of the repo.
+This is not application code — it's a versioned knowledge base. `objects/`, `concepts/`, `implementations/`, `platform/`, and `preamble/` are the authoritative source-of-truth Markdown describing the SoftwareOne Marketplace platform's objects, state machines, business rules, and invariants. Everything else in the repo (`.canon/`, `scripts/`, `.claude/skills/`) exists to produce, validate, or query that Markdown — it is tooling in service of the content, not the point of the repo.
 
 ## Two separate subsystems — do not conflate them
 
@@ -16,11 +16,11 @@ This is not application code — it's a versioned knowledge base. `objects/`, `p
 **`.canon/` app** (run from repo root, needs `npm install && npm run setup` once per clone):
 ```bash
 npm test                          # full unit + integration suite
-npm run validate                  # parse + validate objects/ (no patches)
-npm run validate -- <patch-id>    # parse + validate objects/ + a candidate patch
-npm run apply <patch-id>          # write a validated patch into objects/
+npm run validate                  # parse + validate the whole corpus (no patches)
+npm run validate -- <patch-id>    # ...plus a candidate patch overlaid
+npm run apply <patch-id>          # write a validated patch into the source directories
 npm run apply <patch-id> -- --dry-run
-npm run stats / overview / find / reindex   # read-side CLI queries against objects/
+npm run stats / overview / find / reindex   # read-side CLI queries against the parsed corpus
 ```
 
 **Canon spec/schema scripts** (existing, in `scripts/`, Python 3, stdlib-only unless noted):
@@ -41,6 +41,52 @@ python scripts/canon_drift_scan.py <fingerprint|spec-diff|source|scan> ...   # h
 python scripts/canon_baseline.py <get|record|list|list-canonised|paths-get|paths-set> ...   # drift baselines (config/canon_source_baselines.json) + gitignored object→source-path cache (no secrets)
 ```
 The four evidence scripts (`canon_fetch_openapi_spec.py`, `canon_fetch_live.py`, `canon_diff_actors.py`, `canon_repo_sync.py`) read config from `config/canon_pipeline.config.json` and secrets from `.env` (copy from `.env.example`; never commit real values). The two drift scripts (`canon_drift_scan.py`, `canon_baseline.py`) need no secrets — pure git + JSON — and are invoked by the `canon-drift` Skills, not `canon-generate`. `canon_fetch_live.py` is architecturally GET-only for every environment — there is no `--method` flag and no code path for a write request; do not add one. `canon_fetch_openapi_spec.py` exists because STAGING can be ahead of PROD (preamble §7) — always pull the spec for the environment you're about to call rather than reusing one cached copy across both.
+
+## Three kinds of canon document: Objects, Concepts and Implementations
+
+`objects/` describes what the platform **owns** — a thing with an API collection, an ID prefix, a lifecycle, and an Actor who creates it. `concepts/` describes what the platform **does not own but must still reason about** — an integration, an ERP system, a vendor's own platform. `implementations/` describes **one named realisation** of a Concept or an object — Microsoft's integration, this ERP product. All three parse into the same graph.
+
+A Concept document is a **partial of an object document**: it uses only section numbers the object template already defines, and means by them what the object means.
+
+| Section | Concept | |
+|---|---|---|
+| 1. Identity | yes, reduced | no Namespace, no ID Prefix |
+| 2. Ownership & Visibility | — | nobody creates or deletes it through the API |
+| 3. State Machine | — | the platform cannot observe its states |
+| 4. Business Rules | yes, unchanged | `N/A` in "Applies In State(s)" |
+| 5. Key Attributes → **Key Concepts** | yes, reframed | the entities the concept introduces, in the slot where an object lists its fields |
+| 6. Relationships to Other Objects | — | a relationship to an object is that object's fact |
+| 7. Lifecycle Events & Side Effects | yes, unchanged | both halves — see below |
+| 8. Reversibility & Data Retention | — | nothing here is created or deleted by the platform |
+| 9–11 | yes, unchanged | |
+
+Picking the wrong template is the failure this split exists to prevent: an external system forced into the object template acquires states nobody observed, and a later reader cannot tell them from the confirmed ones. All three tests must hold for a Concept — no Actor creates it through the API and it would exist without the platform; it has no states or transitions the platform can observe (*if you are writing a state machine, you are writing an object*); it nevertheless contacts the domain across a contract that can be written down.
+
+Neither fits? Platform-wide behaviour that is not a thing at all (a renderer, a query language) goes in `platform/` as free prose — and note `platform/` is **not parsed into the graph**, so anything put there is invisible to the MCP servers and to every graph query.
+
+Conventions specific to concepts:
+
+- **The banner declares the kind.** A document's first line is `# Object Canon:`, `# Concept Canon:` or `# Implementation Canon:`, and that — not the directory — is what the parser goes by. A file with no banner fails to parse; a filename that contradicts its banner is reported.
+- **§5 is the concept's vocabulary, and it points inward.** An object's §5 lists fields; a concept's lists the entities it introduces — an ERP system introduces the notion of an identifier. Each becomes an addressable node, and a platform object that consumes one references it from *its own* canon by full id (`[[erp-system:identifier]]`). A Concept never enumerates the platform: writing "the platform holds an ErpLink for this" into an ERP concept states the platform's fact in the wrong document, and it will drift.
+- **§7 keeps both halves.** A Concept *has* an inside — canon simply does not claim to know all of it. 7.1 records the significant confirmed part (an internal event cycle, an upstream system it draws data from); that is internal, it matters, and it is not an effect. 7.2 records what the concept causes in the domain, and is the one place a Concept names platform objects — the acting subject describing its own effects, exactly as an object's 7.2 does.
+- **Narrowing is inheritance, and the test is generality.** A Concept is an arrow out of the domain, and one Concept narrows another whenever it names a genuine *kind*: a sentence about the narrower must hold for every system of that kind, whoever built it. If it is only true of one, it belongs in that system's Implementation. The narrower is its own document naming the broader as `Parent Concept`, and it further attributes the parent rather than replacing it — so refer to the parent for what holds of any instance, and to the child for what is specific to a kind. Never enumerate children inside the parent. Two axes narrow a Concept and the test above holds on both: the **counterparty** on the other end (a back-office ERP integration) and the **aspect** of the contract (order validation, order fulfilment). Narrowing by aspect is what lets a large Implementation be written as several documents, so write the aspect Concept first — an Implementation cannot be split along a joint the abstraction does not have. File naming for either: `concepts/CANON_CONCEPT_<Parent>_<Name>.md` groups the family on disk and nothing more; the id stays top-level and narrowing is stated by `Parent Concept`.
+- **Rule ids stay `BR-NNN`;** open-question ids take a short prefix of the concept's own (`INT-001`, `VAL-001`), since a Concept has no object ID prefix to borrow. A rule id is an address that an Implementation binds by, so a rule that moves out of a document leaves its number retired rather than reused.
+- **Never list a platform object's name in a Concept's "Also Known As".** An alias claims that name in `[[WikiLink]]` resolution and would silently redirect every cross-reference to the concept. Where a word names both — "extension" names a registered platform object *and* the wider relationship — disambiguate in the Description. `concepts/CANON_CONCEPT_Integration.md` does exactly this.
+- **One id space.** A concept is `marketplace:<name>`, a sibling of every entity. Do not name a Concept after an object you expect to canonise later.
+
+Conventions specific to implementations:
+
+- **An Implementation is the Concept shape with bindings.** Same sections, same emitters, plus an `Implements` column in §4 and §5 naming the element of the abstraction that each row realises. §1 names the abstraction under **Implements:** where a Concept would name a **Parent Concept:**.
+- **Narrowing and realising are different edges.** "Back-office ERP integration" is a *Concept* narrowing "Integration" — still a kind, still general. "NetSuite" is an *Implementation* — one thing. Ask whether a sentence about it holds for every instance; if it does, you are writing a Concept.
+- **Bind by full id, and only within the abstraction.** `integration:actor-credential`, never `Actor credential` — bare child names collide across subjects. Validate refuses three things: an abstraction canon does not have (this one does not degrade to a `future:` stub, because bindings cannot be checked against nothing), a target outside that abstraction's subtree, and a type mismatch between a rule and a term. "Inside the abstraction" includes what it inherits: a narrower Concept further attributes its parent rather than restating it, so an implementation of `Validation Integration` binds `integration:actor-credential` where it is declared, at `Integration`. The chain stops below the domain.
+- **An empty `Implements` cell is a statement, not an omission.** It says the row is this implementation's own.
+- **Silence about an element is reported as unbound and nothing more.** Canon cannot tell "not implemented here" from "not recorded here", and neither the validator nor the renderer pretends otherwise. `canon coverage <id>` prints bound, unbound and own. To record that an element deliberately does not apply, bind it and say so in the value — the question has then been answered.
+- **Only §4 and §5 bind.** They are the sections whose rows become nodes. Internal events, cross-object effects and failure modes are anonymous refs with no id to point at, so state your own and note any correspondence in prose.
+- **A realisation too large for one document is a family.** An Implementation may name another as `Parent Implementation` — an umbrella holding what is true of the whole realisation, and one document per contract it holds with the platform. Containment (`Parent Implementation`) and realisation (`Implements`) stay separate edges, and a part must realise an abstraction **strictly below** its umbrella's, so splitting a document requires naming the narrower kind it is about. The two trees are not one-to-one: several parts may realise the same abstraction as **siblings**, which is where material goes when it must be lifted out before anyone can say what makes it a different kind — re-parent it once the Concept exists. An umbrella never enumerates its parts. `canon coverage <umbrella-id>` reports the family's bindings; `canon coverage <part-id>` reports one part's.
+- **File naming:** `implementations/CANON_IMPLEMENTATION_<Name>.md`, or `CANON_IMPLEMENTATION_<Umbrella>_<Part>.md` for one part of a family. No namespace segment; the directory need not exist until the first document. Open-question ids take a short prefix unique to **that document** — distinct from the abstraction's and from every sibling's, since a shared family sequence collides under parallel editing.
+- **Implement the Concept, not the platform object, when a Concept exists.** An Implementation may bind an object as its abstraction, but where a Concept covers the subject the relationship to the platform's own notion is stated once, at the level of the abstraction.
+
+---
 
 ## Canon-generation pipeline architecture
 
@@ -65,13 +111,13 @@ These govern anything written into `objects/` or `platform/`, whether by hand or
 
 - Base every rule, behaviour, and attribute on observed evidence (API responses, source code, confirmed engineering input) — never assume or infer by analogy to other objects.
 - The gathered material — OpenAPI spec, live JSON, source code, Confluence — is *evidence* for a PM-curated document, not a source of truth to transcribe. No source is automatically authoritative; in particular, implemented code is **not** the arbiter of intended behaviour (it can be buggy or lag intent). One use of this canon is to **audit the platform's code against intended behaviour**, so it must not merely mirror the implementation — a document that parrots the code cannot catch the code being wrong. When sources diverge, surface it for the PM to adjudicate and document the intended behaviour (flagging any intent-vs-implementation gap), rather than silently conforming canon to the code.
-- Unconfirmed behaviour is an open question (`questions/CANON_OPEN_QUESTIONS.md`, ID = object's API prefix + sequence, e.g. `PRD-001`; `ENV-NNN` for cross-cutting platform questions), not a guess written into canon.
+- Unconfirmed behaviour is an open question (`questions/CANON_OPEN_QUESTIONS.md`, ID = object's API prefix + sequence, e.g. `PRD-001`; `ENV-NNN` for cross-cutting platform questions), not a guess written into canon. Concept and Implementation questions live in the document's own §10 and are not tracked in that file.
 - State facts, not opinions — avoid "usually"/"typically"; if a rule has exceptions, name them.
 - Never restate `preamble/PLATFORM_CANON_PREAMBLE.md` invariants per-object — reference them.
-- Cross-reference other objects as `Namespace: Object` (e.g. `Commerce: Order`), and additionally as a `[[WikiLink]]` (e.g. `[[Order]]`) wherever the object's canonical name appears in prose or table cells — `.canon/`'s graph parser only creates a cross-object edge from the bracket syntax, so a plain-text or backtick-only mention is a silent completeness gap, not an error. Link the object's exact `Object Name` (never your own object — self-mentions aren't bracketed), plural suffix outside the brackets (`[[Order]]s`), never nested inside backticks, never for an object not yet canonised, and only the first mention per table cell/paragraph. Applies to Section 1 Description, Section 4 Business Rules, Section 7 Lifecycle Events (not the Affected Object identifier column), Section 8, and Section 9 — not Section 5/6's Description columns, the preamble, or changelogs. Full rules (enum-vs-object judgment, section-by-section detail) are codified in `.claude/skills/canon-generate/SKILL.md`'s "Wikilinking other objects".
+- Cross-reference other objects as `Namespace: Object` (e.g. `Commerce: Order`), and additionally as a `[[WikiLink]]` (e.g. `[[Order]]`) wherever the object's canonical name appears in prose or table cells — `.canon/`'s graph parser only creates a cross-object edge from the bracket syntax, so a plain-text or backtick-only mention is a silent completeness gap, not an error. Link the object's exact `Object Name` (never your own object — self-mentions aren't bracketed), plural suffix outside the brackets (`[[Order]]s`), never nested inside backticks, never for an object not yet canonised, and only the first mention per table cell/paragraph. Applies to Section 1 Description, Section 4 Business Rules, Section 7 Lifecycle Events (not the Affected Object identifier column), Section 8, and Section 9 — not an object's Section 5/6 Description columns, the preamble, or changelogs. **A Concept's or Implementation's Section 5 is the exception and links are required there**: its rows are the terms the subject introduces, and landing them on the platform entities they are defined against is the whole purpose of the section. Note the asymmetry the graph enforces: a term's Description is scanned for mentions, its Notes column is not — only rules have their notes scanned — so a link written in a term's Notes is silently inert. Full rules (enum-vs-object judgment, section-by-section detail) are codified in `.claude/skills/canon-generate/SKILL.md`'s "Wikilinking other objects".
 - Never say "hard delete" or "cascade deletion" — use "permanently removed — no longer retrievable via the API"; the platform never cascades deletions (deletion guards are documented explicitly instead).
 - Every change to a canon document gets a changelog row, and changelog entries are ordered **newest-first** — the most recent version is the top data row (directly under the header), the oldest is at the bottom. Add each new entry at the top; never append to the bottom. A canon doc with no open questions is considered complete for its current version.
-- File naming: `CANON_OBJECT_<Namespace>_<Object>.md`, or `CANON_OBJECT_<Namespace>_<Parent>_<Child>.md` for child objects.
+- File naming: `CANON_OBJECT_<Namespace>_<Object>.md`, or `CANON_OBJECT_<Namespace>_<Parent>_<Child>.md` for child objects; `CANON_CONCEPT_<Name>.md` for a Concept and `CANON_CONCEPT_<Parent>_<Name>.md` for one that narrows another; `CANON_IMPLEMENTATION_<Name>.md` for an Implementation and `CANON_IMPLEMENTATION_<Umbrella>_<Part>.md` for one part of a family.
 - Canon documents business rules and observed behavior, not technical implementation — the OpenAPI spec, live JSON samples, and source-code research are evidence used to *derive* a business rule, and none of that derivation mechanism (internal class/method names, file paths, line numbers, query-filter mechanics) belongs in canon content. This repo is public; that level of detail belongs to a separate, private engineering repo.
 - Rule Statements (and any other primary content column) are short and to the point — one or two sentences for the general constraint. Supplementary detail (enumerated concrete values, a mapping, an example) belongs in the Notes column.
 - Notes columns hold additional behavioral information only — never a citation ("Confirmed directly", "Confirmed by [name]"), never attribution, never "Corrects prior canon"/"New, not in prior canon" framing. Canon is a present-state snapshot; corrections and their provenance belong only in the Changelog. An empty Notes cell is `—`.

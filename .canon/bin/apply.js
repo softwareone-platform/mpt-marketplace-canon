@@ -42,7 +42,7 @@ if (!existsSync(patchRoot) || !statSync(patchRoot).isDirectory()) {
 
 // patch payload only flows through these subdirs. Anything at the
 // patch root (README.md, CHANGELOG.md, ...) is metadata — ignored.
-const KNOWN_BASES = ['objects', 'platform', 'preamble', 'questions'];
+const KNOWN_BASES = ['objects', 'concepts', 'implementations', 'platform', 'preamble', 'questions'];
 
 const walk = (dir, rel) => {
   const out = [];

@@ -244,3 +244,113 @@ test('overview hasStateMachine flag mirrors entity meta', () => {
   const foo = kb.overview().find(r => r.id === 'marketplace:foo');
   assert.equal(foo.hasStateMachine, true);
 });
+
+// ── coverage ───────────────────────────────────────────────────────
+
+// The query the Implementation type exists for: what did this
+// realisation actually bind, and what did it leave alone.
+
+const coverageKb = () => createKb({
+  nodes: [
+    { id: 'marketplace', type: 'domain', name: 'Marketplace' },
+    { id: 'marketplace:integration', type: 'concept', name: 'Integration' },
+    { id: 'integration:actor-credential', type: 'term', name: 'Actor credential', description: 'A.' },
+    { id: 'integration:instance', type: 'term', name: 'Instance', description: 'B.' },
+    { id: 'integration:br-004', type: 'rule', name: 'BR-004', description: 'C.' },
+    { id: 'marketplace:microsoft', type: 'implementation', name: 'Microsoft' },
+    { id: 'microsoft:tenant-id', type: 'term', name: 'Tenant id', description: 'D.' },
+    { id: 'microsoft:sku-map', type: 'term', name: 'Sku map', description: 'E.' },
+  ],
+  refs: [
+    { type: 'parent', owner: 'marketplace:integration', pointers: { parent: 'marketplace' } },
+    { type: 'parent', owner: 'integration:actor-credential', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration:instance', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration:br-004', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'marketplace:microsoft', pointers: { parent: 'marketplace' } },
+    { type: 'implements', owner: 'marketplace:microsoft', pointers: { target: 'marketplace:integration' } },
+    { type: 'parent', owner: 'microsoft:tenant-id', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'microsoft:tenant-id', pointers: { target: 'integration:actor-credential' } },
+    { type: 'parent', owner: 'microsoft:sku-map', pointers: { parent: 'marketplace:microsoft' } },
+  ],
+});
+
+test('coverage separates bound, unbound and own', () => {
+  const c = coverageKb().coverage('marketplace:microsoft');
+  assert.deepEqual(c.bound.map(r => r.id), ['integration:actor-credential']);
+  assert.equal(c.bound[0].boundBy, 'microsoft:tenant-id');
+  assert.deepEqual(c.unbound.map(r => r.id).sort(), ['integration:br-004', 'integration:instance']);
+  assert.deepEqual(c.own.map(r => r.id), ['microsoft:sku-map']);
+});
+
+test('coverage is null for anything that is not an implementation', () => {
+  const kb = coverageKb();
+  assert.equal(kb.coverage('marketplace:integration'), null);
+  assert.equal(kb.coverage('nope'), null);
+});
+
+// With no abstraction there is nothing declared to be unbound
+// against — the flag says so rather than the empty list implying
+// full coverage.
+test('coverage flags an unresolved abstraction', () => {
+  const kb = createKb({
+    nodes: [
+      { id: 'marketplace', type: 'domain', name: 'Marketplace' },
+      { id: 'marketplace:microsoft', type: 'implementation', name: 'Microsoft' },
+    ],
+    refs: [
+      { type: 'parent', owner: 'marketplace:microsoft', pointers: { parent: 'marketplace' } },
+      { type: 'implements', owner: 'marketplace:microsoft', pointers: { target: 'marketplace:future:integration' } },
+    ],
+  });
+  const c = kb.coverage('marketplace:microsoft');
+  assert.equal(c.abstractionResolved, false);
+  assert.deepEqual(c.unbound, []);
+});
+
+// A realisation split across several documents is still one
+// realisation, and the question "what does this bind of its
+// abstraction" is asked of the family, not of the file. Containment
+// answers it: the umbrella's descendants are its parts' rows, and the
+// abstraction's descendants are the narrower concepts' elements.
+const familyCoverageKb = () => createKb({
+  nodes: [
+    { id: 'marketplace', type: 'domain', name: 'Marketplace' },
+    { id: 'marketplace:integration', type: 'concept', name: 'Integration' },
+    { id: 'integration:actor-credential', type: 'term', name: 'Actor credential', description: 'A.' },
+    { id: 'marketplace:integration-validation', type: 'concept', name: 'Validation Integration' },
+    { id: 'integration-validation:draft-order', type: 'term', name: 'Draft order', description: 'B.' },
+    { id: 'integration-validation:response', type: 'term', name: 'Response', description: 'C.' },
+    { id: 'marketplace:microsoft', type: 'implementation', name: 'Microsoft' },
+    { id: 'microsoft:token', type: 'term', name: 'Token', description: 'D.' },
+    { id: 'marketplace:microsoft-validation', type: 'implementation', name: 'Microsoft Validation' },
+    { id: 'microsoft-validation:endpoint', type: 'term', name: 'Endpoint', description: 'E.' },
+  ],
+  refs: [
+    { type: 'parent', owner: 'marketplace:integration', pointers: { parent: 'marketplace' } },
+    { type: 'parent', owner: 'integration:actor-credential', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'marketplace:integration-validation', pointers: { parent: 'marketplace:integration' } },
+    { type: 'parent', owner: 'integration-validation:draft-order', pointers: { parent: 'marketplace:integration-validation' } },
+    { type: 'parent', owner: 'integration-validation:response', pointers: { parent: 'marketplace:integration-validation' } },
+    { type: 'parent', owner: 'marketplace:microsoft', pointers: { parent: 'marketplace' } },
+    { type: 'implements', owner: 'marketplace:microsoft', pointers: { target: 'marketplace:integration' } },
+    { type: 'parent', owner: 'microsoft:token', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'microsoft:token', pointers: { target: 'integration:actor-credential' } },
+    { type: 'parent', owner: 'marketplace:microsoft-validation', pointers: { parent: 'marketplace:microsoft' } },
+    { type: 'implements', owner: 'marketplace:microsoft-validation', pointers: { target: 'marketplace:integration-validation' } },
+    { type: 'parent', owner: 'microsoft-validation:endpoint', pointers: { parent: 'marketplace:microsoft-validation' } },
+    { type: 'implements', owner: 'microsoft-validation:endpoint', pointers: { target: 'integration-validation:draft-order' } },
+  ],
+});
+
+test('coverage of an umbrella aggregates what its parts bind', () => {
+  const c = familyCoverageKb().coverage('marketplace:microsoft');
+  assert.deepEqual(c.bound.map(r => r.id).sort(),
+    ['integration-validation:draft-order', 'integration:actor-credential']);
+  assert.deepEqual(c.unbound.map(r => r.id), ['integration-validation:response']);
+});
+
+test('coverage of a part is the part alone', () => {
+  const c = familyCoverageKb().coverage('marketplace:microsoft-validation');
+  assert.deepEqual(c.bound.map(r => r.id), ['integration-validation:draft-order']);
+  assert.deepEqual(c.unbound.map(r => r.id), ['integration-validation:response']);
+});
