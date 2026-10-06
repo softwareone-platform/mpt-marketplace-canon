@@ -5,6 +5,7 @@ dist/
 .canon/model-cache/
 .idea
 .playwright-mcp
+.input
 *.log
 .DS_Store
 

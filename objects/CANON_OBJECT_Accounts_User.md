@@ -227,5 +227,3 @@ No open questions at this time.
 | --- | --- | --- | --- |
 | 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` (Section 8) and removed the stale "not yet canonised" note. No behavioural change. |
 | 0.1 | 2026-07-18 | Stu / canon-generate | Initial draft. Global User identity documented distinct from the per-Account Account User membership. Full state machine derived (New/Invited/InvitationExpired/Active/Blocked/Disabled/Deleted), with membership-projection status recalculation (including backward transitions out of `Active`), explicit Block/Unblock/Delete transitions, self-only password, SSO-maintained email, and jdenticon icon behaviour. Deletion documented as a soft-delete: record retained, retrievable by Operations, excluded from Vendor/Client reads. `accounts` list confirmed Operations-only (Actor-suppressed); `currentAccount` nulled for Vendor/Client when it differs from the viewer's Account. Administration permissions confirmed available to all Actors (Vendor/Client own-account-scoped). |
-</content>
-</invoke>

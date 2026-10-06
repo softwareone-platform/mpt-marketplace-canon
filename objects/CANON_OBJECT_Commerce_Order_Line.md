@@ -1,8 +1,8 @@
 # Object Canon: Order Line
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-17
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -58,12 +58,12 @@ This object has no state machine. An Order Line carries no `status` field of its
 | --- | --- | --- | --- | --- |
 | BR-001 | An Order Line belongs to exactly one Commerce: [[Order]] and references exactly one Catalog: [[Item]] at a requested quantity. It is the unit of work the Order acts on. | All | All | One line per Item at one quantity. A single Order carries one or more lines. |
 | BR-002 | Order Lines have no dedicated create, update, or delete endpoint — the only line endpoint is a read. Lines are authored, changed, and removed only by editing the parent Commerce: [[Order]]. | All | All | The `orders/{orderId}/lines` endpoint is read (`GET`) only. |
-| BR-003 | An Order Line records a requested change as the pair `oldQuantity` → `quantity`; the difference is the change the line applies. | All | All | Signatures by Order type: Purchase 0 → N (new line); Change M → N (quantity change); Configuration N → N (no delta — the change is to parameters, not quantity); Termination N → 0. |
+| BR-003 | An Order Line records a requested change as the pair `oldQuantity` → `quantity`; the difference is the change the line applies. | All | All | Signatures by Order type: Purchase 0 → N (new line); Change M → N (quantity change); Configuration N → N (no delta — the change is to parameters, not quantity); Termination N → 0; Renewal M → N, including M → M and M → 0 (see Commerce: [[Order]] BR-040). |
 | BR-004 | Each Order Line maps to exactly one of a Commerce: [[Subscription]] (recurring Items) or a one-time Asset (one-time Items), determined by the billing model of the referenced Catalog: [[Item]]. | All | All | One-time is signalled by one-time (`x1`) price fields on the line; recurring by per-year/per-month (`xY`/`xM`) fields. Commerce: [[Order Asset]] and Commerce: [[Order Subscription]] are the in-flight parents; on completion they become the Agreement's Asset and Subscription. |
 | BR-005 | A line changing an existing Subscription or Asset carries that reference from authoring; a net-new line is mapped during Processing, and a one-time line without an Asset has one generated when the Order completes. | Draft, Quoted, Processing | Client, Vendor | In Quoted and early Draft a net-new line's Subscription/Asset reference is absent until fulfilment maps it. |
 | BR-006 | When an Order completes, each line is promoted into the Commerce: [[Agreement]] as a Commerce: [[Entitlement]], preserving the line's identity. | Processing → Completed | Vendor | The in-flight Order Line and the resulting Entitlement share one `ALI` id. This is why the `ALI` prefix is registered to the Entitlement and reused by the Order Line (preamble §5.3). |
 | BR-007 | On authoring, a line with no id is created new; a line whose id matches an existing Agreement line brings that Commerce: [[Entitlement]] into the Order for change; a line id matching neither the Order nor the Agreement is rejected. | Draft, Quoted, Processing | Client, Vendor | The three cases are: create (no id), change an existing Entitlement (id in the Agreement), and update a line already on the Order (id already on the Order). |
-| BR-008 | An Order cannot be completed if the change would leave every applicable line at quantity 0 — at least one line in the affected Commerce: [[Agreement]] or Commerce: [[Subscription]] must remain at quantity 1 or higher, unless the Order is terminating it. | Processing → Completed | Vendor | Prevents a Change Order from silently zeroing out an entire Agreement/Subscription; genuine reduction to zero is done through a Termination Order. |
+| BR-008 | An Order cannot be completed if the change would leave every applicable line at quantity 0 — at least one line in the affected Commerce: [[Agreement]] or Commerce: [[Subscription]] must remain at quantity 1 or higher, unless the Order is terminating it. | Processing → Completed | Vendor | Prevents a Change Order from silently zeroing out an entire Agreement/Subscription; genuine reduction to zero is done through a Termination Order, or through a Renewal Order, which terminates a Subscription whose every line is at 0 (Commerce: [[Order]] BR-040). |
 | BR-009 | An Order Line quantity is never negative — a requested quantity below 0 is clamped to 0. | All | All | A quantity of 0 on a line with applicable quantity is the termination signature (see BR-003). |
 | BR-010 | Order Line price fields are visible per Actor: purchase-price fields to Vendor and Operations, selling-price fields to Client and Operations, and markup/margin to Operations only. | All | All | Purchase: `unitPP`, `PPx1`, `PPxY`, `PPxM`. Selling: `unitSP`, `SPx1`, `SPxY`, `SPxM`. `markup`, `margin`, `markupSource`, `defaultMarkupSource`: Operations only. `currency`: all Actors. Consistent with preamble §6.3. |
 | BR-011 | An Order Line's `description` and price `info` block are copied from the Catalog: [[Price List Item]] at line creation. | All | All | `info` carries a `visible` flag and a `description`. |
@@ -170,6 +170,5 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders: added the Renewal signature to BR-003 and named the Renewal Order as the second route to a zero-quantity termination in BR-008's notes, matching Commerce: Order v0.6. Removed stray non-canon markup from the end of the document. |
 | 0.1 | 2026-07-17 | Stu / canon-generate | Initial canon. Generated from the live OpenAPI schema (STAGING), multi-Actor live fetches of Orders across Purchase/Change/Configuration/Termination types and Draft/Quoted/Processing/Completed states, an Actor-suppression diff, and source-code research. Documents: the in-flight, Order-scoped nature of the line (no dedicated create/update/delete endpoint; authored through the Order); the absence of an independent state machine and status field; the `oldQuantity` → `quantity` change signature per Order type; the Subscription-vs-Asset mapping by Item billing model; identity-preserving promotion into the Agreement as an Entitlement (shared `ALI` id); the create/change/orphan authoring rule; the at-least-one-non-zero-line completion guard; per-Actor price-field visibility; and the corrected finding that Configuration Orders do carry a line. 1 candidate open question. |
-</content>
-</invoke>

@@ -1,8 +1,8 @@
 # Object Canon: Order Subscription
 
-> **Version:** 0.1
+> **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-07-17
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -53,11 +53,11 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 | State | Description | Initial State? | Terminal State? |
 | --- | --- | --- | --- |
 | Draft | A net-new Order Subscription being assembled during [[Order]] processing, before the [[Order]] completes. Editable and deletable by the Vendor (or owning Client). Not yet promoted to a live [[Subscription]]. | Yes | No |
-| Active | The Order Subscription mirrors a live [[Subscription]] that is Active — either an existing one referenced by a Change/Configuration/Termination [[Order]], or a net-new one immediately after the [[Order]] completes and promotes it. | No | No |
-| Updating | The Order Subscription mirrors a live [[Subscription]] whose Change or Configuration [[Order]] is being processed. | No | No |
-| Terminating | The Order Subscription mirrors a live [[Subscription]] whose Termination [[Order]] is being processed. | No | No |
+| Active | The Order Subscription mirrors a live [[Subscription]] that is Active — either an existing one referenced by a Change/Configuration/Termination/Renewal [[Order]], or a net-new one immediately after the [[Order]] completes and promotes it. An existing one is also Active while its Renewal Order is Scheduled or Cancelling. | No | No |
+| Updating | The Order Subscription mirrors a live [[Subscription]] whose Change, Configuration, or Renewal [[Order]] is being processed. | No | No |
+| Terminating | The Order Subscription mirrors a live [[Subscription]] whose Termination [[Order]] is being processed, or whose Renewal Order reduces every one of its lines to quantity 0. | No | No |
 | Terminated | The Order Subscription mirrors a live [[Subscription]] that has been terminated. Terminal — no outbound transitions. | No | Yes |
-| Deleted | A Draft Order Subscription that was deleted. Permanently removed — no longer retrievable via the API. Terminal — no outbound transitions. | No | Yes |
+| Deleted | A Draft Order Subscription that was deleted, or that a cancelled Renewal [[Order]] would have added. Permanently removed — no longer retrievable via the API. Terminal — no outbound transitions. | No | Yes |
 
 > **Note on mirrored statuses:** An Order Subscription mirrors the status of the [[Subscription]] it references. In addition to `Draft`, `Active`, `Updating`, `Terminating`, `Terminated`, and `Deleted`, it can therefore reflect `Suspending`, `Suspended`, `Resuming`, and `Expired` when the referenced [[Subscription]] is in one of those states (see Commerce: [[Subscription]] for the suspend/resume and expiry lifecycle).
 
@@ -67,13 +67,13 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Draft | Vendor creates a net-new Order Subscription | `POST` (base collection endpoint) | Vendor | Parent [[Order]] is past Draft (in processing); at least one order line supplied, each with matching billing model, billing frequency, and commitment term | Net-new subscription assembly during a Purchase or Change [[Order]]. |
 | T2 | — | Active | Materialised from the referenced live [[Subscription]] | No dedicated endpoint — created on first edit/reference during [[Order]] processing | Vendor | Parent [[Order]] references an existing [[Subscription]] | Inherits the live [[Subscription]]'s status, terms, parameters, and external IDs — so the initial state is whatever the referenced [[Subscription]] currently is (Active shown as the common case). |
-| T3 | Draft | Deleted | Delete a draft Order Subscription | `DELETE` (`/{id}`) | Vendor, owning Client | Order Subscription status is Draft | Permanently removed — no longer retrievable via the API. Assigned order lines are unassigned first. |
-| T4 | Draft | Active | Net-new Order Subscription promoted on [[Order]] completion | No dedicated endpoint — driven by [[Order]] completion | Platform | Purchase or Change [[Order]] transitions to Completed | A live [[Subscription]] is created with the same SUB identifier, in Active. Under the completing Actor's token context. |
-| T5 | Active | Updating | Change or Configuration [[Order]] enters processing | No dedicated endpoint — driven by [[Order]] state | Platform | Change or Configuration [[Order]] enters Processing | Mirrors the live [[Subscription]] → Updating. |
-| T6 | Updating | Active | Change or Configuration [[Order]] completes or fails | No dedicated endpoint — driven by [[Order]] state | Platform | [[Order]] transitions to Completed or Failed | On completion the edits are merged into the live [[Subscription]] (same ID). |
-| T7 | Active | Terminating | Termination [[Order]] enters processing | No dedicated endpoint — driven by [[Order]] state | Platform | Termination [[Order]] enters Processing | Mirrors the live [[Subscription]] → Terminating. |
-| T8 | Terminating | Terminated | Termination [[Order]] completes | No dedicated endpoint — driven by [[Order]] completion | Platform | Termination [[Order]] transitions to Completed | `terminationDate` set; `autoRenew` forced false. Merged into the live [[Subscription]] (same ID). |
-| T9 | Terminating | Active | Termination [[Order]] fails | No dedicated endpoint — driven by [[Order]] state | Platform | Termination [[Order]] transitions to Failed | Reverts to the pre-[[Order]] status. |
+| T3 | Draft | Deleted | Delete a draft Order Subscription, or Renewal Order cancelled | `DELETE` (`/{id}`); no dedicated endpoint on cancellation | Vendor, owning Client, Platform | Order Subscription status is Draft | Permanently removed — no longer retrievable via the API. Assigned order lines are unassigned first. When a Renewal Order is cancelled, the platform deletes the Draft Order Subscriptions it would have added. |
+| T4 | Draft | Active | Net-new Order Subscription promoted on [[Order]] completion | No dedicated endpoint — driven by [[Order]] completion | Platform | Purchase, Change, or Renewal [[Order]] transitions to Completed | A live [[Subscription]] is created with the same SUB identifier, in Active. Under the completing Actor's token context. |
+| T5 | Active | Updating | Change, Configuration, or Renewal [[Order]] enters processing | No dedicated endpoint — driven by [[Order]] state | Platform | Change, Configuration, or Renewal [[Order]] enters Processing, including a Scheduled Renewal Order returning to Processing; for a Renewal Order, at least one line remains above quantity 0 | Mirrors the live [[Subscription]] → Updating. |
+| T6 | Updating | Active | Change, Configuration, or Renewal [[Order]] completes or fails, or Renewal Order scheduled | No dedicated endpoint — driven by [[Order]] state | Platform | [[Order]] transitions to Completed or Failed, or a Renewal Order transitions to Scheduled | On completion the edits are merged into the live [[Subscription]] (same ID). On scheduling, nothing is merged yet. |
+| T7 | Active | Terminating | Termination [[Order]], or a Renewal Order emptying the subscription, enters processing | No dedicated endpoint — driven by [[Order]] state | Platform | Termination [[Order]] enters Processing, or a Renewal Order enters Processing with every line of this subscription at quantity 0 | Mirrors the live [[Subscription]] → Terminating. |
+| T8 | Terminating | Terminated | Termination or Renewal [[Order]] completes | No dedicated endpoint — driven by [[Order]] completion | Platform | Termination or Renewal [[Order]] transitions to Completed | `terminationDate` set; `autoRenew` forced false. Merged into the live [[Subscription]] (same ID). |
+| T9 | Terminating | Active | Termination or Renewal [[Order]] fails, or Renewal Order scheduled | No dedicated endpoint — driven by [[Order]] state | Platform | Termination or Renewal [[Order]] transitions to Failed, or a Renewal Order transitions to Scheduled | Reverts to the pre-[[Order]] status. |
 | T10 | Draft | Terminating | Net-new subscription carried into a termination during the same processing cycle | No dedicated endpoint — driven by [[Order]] state | Platform | Termination signature applies to a still-Draft Order Subscription | Domain-permitted edge; may proceed to Terminated in the same cycle. Not observed in a live sample. |
 
 > **Guidance:** Suspending/Suspended/Resuming transitions mirror the live [[Subscription]]'s Operations-driven suspend/resume flow (see the Section 3.1 note). They are not enumerated as separate rows here.
@@ -83,13 +83,13 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 ```
 — ---(Vendor creates net-new : Vendor)---> [Draft]
 — ---(Materialised from existing Subscription : Vendor/Platform)---> [Active] (or live sub's current status)
-[Draft] ---(Delete : Vendor/owning Client)---> [Deleted]
+[Draft] ---(Delete, or Renewal Order cancelled : Vendor/owning Client/Platform)---> [Deleted]
 [Draft] ---(Order completed, promoted : Platform)---> [Active]
-[Active] ---(Change/Configuration Order processing : Platform)---> [Updating]
-[Updating] ---(Order completed or failed : Platform)---> [Active]
-[Active] ---(Termination Order processing : Platform)---> [Terminating]
-[Terminating] ---(Termination Order completed : Platform)---> [Terminated]
-[Terminating] ---(Termination Order failed : Platform)---> [Active]
+[Active] ---(Change/Configuration/Renewal Order processing : Platform)---> [Updating]
+[Updating] ---(Order completed or failed, or Renewal Order scheduled : Platform)---> [Active]
+[Active] ---(Termination Order, or emptying Renewal Order, processing : Platform)---> [Terminating]
+[Terminating] ---(Termination or Renewal Order completed : Platform)---> [Terminated]
+[Terminating] ---(Order failed, or Renewal Order scheduled : Platform)---> [Active]
 ```
 
 ---
@@ -110,6 +110,7 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 | BR-010 | Order Subscription pricing field visibility is Actor-scoped: `PPxY`/`PPxM` are visible to Vendor and Operations; `SPxY`/`SPxM` to Client and Operations; `markup`, `margin`, `defaultMarkup`, `defaultMargin`, `defaultMarkupSource`, and `markupSource` to Operations only; `currency` to all Actors. | All | All | Mirrors the pricing-visibility model on [[Order]]s, [[Agreement]]s, and [[Subscription]]s. Suppressed fields are invisible to the Actor entirely (preamble §6.3). |
 | BR-011 | Order Subscription visibility is self-scoped per Actor: the Vendor sees only those on [[Order]]s where they are the Vendor; the Client only those on [[Order]]s belonging to their own [[Account]]; Operations sees all. | All | All | — |
 | BR-012 | An Order Subscription's `status` cannot be set through a plain field write. It is set at creation (Draft), on delete (Deleted), and thereafter driven entirely by the parent [[Order]]'s state transitions. | All | All | The Order Subscription has no dedicated terminate/suspend/resume endpoints of its own — those act on the live [[Subscription]]. |
+| BR-013 | On a Renewal [[Order]], scheduling returns the Order Subscriptions of existing [[Subscription]]s to Active while Draft ones stay Draft; the Order's return to Processing moves them back to Updating or Terminating; cancelling the Order deletes the Draft ones. | Draft, Active, Updating, Terminating | Platform | An existing Subscription becomes Terminating only when every one of its lines is at quantity 0 — see Commerce: Order BR-040. |
 
 ---
 
@@ -144,7 +145,7 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
 | --- | --- | --- | --- | --- |
 | Commerce: Order | Parent | Many Order Subscriptions to one Order | Every Order Subscription belongs to exactly one Order and is scoped to it. | The Order Subscription exists only for the Order's lifecycle; its status is driven by the Order's state. |
-| Commerce: Subscription | Association | One Order Subscription to one Subscription | The live, agreement-scoped record the Order Subscription creates (on a Purchase/Change Order) or changes (on a Change/Configuration/Termination Order), sharing the SUB identifier. | On Order completion a net-new Order Subscription is promoted to a new Subscription; an existing Subscription is updated from the Order Subscription's edits. |
+| Commerce: Subscription | Association | One Order Subscription to one Subscription | The live, agreement-scoped record the Order Subscription creates (on a Purchase/Change/Renewal Order) or changes (on a Change/Configuration/Termination/Renewal Order), sharing the SUB identifier. | On Order completion a net-new Order Subscription is promoted to a new Subscription; an existing Subscription is updated from the Order Subscription's edits. |
 | Commerce: Entitlement | Child | One Order Subscription to many Entitlements | The order lines (Entitlements) assigned to this Order Subscription; each promoted line becomes an Agreement Line under the resulting Subscription. | Line terms must match the Order Subscription's terms. An Order Subscription with no assigned lines at completion is discarded. |
 | Commerce: Agreement | Association | Many Order Subscriptions to one Agreement | The Agreement the parent Order belongs to; the resulting Subscription is linked to it on completion. | Immutable reference during processing. |
 | Catalog: Product | Association | Many Order Subscriptions to one Product | The Product the resulting Subscription covers, derived from the Agreement. | Immutable after creation. |
@@ -162,6 +163,7 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 | Order Subscription updated | Vendor edits fields; Operations edits `commitmentDate`/`externalIds.operations`; Client edits `externalIds.client` | Vendor, Operations, Client | Persisted immediately; `price` is recomputed if lines or parameters change. No status change. |
 | Line assignment changed | Vendor assigns or removes order lines | Vendor | `price` is re-aggregated. Existing live-[[Subscription]] lines cannot be detached. An Order Subscription reduced to zero lines is removed from the [[Order]]. |
 | Order Subscription deleted | Vendor or owning Client deletes a Draft Order Subscription | Vendor, Client | Assigned lines are unassigned, then the Order Subscription is permanently removed — no longer retrievable via the API. |
+| Renewal Order cancelled | Vendor cancels the parent Renewal [[Order]] | Vendor | Draft Order Subscriptions → Deleted; the others remain Active (BR-013). |
 
 ### 7.2 Cross-Object State Effects
 
@@ -183,7 +185,7 @@ OrderSubscription (API schema name). Informally "the subscription on the order" 
 - Deleted and Terminated are permanently terminal.
 
 **Deletion:**
-An Order Subscription may be deleted by the Vendor or the owning Client only while it is in Draft status. Once deleted, it is permanently removed — no longer retrievable via the API. Operations cannot delete an Order Subscription. Once an Order Subscription is past Draft it cannot be deleted; it is instead resolved (promoted, merged, or discarded) when its parent [[Order]] completes, fails, or is itself deleted. Deleting an Order Subscription does not remove any other object — its assigned order lines are unassigned first, not removed.
+An Order Subscription may be deleted by the Vendor or the owning Client only while it is in Draft status. Once deleted, it is permanently removed — no longer retrievable via the API. Operations cannot delete an Order Subscription. Once an Order Subscription is past Draft it cannot be deleted; it is instead resolved (promoted, merged, or discarded) when its parent [[Order]] completes, fails, or is itself deleted. Deleting an Order Subscription does not remove any other object — its assigned order lines are unassigned first, not removed. A Draft Order Subscription is also deleted by the platform when its Renewal [[Order]] is cancelled.
 
 **Audit & history requirements:**
 The audit block captures `created`, `updated`, `active`, `updating`, `terminating`, and `terminated` timestamps with Actor references; only entries for states the Order Subscription has reached are present. Draft and Deleted are not recorded as audited status events. The audit block is omitted from responses by default — request via `select=+audit`. Audit history of the resulting live [[Subscription]] is documented in Commerce: [[Subscription]] canon.
@@ -213,6 +215,5 @@ The audit block captures `created`, `updated`, `active`, `updating`, `terminatin
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.2 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). States, T3–T9 and the diagram now name the Renewal Order: Updating/Terminating on processing (Terminating when every line is at 0), back to Active on scheduling, Terminated/Active on completion, and deletion of Draft Order Subscriptions when the Renewal Order is cancelled. Added BR-013 and the matching §6, §7.1 and §8 entries. |
 | 0.1 | 2026-07-17 | Stu / canon-generate | Initial canon. Documents the Order-scoped, in-flight Subscription representation: Draft/Active/Updating/Terminating/Terminated/Deleted statuses; Vendor-only creation on a processing Order with matching-terms lines; the promotion-on-completion model (net-new promoted to a new live Subscription with the same SUB id; existing Subscription merged from edits); Actor write scoping (Vendor broad, Operations `commitmentDate`/`externalIds.operations`, Client `externalIds.client`); Draft-only deletion by Vendor or owning Client (not Operations); pricing-field Actor visibility; and self-scoped read visibility. Documents the mirrored suspend/resume/expiry statuses (Suspending/Suspended/Resuming/Expired) as real. SUB-004 parked on whether an Operations Suspend/Resume Order produces an Order Subscription record (no live sample). |
-</content>
-</invoke>

@@ -136,5 +136,3 @@ Event Types are part of the Audit Trail's own infrastructure and are retained pe
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft generated from OpenAPI schema, live multi-Actor STAGING fetch, Actor diff, source-code research, and the Audit Trail business-context page. Documents Event Type as a system-provisioned, immutable-key label catalog (key/name/description only — the thin model is intended; richer per-event concerns live on Audit: Audit Record by design); Operations-curated names; standard-vs-custom distinguished solely by the key prefix; no state machine; global unscoped read visibility; permanent (no delete). One open question: AET-002 (the update endpoint enforces no actor restriction, diverging from the Operations-curated intent).
-</content>
-</invoke>

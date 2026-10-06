@@ -230,5 +230,3 @@ A charge carries in-object audit stamps recording the Actor and timestamp of its
 | --- | --- | --- | --- |
 | 0.2 | 2026-07-20 | Stu / canon-generate-batch | Billing: Ledger and Billing: Statement now canonised — bracket-linked the `[[Ledger]]` and `[[Statement]]` cross-references (Section 1, BR-012, Section 7) and dropped the stale "not yet canonised" notes (BR-012, Section 5, Section 6, Section 7). No behavioural change. |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft from evidence: PROD OpenAPI schema, live multi-Actor PROD samples (parent and split-child charge), Operations-vs-Vendor actor diff confirming sell-side pricing and processing-status suppression, and Billing service source research. Documents the two per-Actor status views, the reconciliation state machine (`match`/`ignore`/`reset`), the automatic split into child charges, and the read-only-plus-reconciliation API surface. statementType confirmed derived from the entry amount sign; charge events confirmed to generate no separate platform Audit Records. One open question (CHG-001: the origin of the Consolidated billing type). |
-</content>
-</invoke>

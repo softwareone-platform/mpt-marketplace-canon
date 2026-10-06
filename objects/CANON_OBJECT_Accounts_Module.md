@@ -165,5 +165,3 @@ No open questions at this time.
 | --- | --- | --- | --- |
 | 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[API Token]]` (BR-003) and `[[User]]` (BR-002), and removed the stale "User Group and API Token not yet canonised" notes (BR-003, BR-009, Section 6). No behavioural change. |
 | 0.1 | 2026-07-18 | Stu / canon-generate-batch | Initial draft from OpenAPI schema, live STAGING fetch (Operations; Vendor and Client returned 403), and platform source research. Documents Module as read-only, platform-managed reference data governing User Group and API Token permission sets. `accountTypes` recorded as title-case (STAGING matches PROD; Modules are stable). Buyer-visibility capability (BR-008) and non-retroactive gating-change behaviour (BR-009) confirmed from source. Cross-links to User Group bracketed at promotion; the API Token cross-link is pending its canonisation. |
-</content>
-</invoke>

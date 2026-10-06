@@ -1,8 +1,8 @@
 # Object Canon: Parameter
 
-> **Version:** 0.4
+> **Version:** 0.5
 > **Owner:** Stu
-> **Last Updated:** 2026-07-15
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -75,7 +75,7 @@ None known.
 | --- | --- | --- | --- | --- |
 | BR-001 | A Parameter belongs to exactly one [[Product]] and cannot be shared across Products. | All | All | — |
 | BR-002 | A Parameter has a scope, which determines which platform object type the Parameter is associated with. | All | All | Confirmed values: [[Agreement]], [[Asset]], [[Item]], [[Order]], [[Subscription]]. |
-| BR-002a | The `context` property is applicable to [[Order]]-scoped Parameters only. It defines the type of Order the Parameter is designed for. | All | All | Valid values: `Purchase`, `Change`, `Configuration`, `Termination`, `None`. `None` means the Parameter applies to all Order types. For all other scopes, `context` is always `None`. |
+| BR-002a | The `context` property is applicable to [[Order]]-scoped Parameters only. It defines the type of Order the Parameter is designed for. | All | All | Valid values: `Purchase`, `Change`, `Configuration`, `Termination`, `Renewal`, `None`. `None` means the Parameter applies to all Order types. A Renewal Order collects only Parameters with context `Renewal` or `None` — a `Change` Parameter does not apply to it. For all other scopes, `context` is always `None`. |
 | BR-003 | A Parameter has a phase, which determines when in the lifecycle the parameter is relevant. | All | All | Confirmed values: `Configuration`, `Order`, `Fulfillment`. |
 | BR-004 | Each scope is only valid for specific phases — not every scope/phase combination is permitted. | All | All | [[Agreement]] scope: `Order` or `Fulfillment` phase. [[Order]] scope: `Order` phase only. [[Item]] scope: `Configuration` phase only. [[Asset]] and [[Subscription]] scopes: `Fulfillment` phase only. |
 | BR-005 | A [[Parameter Group]] is optional on most Parameters — a Parameter may be created, and remain, with no Group at all. | All | All | The platform requires a Group at creation only for [[Agreement]]-scoped, Order-phase Parameters and [[Order]]-scoped Parameters — creation is rejected without one. Consistent with [[Parameter Group]] canon BR-003. |
@@ -122,7 +122,7 @@ None known.
 | Phase | Enum | One of: `Configuration`, `Order`, `Fulfillment` | Vendor | No | Required on creation. Immutable after creation. See BR-004 for which phases are valid for which scope. |
 | Type | Enum | One of: `SingleLineText`, `MultiLineText`, `Choice`, `DropDown`, `Checkbox`, `Address`, `Contact`, `Email`, `Date`, `DataObject`, `Subdomain`, `Heading` | Vendor | No | Required on creation. Immutable after creation. See BR-006 for type-specific notes. |
 | Multiple | Boolean | Whether multiple values can be associated with a single parameter instance | Vendor | No | Immutable after creation. See BR-007a for the paired `capacity` constraint. |
-| Context | Enum | Applicable to Order-scoped Parameters only. One of: `Purchase`, `Change`, `Configuration`, `Termination`, `None` | Vendor | Yes | Optional. Nullable. See BR-002a. |
+| Context | Enum | Applicable to Order-scoped Parameters only. One of: `Purchase`, `Change`, `Configuration`, `Termination`, `Renewal`, `None` | Vendor | Yes | Optional. Nullable. See BR-002a. |
 | Display Order | Integer | Controls the sequence in which this Parameter is presented | Vendor | Yes | Required on creation. |
 | Group | Object (reference: id, name, revision) | Reference to the parent Parameter Group, if assigned | Vendor | Yes | Optional for most scope/phase combinations — see BR-005. Absent (null) when unassigned, not defaulted. |
 | Constraints | Object | Definition-level default constraints: `hidden`, `readonly`, `required`, `capacity`. Shape varies by scope — see BR-012, BR-007a. | Vendor | Yes | Required on creation. Instance-level overrides on live objects take precedence per BR-013. |
@@ -201,6 +201,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.5 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders: added the `Renewal` context to BR-002a and the Context attribute, and stated that a Renewal Order does not fall back to `Change` Parameters. Matches Commerce: Order v0.6. |
 | 0.4 | 2026-07-15 | Stu / canon-generate | Refresh via live OpenAPI schema, one live-fetched real object (STAGING, all Actors — no suppression found), and source-code research. **Significant corrections**: Request scope is fully removed from the platform (not merely deprecated) — dropped from BR-002 and the Scope attribute. BR-004 corrected — Item-scoped Parameters are Configuration-phase only, not Fulfillment-phase as previously stated (grouped incorrectly with Asset/Subscription). BR-005 corrected — a Parameter is *not* automatically assigned to the Default Parameter Group when created without one (it may remain groupless); a Group is genuinely required only for Agreement-scoped Order-phase and Order-scoped Parameters. New BR-006a (Address/Contact/Email default-value presets are a hint to the API consumer, not platform-enforced) and BR-007a (the previously-undocumented `capacity` constraint, paired with `multiple`, exempt from the per-scope constraint table) — both resolved directly with the PM. New `Group` and `Product` attributes documented (not previously listed). Section 8 audit note resolved — parameter value history lives only in the exposing object's own Audit log, not a Parameter-specific store. Section 9's last failure mode row refined — the validation logic is shared Commerce-wide infrastructure, not Order-exclusive. Also corrected `Catalog: Product Parameter Group` canon (BR-003, Default attribute, Section 7.2) for the same Default-Group auto-assignment error. |
 | 0.3 | 2026-03-14 | Stu | Schema review against OpenAPI extract. BR-002: Request scope added (deprecated, pending v5 removal). BR-003: Configuration phase added. BR-004: Configuration phase included in Order/Agreement scope rule. BR-006: Subdomain, Heading, DropDown types added with descriptions. Section 5: required fields on creation noted, all enums corrected, Request scope and Heading type notes added. Section 8: deletion language cleaned up. Section 10: cleaned up. |
 | 0.2 | 2026-03-08 | Stu | Added two-layer constraint model (BR-012–BR-015), scope-differentiated constraint availability, constraint copy behaviour on Order completion (BR-020), post-completion constraint mutability (BR-021). Expanded failure modes. |
