@@ -1,8 +1,8 @@
 # Object Canon: Template
 
-> **Version:** 0.8
+> **Version:** 0.9
 > **Owner:** Stu
-> **Last Updated:** 2026-07-15
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -55,9 +55,9 @@ This object has no state machine. It is created and modified as a unit, with no 
 | Rule ID | Rule Statement | Applies In State(s) | Actor Scope | Notes |
 | --- | --- | --- | --- | --- |
 | BR-001 | A Template belongs to exactly one [[Product]] and cannot be shared across Products. | N/A | All | — |
-| BR-002 | A Template has a `type`, which determines which object and state it can be applied to (see BR-003). | N/A | All | Confirmed values: `Asset`, `Subscription`, `OrderProcessing`, `OrderQuerying`, `OrderCompleted`. |
-| BR-003 | A Template can only be applied to an object whose type and state match the Template type. | N/A | All | `Asset` (any state), `Subscription` (any state), `OrderProcessing` ([[Order]] in Processing state only), `OrderQuerying` ([[Order]] in Querying state only), `OrderCompleted` ([[Order]] in Completed state only). |
-| BR-004 | For each of the three [[Order]] Template types (`OrderProcessing`, `OrderQuerying`, `OrderCompleted`), exactly one Template of that type must be marked as Default, scoped per Product. Default Templates cannot be deleted. To delete a Default Template, the Vendor must first demote it by marking another Template of the same type as Default. | N/A | Vendor | — |
+| BR-002 | A Template has a `type`, which determines which object and state it can be applied to (see BR-003). | N/A | All | Confirmed values: `Asset`, `Subscription`, `OrderProcessing`, `OrderQuerying`, `OrderCompleted`, `OrderScheduled`, `OrderCancelling`. |
+| BR-003 | A Template can only be applied to an object whose type and state match the Template type. | N/A | All | `Asset` (any state), `Subscription` (any state), `OrderProcessing` ([[Order]] in Processing state only), `OrderQuerying` ([[Order]] in Querying state only), `OrderCompleted` ([[Order]] in Completed state only), `OrderScheduled` (Renewal Order in Scheduled state only), `OrderCancelling` (Renewal Order in Cancelling state only). A Cancelled Renewal Order uses a fixed platform message, not a Template. |
+| BR-004 | For each of the five [[Order]] Template types (`OrderProcessing`, `OrderQuerying`, `OrderCompleted`, `OrderScheduled`, `OrderCancelling`), exactly one Template of that type must be marked as Default, scoped per Product. Default Templates cannot be deleted. To delete a Default Template, the Vendor must first demote it by marking another Template of the same type as Default. | N/A | Vendor | — |
 | BR-005 | If a Vendor marks a Template as Default and another Template of the same type is already marked as Default, the existing Default is automatically demoted. | N/A | Vendor | There is always exactly one Default per [[Order]] Template type, per Product. |
 | BR-005a | A Default Template cannot be directly un-marked as Default. The only way to change which Template is Default for a given type is to mark a different Template of that type as Default (BR-005). | N/A | Vendor | Attempting to directly unset Default on a currently-Default Template is rejected. |
 | BR-006 | [[Asset]] and [[Subscription]] Template types have no Default mechanism and are never applied automatically by the platform. The Vendor is solely responsible for explicitly applying their chosen Template. | N/A | Vendor | Contrast with [[Order]] Template types, where the platform applies the Default Template automatically on state transition if no Template is specified (BR-007). |
@@ -84,8 +84,8 @@ This object has no state machine. It is created and modified as a unit, with no 
 | Attribute | Type | Description | Set By | Mutable After Creation? | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Name | String | Human-readable label for the Template | Vendor | Yes | Required on creation. Used to identify the Template in the UI and API. Not required to be unique within a Product. |
-| Type | Enum | One of: `Asset`, `Subscription`, `OrderProcessing`, `OrderQuerying`, `OrderCompleted` | Vendor | No | Required on creation — the API spec omits this from the required array, but this is a spec inaccuracy. Determines which object and state this Template can be applied to. |
-| Is Default | Boolean | Marks this Template as the Default for its Order Template type | Vendor | Yes | Applicable to `OrderProcessing`, `OrderQuerying`, `OrderCompleted` types only. Setting this to true demotes the existing Default of the same type (BR-005); cannot be set to false directly (BR-005a). Absent from the API response (null-suppressed) for `Asset` and `Subscription` types, which have no Default mechanism. |
+| Type | Enum | One of: `Asset`, `Subscription`, `OrderProcessing`, `OrderQuerying`, `OrderCompleted`, `OrderScheduled`, `OrderCancelling` | Vendor | No | Required on creation — the API spec omits this from the required array, but this is a spec inaccuracy. Determines which object and state this Template can be applied to. |
+| Is Default | Boolean | Marks this Template as the Default for its Order Template type | Vendor | Yes | Applicable to `OrderProcessing`, `OrderQuerying`, `OrderCompleted`, `OrderScheduled`, `OrderCancelling` types only. Setting this to true demotes the existing Default of the same type (BR-005); cannot be set to false directly (BR-005a). Absent from the API response (null-suppressed) for `Asset` and `Subscription` types, which have no Default mechanism. |
 | Content | String | The markdown/html body of the Template | Vendor | Yes | Required on creation. Max 8,000 characters including tags. Rendered against background #f4f6f8. Where used in notifications, must use html compatible with email clients. |
 | Parameter Fields | String (embedded) | Substitution tokens in the format {{ PAR-XXXX-XXXX-XXXX }} embedded within Content | Vendor | Yes | References a Parameter ID defined under the same Product. Resolved at render time against the current parameter value on the target object. |
 | Product | Object (reference: id, name, icon, revision, externalIds, status) | Reference to the parent Product | System | No | Set at creation. Identifies which Product this Template belongs to. |
@@ -113,7 +113,7 @@ This object has no state machine. It is created and modified as a unit, with no 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
 | Template created | Vendor creates Template under a [[Product]] | Vendor | Template becomes available for application to eligible objects of the matching type. |
-| Default Templates auto-created | Parent [[Product]] is created | Platform | The platform automatically creates one Default Template of each [[Order]] type: `OrderProcessing`, `OrderQuerying`, and `OrderCompleted`. This ensures the one-and-only-one Default invariant for each Order Template type is satisfied from the moment the Product exists. [[Asset]] and [[Subscription]] Templates are never auto-created (BR-006). |
+| Default Templates auto-created | Parent [[Product]] is created | Platform | The platform automatically creates one Default Template of each [[Order]] type: `OrderProcessing`, `OrderQuerying`, `OrderCompleted`, `OrderScheduled`, and `OrderCancelling`. This ensures the one-and-only-one Default invariant for each Order Template type is satisfied from the moment the Product exists. [[Asset]] and [[Subscription]] Templates are never auto-created (BR-006). |
 | Template marked as Default | Vendor sets Is Default = true | Vendor | Any existing Default Template of the same type is automatically demoted (Is Default set to false). |
 | Template deleted | Vendor deletes Template | Vendor | Any [[Order]], [[Agreement]], [[Asset]], or [[Subscription]] currently referencing this Template will fail to render it. No cascade deletion. |
 
@@ -160,6 +160,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.9 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders: added the `OrderScheduled` and `OrderCancelling` Template types to BR-002, BR-003, BR-004, the Type and Is Default attributes, and the Default Templates auto-created event. Both carry a Default per Product like the other Order types; the fixed Cancelled message is noted in BR-003. Matches Commerce: Order v0.6. |
 | 0.8 | 2026-07-15 | Stu / canon-generate | Fixed BR-018 — the substitution-token format was wrapped in a stray `[[PAR]]` wikilink instead of plain text, which broke mention validation once Catalog: Product Parameter's own canon correctly declared `PAR` as its ID prefix. Surfaced during the Parameter canon refresh. |
 | 0.7 | 2026-07-15 | Stu / canon-generate | Refresh via live OpenAPI schema, one live-fetched real object (STAGING, all Actors — no suppression found), and source-code research. ID Prefix corrected (was "None", is TPL) and moved out of Also Known As. **Significant corrections**: `RequestProcessing` is fully removed from the platform (not merely deprecated) — removed from BR-002, the Type attribute, and the Section 7.1 auto-creation event; max Content length corrected from 4,000 to 8,000 characters (BR-017, Content attribute) — 4,000 did not match any value this constant has held. New BR-005a: a Default Template cannot be directly un-marked, only demoted by promoting another. New Product attribute documented (reference to parent Product, not previously listed). External IDs corrected — a single fixed `vendor` key, not a flexible map. Section 9 render-failure row tightened — confirmed a dedicated render action fails, not the parent object's own record. Also corrected `Commerce: Agreement` canon (BR-005a added) — Template rendering is permitted in Terminated status, not just Active. |
 | 0.6 | 2026-03-14 | Stu | Section 7.1: auto-creation event added — platform creates one Default Template of each Order type on Product creation. RequestProcessing also auto-created today, pending removal in v5. |

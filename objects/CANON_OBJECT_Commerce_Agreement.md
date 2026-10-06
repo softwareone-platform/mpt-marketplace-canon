@@ -1,8 +1,8 @@
 # Object Canon: Agreement
 
-> **Version:** 0.10
+> **Version:** 0.11
 > **Owner:** Stu
-> **Last Updated:** 2026-07-19
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -52,8 +52,8 @@ None known.
 | --- | --- | --- | --- |
 | Draft | The Agreement has been co-created with a Purchase Order that has not yet been placed. It has no active Subscriptions or Assets, and no parameters yet. | Yes (co-creation) | No |
 | Provisioning | The Purchase Order against this Agreement has been placed and is being processed by the Vendor. | No | No |
-| Updating | A Change, Configuration, Termination, Suspend, or Resume Order against this Agreement has been placed and is being processed. | No | No |
-| Active | The Agreement is active with at least one live Subscription or Asset. It returns to Active when a Change, Configuration, or Termination Order completes or fails. | Yes (Operations direct create) | No |
+| Updating | A Change, Configuration, Termination, Suspend, Resume, or Renewal Order against this Agreement has been placed and is being processed. | No | No |
+| Active | The Agreement is active with at least one live Subscription or Asset. It returns to Active when a Change, Configuration, Termination, or Renewal Order completes or fails, or when a Renewal Order is scheduled, and it stays Active while a Renewal Order is Scheduled or Cancelling. | Yes (Operations direct create) | No |
 | Terminated | Every Subscription on the Agreement is Terminated or Expired. Terminal — no outbound transitions. | Yes (Operations direct create) | Yes |
 | Failed | The Purchase Order against this Agreement failed. The Agreement cannot be transacted against and cannot be recovered. Terminal — no outbound transitions. | No | Yes |
 | Deleted | The Agreement has been soft-deleted — moves to Deleted status and remains retrievable via the API including in standard list responses. Only reachable from Draft when the co-created Purchase Order is deleted. Terminal — no outbound transitions. Deviates from Platform Invariant 7. | No | Yes |
@@ -72,9 +72,9 @@ None known.
 | T6 | Draft | Deleted | Purchase Order deleted | (no dedicated Agreement endpoint — Draft/Quoted Purchase Order deleted) | Platform (deleting Actor's token) | Co-created Purchase Order deleted | Soft-delete — remains retrievable via the API. |
 | T7 | Provisioning | Active | Purchase Order completed | (no dedicated Agreement endpoint — Purchase Order → Completed) | Platform (Vendor token) | Purchase Order transitions to Completed | Draft Subscriptions and Assets become Active. Only the Vendor can complete an Order. |
 | T8 | Provisioning | Failed | Purchase Order failed | (no dedicated Agreement endpoint — Purchase Order → Failed) | Platform (Vendor or Operations token) | Purchase Order transitions to Failed | Terminal — cannot be recovered. |
-| T9 | Active | Updating | Change, Configuration, Termination, Suspend, or Resume Order placed | (no dedicated Agreement endpoint — non-Purchase Order → Processing) | Platform (Client token) | A non-Purchase Order transitions to Processing | Automated. |
-| T10 | Updating | Active | Order completed, or non-Purchase Order failed | (no dedicated Agreement endpoint — Order → Completed/Failed) | Platform (Vendor or Operations token) | The Processing Order completes, or a non-Purchase Order fails (revert) | On failure of a non-Purchase Order, the Agreement and its Subscriptions revert to Active unchanged. |
-| T11 | Active | Terminated | Final Subscription terminated | (no dedicated Agreement endpoint — driven by Subscription state / Termination Order completion) | Platform | Every Subscription on the Agreement is Terminated or Expired | Triggered whether via a Termination Order, direct Vendor action on the last Subscription, or expiry — see BR-006. Direct action transits Updating internally. |
+| T9 | Active | Updating | Change, Configuration, Termination, Suspend, Resume, or Renewal Order placed, or a Scheduled Renewal Order returned to Processing | (no dedicated Agreement endpoint — non-Purchase Order → Processing) | Platform (Client token; renewal service or Vendor token for a Scheduled Renewal Order) | A non-Purchase Order transitions to Processing | Automated. A Scheduled Renewal Order is returned to Processing by the renewal service only while the Agreement is Active (BR-019), or earlier by the Vendor. |
+| T10 | Updating | Active | Order completed, non-Purchase Order failed, or Renewal Order scheduled | (no dedicated Agreement endpoint — Order → Completed/Failed/Scheduled) | Platform (Vendor or Operations token) | The Processing Order completes, a non-Purchase Order fails (revert), or a Renewal Order transitions to Scheduled | On failure of a non-Purchase Order, the Agreement and its Subscriptions revert to Active unchanged. Scheduling a Renewal Order releases the Agreement before the Order's changes are applied (BR-019). |
+| T11 | Active | Terminated | Final Subscription terminated | (no dedicated Agreement endpoint — driven by Subscription state / Termination Order completion) | Platform | Every Subscription on the Agreement is Terminated or Expired | Triggered whether via a Termination Order, a Renewal Order that terminates the last Subscriptions, direct Vendor action on the last Subscription, or expiry — see BR-006. Direct action transits Updating internally. |
 
 ### 3.3 State Diagram
 
@@ -87,8 +87,8 @@ None known.
 [Draft] ---(Purchase Order deleted : Platform)---> [Deleted]
 [Provisioning] ---(Purchase Order completed : Platform)---> [Active]
 [Provisioning] ---(Purchase Order failed : Platform)---> [Failed]
-[Active] ---(Change/Configuration/Termination Order placed : Platform)---> [Updating]
-[Updating] ---(Order completed or failed : Platform)---> [Active]
+[Active] ---(Non-Purchase Order placed, or Scheduled Renewal Order returned to Processing : Platform)---> [Updating]
+[Updating] ---(Order completed or failed, or Renewal Order scheduled : Platform)---> [Active]
 [Active] ---(All Subscriptions terminated : Platform)---> [Terminated]
 ```
 
@@ -115,8 +115,9 @@ None known.
 | BR-014 | The `termsAndConditions` array records the T&Cs accepted at the time of the original Purchase [[Order]]. T&Cs from subsequent Change, Configuration, or Termination Orders are not accumulated on the Agreement. | All | Client | Each entry records the Catalog: [[Terms]] reference, acceptance timestamp, and accepting [[User]]. Empty on Draft. |
 | BR-015 | The Vendor or Operations can set an estimated aggregate price on the Agreement by supplying price estimates on update; doing so sets the price `source` to `Manual` and records the acting User. The Vendor may set purchase-price estimates (`PPxM`/`PPxY`) only; Operations may set both purchase- and sell-price estimates (`SPxM`/`SPxY`). The Client cannot set estimates. | All | Vendor, Operations | Intended for reflecting estimated pricing on usage-based / pay-as-you-go entitlements. The platform does not gate this on status or billing model. A manually estimated price is not durable — any subsequent activity that recomputes the aggregate (an [[Order]] completing, a [[Subscription]] or [[Asset]] change, or expiry) resets `source` to `Computed`, discarding the estimate. |
 | BR-016 | Each Actor can update its own `externalIds` field on the Agreement: `externalIds.client` (Client), `externalIds.operations` (Operations), `externalIds.vendor` (Vendor). All are optional. | All | All | — |
-| BR-017 | There can be only one Processing [[Order]] per Agreement at any time. While an [[Order]] is Processing, the Agreement is in Provisioning or Updating and no further Orders can be placed against it. | Provisioning, Updating | All | See Commerce: [[Order]] canon BR-005. |
+| BR-017 | There can be only one Processing [[Order]] per Agreement at any time. While an [[Order]] is Processing, the Agreement is in Provisioning or Updating and no further Orders can be placed against it. | Provisioning, Updating | All | See Commerce: [[Order]] canon BR-005. A Scheduled or Cancelling Renewal Order does not count: scheduling releases the Agreement to Active (BR-019). |
 | BR-018 | Split Billing is configured on the Agreement via the `/split` sub-resource and can be managed only by the Client or Operations — never the Vendor. Activation requires the [[Product]] to have Split Billing enabled, requires the [[Licensee]]'s default [[Buyer]] to be included, and cannot be repeated once activated. | All | Client, Operations | Activation has no Agreement-status precondition. On activation, each [[Subscription]] is seeded with a split allocation to the default [[Buyer]] (100%; other buyers 0%). Allocation percentages are platform-computed from each [[Buyer]]'s share of Subscription selling price — not free-form Actor input. A [[Buyer]] with existing Subscription-level allocations cannot be removed. Full model in the Commerce: [[Agreement Split Billing]] canon. |
+| BR-019 | Scheduling a Renewal [[Order]] returns the Agreement to Active while the Order's changes wait for the renewal of its [[Subscription]]; the Agreement returns to Updating when the Order goes back to Processing. The renewal service returns a Scheduled Renewal Order to Processing only while the Agreement is Active. | Active, Updating | Platform | While a Renewal Order waits, other Orders can be placed against the Agreement. At most one Scheduled Renewal Order per Agreement is returned to Processing per run of the renewal service. See Commerce: Order BR-042 and BR-043. |
 
 ---
 
@@ -213,7 +214,7 @@ None known.
 ## 8. Reversibility & Data Retention
 
 **Reversible transitions:**
-Active → Updating is reversible with no limit on cycles — each new [[Order]] placed against an Active Agreement moves it to Updating, and each Order completion or failure returns it to Active. All other transitions are irreversible: Provisioning → Active is one-way, and Terminated, Failed, and Deleted are terminal.
+Active → Updating is reversible with no limit on cycles — each new [[Order]] placed against an Active Agreement moves it to Updating, and each Order completion or failure returns it to Active. Scheduling a Renewal Order also returns it to Active, and that Order's return to Processing after the renewal moves it back to Updating. All other transitions are irreversible: Provisioning → Active is one-way, and Terminated, Failed, and Deleted are terminal.
 
 **Deletion:**
 Agreements use a soft-delete model. An Agreement reaches Deleted only when its co-created Draft or Quoted Purchase [[Order]] is deleted; there is no DELETE endpoint and no Actor can delete an Agreement directly. Deleted Agreements remain retrievable via the API including in standard list responses. This deviates from Platform Invariant 7.
@@ -233,6 +234,7 @@ The audit block captures `created`, `updated`, `provisioning`, `active`, and `te
 | A manually estimated price is set, then Agreement activity occurs | The `Manual` price is not durable: the next event that recomputes the aggregate (an [[Order]] completing, a [[Subscription]]/[[Asset]] change, or expiry) resets `source` to `Computed`, discarding the estimate. | Vendor, Operations | Medium | The Vendor must re-apply the estimate after such activity if the estimated value is to persist. See BR-015. |
 | Client attempts to modify Agreement-scoped parameters after the Purchase [[Order]] completes | The platform does not permit it — only the Vendor can update Agreement-scoped parameters thereafter. | Client | Low | The Client can update [[Order]]-scoped parameters via subsequent Orders, but these never carry back to the Agreement. |
 | `billingCurrency` set to a currency not in the [[Seller]]'s `currencies` array | The platform rejects the update. | Client | Low | Platform-enforced — see BR-013. |
+| Agreement is not Active when a Scheduled Renewal Order is due | The renewal service leaves the Renewal [[Order]] Scheduled and retries on each subsequent run until the Agreement is Active. The Order's changes take effect later than the renewal. | Client, Vendor | Medium | Typical cause: another Order on the Agreement is Processing or Querying. See BR-019. |
 | Failed Agreement coexists with a new Agreement for the same [[Product]] and Client | A Failed Agreement remains visible in the API; a new Purchase [[Order]] creates a new Agreement rather than replacing it. Both exist simultaneously. | Client, Operations | Medium | The Failed Agreement has no operational impact once a new Agreement is Active. |
 
 ---
@@ -247,6 +249,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.11 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). Updating and Active now name the Renewal Order (§3.1); T9 also covers a Scheduled Renewal Order returning to Processing (under the renewal service or the Vendor) and T10 a Renewal Order being scheduled; T11 names Renewal termination. Added BR-019 (scheduling releases the Agreement; the renewal service waits for it to be Active), a BR-017 note that a Scheduled Renewal Order does not hold the Agreement, and matching §8 and §9 entries. |
 | 0.10 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[User]]` (BR-014, the accepting User of the recorded T&Cs). No behavioural change. |
 | 0.9 | 2026-07-17 | Stu / canon-generate | Terminology corrected while refreshing Commerce: Order: fulfilment actions are attributed to "the Vendor" (the Actor), not a "Vendor Extension"/"Vendor's fulfilment Extension" — Vendor fulfilment is manual-first and does not require an extension. §3.1 Provisioning state, BR-010, and the §6 Subscription/Asset child rows updated. |
 | 0.8 | 2026-07-17 | Stu / canon-generate | BR-006 (and the §3.1 Terminated state, T11 precondition, and §6 Subscription row) corrected while refreshing Commerce: Subscription: the Agreement auto-terminates when every Subscription is Terminated **or Expired**, not Terminated alone — Expired Subscriptions count toward the condition. |

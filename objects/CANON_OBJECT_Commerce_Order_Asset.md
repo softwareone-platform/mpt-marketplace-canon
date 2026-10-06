@@ -204,5 +204,3 @@ The `audit` block records `created` and `updated` (each a timestamp and the acti
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
 | 0.1 | 2026-07-17 | Stu / canon-generate-batch | Initial draft. Covers the Order-scoped Draft/Active lifecycle, Vendor-only create/line/parameter/delete authority, Draft-only deletion guard, one-time-Line auto-generation and empty-Order-Asset removal at completion, promotion to the live Commerce: Asset with identity preserved, terms/price derivation, and Actor-based price suppression. Drafted alongside the Commerce: Order refresh and the fresh Order Line and Order Subscription siblings. |
-</content>
-</invoke>

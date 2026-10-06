@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 3.3
-> **Last Updated:** 2026-07-15
+> **Version:** 3.7
+> **Last Updated:** 2026-10-06
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -35,6 +35,10 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 | ORD-005 | Whether the platform handles simultaneous Order placement attempts against the same Agreement atomically — preventing race conditions where two Orders could both reach Processing status simultaneously — is not confirmed. |
 | ORD-006 | Split Billing is enabled at the Agreement level and has implications for Order behaviour. This section requires updating once Split Billing has been canonised in the Agreement canon. |
 | ORD-007 | The `certificates` array on the Order is always empty in observed samples where no Program is assigned to the Product. The full structure of a populated `certificates` entry, which Actors can read it, and whether it is suppressed for any Actor type is not confirmed. See Programs and Certificates canon — pending canonisation. |
+| ORD-009 | Can a Renewal Order be cancelled while it is Processing? The product design states that the Vendor may cancel a Processing Renewal Order, and the technical design mentions Processing → Cancelled among the transitions into the renewal branch while omitting it from its own transition table. The platform rejects the transition: the only exits from Processing are Completed, Failed, Querying, and Scheduled. |
+| ORD-010 | What should happen to a Scheduled Renewal Order whose Subscription is not renewed — because it expires with auto-renewal disabled, or is terminated? The Order currently stays Scheduled indefinitely and keeps the Subscription locked until the Vendor cancels it. No design record addresses the case. |
+| ORD-011 | When the Vendor declines a cancellation (Cancelling → Scheduled) after the Subscription has already renewed, is the Order meant to wait for the following renewal, a full commitment term later? Not observed. |
+| ORD-012 | The product design calls for the Order to show any discrepancy between its quantities and the Subscription's — or a disabled auto-renewal — when a Scheduled Renewal Order returns to Processing, with the Order's quantities prevailing on completion. No such discrepancy display has been observed. Whether it is still intended is not confirmed. |
 
 ---
 
@@ -123,6 +127,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.7 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6): added ORD-009 (Processing → Cancelled permitted by the product design, rejected by the platform), ORD-010 (Scheduled Renewal Order whose Subscription is not renewed), ORD-011 (declined cancellation after the renewal) and ORD-012 (discrepancy display not observed). |
 | 3.6 | 2026-07-19 | Stu / canon-generate-batch | Billing batch: added BJO-005 (Billing: Journal — possible Operations manual-upload/custom-ledger injection path) and CHG-001 (Billing: Charge — origin of the Consolidated billing type). Billing: Journal Attachment has no open questions. |
 | 3.5 | 2026-07-19 | Stu / canon-generate-batch | Audit batch: added AET-002 (Audit: Event Type — the update endpoint enforces no actor restriction, diverging from the Operations-curated intent; engineering to decide if defect or intended). Audit: Audit Record has no open questions. |
 | 3.4 | 2026-07-17 | Stu / canon-generate-batch | Order batch: ORD-001/002/003 resolved and removed (Querying is Vendor-only to enter and Operations-only to fail from; valid creation statuses Draft/Quoted/Processing) — ORD-004/005/006/007 retained. ORD-008 (Suspend/Resume Order types) and the /quote authority question resolved into the Order canon, not tracked. Added AST-004/AST-005 (Commerce: Order Asset) and SUB-004 (Commerce: Order Subscription). Order Line has no open questions. |

@@ -1,8 +1,8 @@
 # Object Canon: Subscription
 
-> **Version:** 0.4
+> **Version:** 0.5
 > **Owner:** Stu
-> **Last Updated:** 2026-07-17
+> **Last Updated:** 2026-10-06
 > **Status:** Draft
 
 ---
@@ -38,7 +38,7 @@ None known.
 
 | Actor | Can Create | Can Read | Can Update | Can Delete | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Vendor | Yes | Yes | Yes | No | Creates Subscriptions directly (migration/edge cases) or via [[Order]] processing. Updates `name`, `template`, `autoRenew`, `commitmentDate`, `parameters.fulfillment`, `externalIds.vendor`. Terminates, suspends, and resumes via dedicated endpoints. Read is scoped to Subscriptions on [[Agreement]]s where they are the Vendor (BR-020). |
+| Vendor | Yes | Yes | Yes | No | Creates Subscriptions directly (migration/edge cases) or via [[Order]] processing. Updates `name`, `template`, `autoRenew`, `commitmentDate`, `parameters.fulfillment`, `externalIds.vendor`. Terminates, suspends, and resumes via dedicated endpoints — except while the Subscription belongs to a Scheduled or Cancelling Renewal Order (BR-022). Read is scoped to Subscriptions on [[Agreement]]s where they are the Vendor (BR-020). |
 | Operations | No | Yes | Yes | No | Updates `commitmentDate` and `price.defaultMarkup` (only while Active or Suspended), and manages Split Billing via the `/split` endpoint. Suspend and resume Orders are Operations-driven. Read is not self-scoped — Operations sees all Subscriptions platform-wide. |
 | Client | No | Yes | Yes | No | Updates `name` and `externalIds.client`. Cannot create, terminate, suspend, resume, or delete. Read is scoped to Subscriptions on [[Agreement]]s belonging to their own [[Account]] (BR-020). |
 
@@ -50,9 +50,9 @@ None known.
 
 | State | Description | Initial State? | Terminal State? |
 | --- | --- | --- | --- |
-| Active | The Subscription is live and fulfilling. It is evaluated daily by the platform's renewal service and may be renewed, expired, suspended, updated, or terminated. | Yes | No |
-| Updating | A Change or Configuration Order affecting this Subscription is being processed. The Subscription returns to Active when the Order completes or fails. | No | No |
-| Terminating | A Termination Order affecting this Subscription is being processed. The Subscription transitions to Terminated when the Order completes, or reverts when it fails. | No | No |
+| Active | The Subscription is live and fulfilling. It is evaluated daily by the platform's renewal service and may be renewed, expired, suspended, updated, or terminated. It stays Active while it belongs to a Scheduled or Cancelling Renewal Order, but the Vendor cannot then change it directly (BR-022). | Yes | No |
+| Updating | A Change, Configuration, or Renewal Order affecting this Subscription is being processed. The Subscription returns to Active when the Order completes or fails, or when a Renewal Order is scheduled. | No | No |
+| Terminating | A Termination Order affecting this Subscription is being processed, or a Renewal Order that reduces every one of its Lines to quantity 0. The Subscription transitions to Terminated when the Order completes, or reverts when it fails; a Renewal Order being scheduled returns it to Active. | No | No |
 | Suspending | A Suspend Order affecting this Subscription is being processed. The Subscription transitions to Suspended when the Order completes, or reverts to Active when it fails. | No | No |
 | Suspended | Fulfilment is paused. The Subscription can be resumed, terminated, or expired. | No | No |
 | Resuming | A Resume Order affecting this Subscription is being processed. The Subscription transitions to Active when the Order completes, or reverts to Suspended when it fails. | No | No |
@@ -69,22 +69,22 @@ None known.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | T1 | — | Active | Order completed — promoted from the Order-scoped representation | No dedicated endpoint — driven by Purchase/Change Order completion | Platform | Purchase or Change Order transitions to Completed | Under Vendor token context. Same ID retained. Linked to the Agreement simultaneously. |
 | T2 | — | Active | Vendor creates directly | `POST` (base collection endpoint) | Vendor | Parent Agreement is Active, New, or Draft | Migration/vendor-sync. Created directly in Active without an Order. |
-| T3 | Active | Updating | Change or Configuration Order placed | No dedicated endpoint — driven by Order state | Platform | Change or Configuration Order enters Processing | Under the placing Actor's token context. |
-| T4 | Active | Terminating | Termination Order placed | No dedicated endpoint — driven by Order state | Platform | Termination Order enters Processing | Parent Agreement transitions to Updating. |
-| T5 | Active | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active | Immediate. `terminationDate` set to now, `autoRenew` forced false, active Lines set to quantity 0 and terminated. If last, Agreement → Terminated (BR-003). |
-| T6 | Active | Suspended | Vendor suspends directly | `suspend` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor suspend | Immediate — skips Suspending. |
+| T3 | Active | Updating | Change, Configuration, or Renewal Order placed, or a Scheduled Renewal Order returned to Processing | No dedicated endpoint — driven by Order state | Platform | Change, Configuration, or Renewal Order enters Processing; for a Renewal Order, at least one Line for this Subscription remains above quantity 0 | Under the placing Actor's token context. A Scheduled Renewal Order returns to Processing after the renewal, under the renewal service, or earlier under the Vendor's token (BR-023). |
+| T4 | Active | Terminating | Termination Order placed, or a Renewal Order emptying this Subscription enters Processing | No dedicated endpoint — driven by Order state | Platform | Termination Order enters Processing, or a Renewal Order enters Processing with every Line for this Subscription at quantity 0 | Parent Agreement transitions to Updating. |
+| T5 | Active | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active; the Subscription does not belong to a Scheduled or Cancelling Renewal Order (BR-022) | Immediate. `terminationDate` set to now, `autoRenew` forced false, active Lines set to quantity 0 and terminated. If last, Agreement → Terminated (BR-003). |
+| T6 | Active | Suspended | Vendor suspends directly | `suspend` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor suspend; the Subscription does not belong to a Scheduled or Cancelling Renewal Order (BR-022) | Immediate — skips Suspending. |
 | T7 | Active | Suspending | Suspend Order placed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order (Operations) enters Processing; the Product's Suspend/Resume setting permits it | |
 | T8 | Active | Expired | Renewal service — not renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today, `autoRenew` = false, parent Agreement Active, and the Product's cessation setting permits expiry (BR-006) | Terminal. |
-| T9 | Active | Active | Renewal service — renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today and `autoRenew` = true | Not a state change. `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded (BR-005). |
-| T10 | Updating | Active | Change or Configuration Order completed or failed | No dedicated endpoint — driven by Order state | Platform | Order transitions to Completed or Failed | Returns to Active in both cases. |
-| T11 | Terminating | Terminated | Termination Order completed | No dedicated endpoint — driven by Order state | Platform | Termination Order transitions to Completed | `terminationDate` set. If last, Agreement → Terminated (BR-003). |
-| T12 | Terminating | Active | Termination Order failed | No dedicated endpoint — driven by Order state | Platform | Termination Order transitions to Failed | Reverts unchanged (or to Suspended if the Subscription was Suspended before the Order). |
+| T9 | Active | Active | Renewal service — renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today and `autoRenew` = true | Not a state change. `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded (BR-005). The Subscription's Scheduled Renewal Order, if any, is then returned to Processing (BR-023). |
+| T10 | Updating | Active | Change, Configuration, or Renewal Order completed or failed, or Renewal Order scheduled | No dedicated endpoint — driven by Order state | Platform | Order transitions to Completed or Failed, or a Renewal Order transitions to Scheduled | Returns to Active in all cases. On scheduling, the Renewal Order's changes are not yet applied. |
+| T11 | Terminating | Terminated | Termination or Renewal Order completed | No dedicated endpoint — driven by Order state | Platform | Termination or Renewal Order transitions to Completed | `terminationDate` set. If last, Agreement → Terminated (BR-003). |
+| T12 | Terminating | Active | Termination Order failed, or Renewal Order failed or scheduled | No dedicated endpoint — driven by Order state | Platform | Termination or Renewal Order transitions to Failed, or a Renewal Order transitions to Scheduled | Reverts unchanged (or to Suspended if the Subscription was Suspended before a Termination Order). A Subscription in a Renewal Order was Active before it. |
 | T13 | Suspending | Suspended | Suspend Order completed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order transitions to Completed | |
 | T14 | Suspending | Active | Suspend Order failed | No dedicated endpoint — driven by Suspend Order state | Platform | Suspend Order transitions to Failed | Reverts unchanged. |
-| T15 | Suspended | Active | Vendor resumes directly | `resume` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor resume | Immediate — skips Resuming. `resumed` audit event recorded. |
+| T15 | Suspended | Active | Vendor resumes directly | `resume` | Vendor | Parent Agreement is Active; the Product's Suspend/Resume setting permits Vendor resume; the Subscription does not belong to a Scheduled or Cancelling Renewal Order (BR-022) | Immediate — skips Resuming. `resumed` audit event recorded. |
 | T16 | Suspended | Resuming | Resume Order placed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order (Operations) enters Processing; the Product's Suspend/Resume setting permits it | |
 | T17 | Suspended | Terminating | Termination Order placed | No dedicated endpoint — driven by Order state | Platform | Termination Order enters Processing | |
-| T18 | Suspended | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active | Immediate. |
+| T18 | Suspended | Terminated | Vendor terminates directly | `terminate` | Vendor | Parent Agreement is Active; the Subscription does not belong to a Scheduled or Cancelling Renewal Order (BR-022) | Immediate. |
 | T19 | Suspended | Expired | Renewal service — not renewed | No dedicated endpoint — daily renewal service | Platform | `commitmentDate` < today, parent Agreement Active, and the Product's cessation setting permits expiry | Terminal. A Suspended Subscription past its commitment date is expired by the same daily service. |
 | T20 | Resuming | Active | Resume Order completed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order transitions to Completed | |
 | T21 | Resuming | Suspended | Resume Order failed | No dedicated endpoint — driven by Resume Order state | Platform | Resume Order transitions to Failed | Reverts to Suspended. |
@@ -94,16 +94,16 @@ None known.
 ```
 — ---(Order completed, promoted : Platform)---> [Active]
 — ---(Vendor creates directly : Vendor)---> [Active]
-[Active] ---(Change/Configuration Order placed : Platform)---> [Updating]
-[Active] ---(Termination Order placed : Platform)---> [Terminating]
+[Active] ---(Change/Configuration/Renewal Order placed : Platform)---> [Updating]
+[Active] ---(Termination Order, or emptying Renewal Order, placed : Platform)---> [Terminating]
 [Active] ---(Vendor suspends directly : Vendor)---> [Suspended]
 [Active] ---(Suspend Order placed : Platform)---> [Suspending]
 [Active] ---(Renewal service, not renewed : Platform)---> [Expired]
 [Active] ---(Renewal service, renewed : Platform)---> [Active] (commitmentDate advanced)
 [Active] ---(Vendor terminates directly : Vendor)---> [Terminated]
-[Updating] ---(Order completed or failed : Platform)---> [Active]
-[Terminating] ---(Termination Order completed : Platform)---> [Terminated]
-[Terminating] ---(Termination Order failed : Platform)---> [Active] (or [Suspended])
+[Updating] ---(Order completed or failed, or Renewal Order scheduled : Platform)---> [Active]
+[Terminating] ---(Termination or Renewal Order completed : Platform)---> [Terminated]
+[Terminating] ---(Order failed, or Renewal Order scheduled : Platform)---> [Active] (or [Suspended])
 [Suspending] ---(Suspend Order completed : Platform)---> [Suspended]
 [Suspending] ---(Suspend Order failed : Platform)---> [Active]
 [Suspended] ---(Vendor resumes directly : Vendor)---> [Active]
@@ -141,6 +141,9 @@ None known.
 | BR-018 | The `/terminate` endpoint's request body is applied as a Vendor update (the same fields a Vendor may update) immediately before termination; it carries no termination-date or effective-date field. Termination is immediate — `terminationDate` is always set to the current time. | Active, Terminating, Suspended | Vendor | There is no future-dated or effective-dated termination via this endpoint. |
 | BR-019 | Subscription state transitions are driven by [[Order]] state, the platform's daily renewal service, or direct Vendor action (terminate/suspend/resume). No Actor can set `status` through a plain field write. | All | All | — |
 | BR-020 | Subscription visibility is self-scoped per Actor: the Vendor sees only Subscriptions on [[Agreement]]s where they are the Vendor; the Client only those on [[Agreement]]s belonging to their own [[Account]]; Operations sees all. | All | All | — |
+| BR-021 | A Subscription belongs to at most one Renewal [[Order]] at a time, and only an Active Subscription with `autoRenew` = true can join one. It references that Order through `relationships.renewalOrder`. | Active, Updating, Terminating | Client | The reference is set at the Renewal Order's creation, Draft and Quoted included, and cleared when the Order is Completed, Failed, Cancelled, or Deleted, or the Subscription is removed from it. See Commerce: Order BR-039. |
+| BR-022 | While a Subscription belongs to a Scheduled or Cancelling Renewal [[Order]], the Vendor cannot update, terminate, suspend, or resume it directly, and no other Order involving it can be completed. | Active, Suspended | Vendor | Operations' direct writes are not restricted. The Vendor must cancel the Renewal Order first. Other Orders can still be placed. See Commerce: Order BR-044 and BR-045. |
+| BR-023 | After renewing a Subscription, the daily renewal service returns the Subscription's Scheduled Renewal [[Order]] to Processing, so that the Order's changes take effect after the renewal. A Subscription that expires or is terminated instead leaves its Renewal Order Scheduled. | Active | Platform | The return waits while the parent [[Agreement]] is not Active, and is retried on the next run. See Commerce: Order BR-043 and ORD-010. |
 
 ---
 
@@ -165,6 +168,7 @@ None known.
 | `externalIds.client` | String | The Client's own reference for this Subscription. | Client | Yes | Optional. Absent when null. |
 | `split` | Object | Reference to the Subscription's Split Billing configuration. | Operations | Yes | Suppressed for the Vendor Actor. Absent when null. See BR-015. |
 | `splitStatus` | Enum | Split Billing status: `Disabled`, `Active`. | Platform | Yes — platform-managed | Suppressed for the Vendor Actor. `Active` once a split is seeded, `Disabled` before. |
+| `relationships.renewalOrder` | Object | Reference to the Renewal Order the Subscription currently belongs to. | Platform | Yes — platform-managed | Read-only. Absent when null. Set and cleared per BR-021. |
 | `agreement` | Object | Reference to the parent Commerce Agreement. | Platform | No | — |
 | `product` | Object | Reference to the Catalog Product. | Platform | No | Derived from the Agreement. |
 | `buyer` | Object | Reference to the Accounts Buyer. | Platform | No | Derived from the Agreement. |
@@ -179,7 +183,7 @@ None known.
 | Related Object | Relationship Type | Cardinality | Description | Lifecycle Dependency? |
 | --- | --- | --- | --- | --- |
 | Commerce: Agreement | Parent | Many Subscriptions to one Agreement | Every Subscription belongs to an Agreement, created and linked during Order processing. | When every Subscription on the Agreement is Terminated or Expired, the Agreement transitions to Terminated. |
-| Commerce: Order | Association | Many Subscriptions to many Orders | Subscriptions are created during Purchase or Change Order processing; Change, Configuration, Termination, Suspend, and Resume Orders drive the Subscription's state transitions. | Subscription state is driven by Order state. See Commerce: Order canon Section 7.2. |
+| Commerce: Order | Association | Many Subscriptions to many Orders | Subscriptions are created during Purchase, Change, or Renewal Order processing; Change, Configuration, Termination, Suspend, Resume, and Renewal Orders drive the Subscription's state transitions. | Subscription state is driven by Order state. See Commerce: Order canon Section 7.2. A Subscription in a Renewal Order references it through `relationships.renewalOrder` (BR-021). |
 | Commerce: Entitlement | Child | One Subscription to many Entitlements | The Subscription's Lines (Entitlements), reachable via `/subscriptions/{id}/lines` and via the Agreement's `/lines` endpoint. | Line terms match Subscription terms; Lines are terminated or expired with the Subscription. |
 | Catalog: Product | Association | Many Subscriptions to one Product | The Product this Subscription covers, derived from the Agreement. The Product's cessation and suspend/resume settings gate the Subscription's expiry and suspend/resume behaviour. | Immutable after creation. |
 | Catalog: Template | Association | Many Subscriptions to one Template | The Template rendered to the Client when viewing the Subscription. | No lifecycle dependency — Template changes do not affect Subscription status. |
@@ -195,7 +199,7 @@ None known.
 
 | Event | Trigger | Permitted Actor(s) | Side Effect / Downstream Action |
 | --- | --- | --- | --- |
-| Subscription renewed | Daily renewal service; `autoRenew` = true and `commitmentDate` < today | Platform | `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded. No status change. |
+| Subscription renewed | Daily renewal service; `autoRenew` = true and `commitmentDate` < today | Platform | `commitmentDate` advanced by `terms.commitment`; `renewed` audit event recorded. No status change. If the Subscription belongs to a Scheduled Renewal [[Order]], that Order is then returned to Processing (BR-023). |
 | `autoRenew` updated | Vendor updates `autoRenew` | Vendor | Persisted immediately; affects the next renewal evaluation. No state transition. |
 | Parameters updated | Vendor updates `parameters.fulfillment` | Vendor | Persisted immediately. No state transition. |
 | Template updated | Vendor updates `template` | Vendor | Rendered content shown to the Client updates immediately. No state transition. |
@@ -213,6 +217,9 @@ None known.
 | Termination Order completed | Commerce: Subscription | Subscription → Terminated | Yes — platform, under Vendor token | Termination [[Order]] → Completed | `terminationDate` set. |
 | Termination Order failed | Commerce: Subscription | Subscription → Active (or Suspended) | Yes — platform | Termination [[Order]] → Failed | Reverts to its pre-Order status. |
 | Change or Configuration Order completed or failed | Commerce: Subscription | Subscription → Active | Yes — platform | [[Order]] type is Change or Configuration | Returns to Active in both cases. |
+| Subscription renewed | Commerce: Order | The Subscription's Scheduled Renewal [[Order]] → Processing | Yes — platform | The Subscription belongs to a Scheduled Renewal Order and the parent Agreement is Active | See BR-023. |
+| Renewal Order scheduled | Commerce: Subscription | Subscription → Active, from Updating or Terminating | Yes — platform, under Vendor token | [[Order]] type is Renewal | The Order's changes are not yet applied. |
+| Renewal Order completed or failed | Commerce: Subscription | Subscription → Active, or → Terminated where the Order completed with every Line for it at quantity 0 | Yes — platform | [[Order]] type is Renewal | `relationships.renewalOrder` cleared. |
 | Suspend/Resume Order completed or failed | Commerce: Subscription | Subscription → Suspended/Active, or reverts | Yes — platform, under Operations-driven flow | Suspend/Resume [[Order]] reaches a terminal state | The Operations Order path also moves the [[Agreement]] Active → Updating → Active. |
 
 ---
@@ -224,6 +231,7 @@ None known.
 - Terminating → Active is reversible if the Termination [[Order]] fails.
 - Suspending → Active is reversible if the Suspend [[Order]] fails; Resuming → Suspended if the Resume [[Order]] fails.
 - Suspended ↔ Active is fully reversible — a Subscription may be suspended and resumed repeatedly.
+- Updating → Active and Terminating → Active also occur when a Renewal [[Order]] is scheduled; the Subscription moves back to Updating or Terminating when the Order returns to Processing after the renewal.
 
 Terminated and Expired are permanently terminal. A Subscription cannot be reactivated from either state.
 
@@ -245,6 +253,8 @@ The audit block captures `created`, `updated`, `active`, `terminating`, `updatin
 | Subscription stuck in Updating, Terminating, Suspending, or Resuming | No platform-level timeout. If the driving [[Order]] is abandoned, the Subscription remains in the transient state indefinitely. | Client, Operations | High | Operations should monitor long-running [[Order]]s. See Commerce: Order canon Section 9. |
 | Vendor creates a Subscription directly without an Order | Created directly in Active and linked to the [[Agreement]]; no [[Order]]-level audit trail exists for its creation. | Operations, Client | Medium | Used for migration. Operations should ensure direct creations are documented externally. |
 | Renewal service races a pending Termination Order | An Active Subscription with a Termination [[Order]] not yet in Processing can still be picked up by the daily renewal. Once the Order moves the Subscription to Terminating it is excluded from renewal. | Client, Vendor | Medium | The renewal service re-checks `commitmentDate` to avoid double-renewal within a run. |
+| Subscription expires while its Renewal Order is Scheduled | The Renewal [[Order]] is neither returned to Processing nor cancelled. The Subscription keeps referencing it, and the restrictions of BR-022 persist until the Vendor cancels the Order. | Vendor, Client | High | Reachable when `autoRenew` was disabled before the Order was scheduled. See Commerce: Order ORD-010. |
+| Vendor changes a Subscription directly while it is in a Scheduled or Cancelling Renewal Order | The platform rejects the update, termination, suspension, or resumption. | Vendor | Low | See BR-022. The Vendor must cancel the Renewal [[Order]] first. |
 | Direct Vendor suspend/resume while an Operations Suspend/Resume Order is in flight | The direct endpoint jumps straight to Suspended/Active, bypassing the transient state the Order path expects, which can leave the in-flight Order inconsistent with the Subscription's status. | Operations, Vendor | Medium | The two suspend/resume paths are independent; coordinating them is the operator's responsibility (preamble §3.1). |
 
 ---
@@ -259,6 +269,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.5 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). Updating and Terminating now name the Renewal Order as a driver, and both return to Active when a Renewal Order is scheduled (§3.1, T3, T4, T10–T12, diagram). The Vendor's direct terminate/suspend/resume (T5, T6, T15, T18) is barred while the Subscription is in a Scheduled or Cancelling Renewal Order. Added BR-021 (one Renewal Order per Subscription; `relationships.renewalOrder`), BR-022 (Vendor direct-change and completion locks), BR-023 (the renewal service returns the Scheduled Renewal Order to Processing after renewing), the `relationships.renewalOrder` attribute, and matching §6, §7, §8 and §9 rows. |
 | 0.4 | 2026-07-17 | Stu / canon-generate | Terminology corrected while refreshing Commerce: Order: fulfilment actions are attributed to "the Vendor" (the Actor), not a "Vendor Extension" — reflecting that Vendor fulfilment is manual-first and does not require an extension. §1 and BR-007 updated. |
 | 0.3 | 2026-07-17 | Stu / canon-generate | `splitStatus` corrected while canonising Commerce: Subscription Split Billing: values are `Disabled` and `Active` only — the platform sets `Active` when a split is first seeded and never sets any other value (BR-015, attribute row). The §7 "Split Billing updated" event corrected — a split-allocation update does not change `splitStatus`, and the update is performed by Client or Operations (was "Operations"). BR-015 now points to the Commerce: Subscription Split Billing canon for the full split object. |
 | 0.2 | 2026-07-17 | Stu / canon-generate | Full evidence-based refresh via live STAGING OpenAPI schema, a multi-Actor live fetch, and source-code research. Added the Suspend/Resume feature: three states (Suspending/Suspended/Resuming) and their transitions — a Vendor-direct immediate path (`/suspend`→Suspended, `/resume`→Active) and an Operations Suspend/Resume Order path using the transient states — gated by the Product's Suspend/Resume setting and not yet exposed on the public API surface. §3.2 transition mechanisms confirmed and filled (were "Unconfirmed"): direct `terminate`/`suspend`/`resume` endpoints vs plain status writes driven by Order state; direct create via `POST` with the Agreement Active/New/Draft precondition; renewal/expiry via the daily service. Resolved SUB-001 (the `/terminate` body is applied as a Vendor update then terminates immediately — no effective/termination-date field; BR-018) and SUB-002 (`commitmentDate` defaults to `startDate` + `terms.commitment`, Vendor-settable at creation, advanced by `terms.commitment` on renewal; BR-017). Corrected: BR-005 renewal advances `commitmentDate` by `terms.commitment` (was `terms.period`); BR-013 Operations sets `defaultMarkup` only, not `defaultMargin`, and can set `commitmentDate`, only while Active or Suspended; expiry (BR-006) is gated by the parent Agreement being Active and the Product's cessation setting, not `autoRenew` = false alone; `terms.period` enum adds `3y`; `terms.commitment` enum is `1m`/`1y`/`2y`/`3y`/`4y`/`5y` and may be absent. Documented the Agreement-termination condition as all Subscriptions Terminated-or-Expired. Closed SUB-003 — the subscription-side split fields are documented (Client/Operations-only, `splitStatus` Disabled/Active/Review, Vendor-suppressed, own `/split` endpoint); the full Split Billing Subscription object remains tracked separately. Removed the duplicate `---` after §1. |
