@@ -1,8 +1,8 @@
 # Object Canon: Service
 
-> **Version:** 0.2
+> **Version:** 0.3
 > **Owner:** Stu
-> **Last Updated:** 2026-07-19
+> **Last Updated:** 2026-10-14
 > **Status:** Draft
 
 ---
@@ -142,5 +142,6 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
+| 0.3 | 2026-10-14 | Anton Hinz / Marcerito | Removed stray non-canon markup (`</content>`, `</invoke>`) left at the end of the document. No content change. |
 | 0.2 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[Audit Record]]` (Section 9) and removed the stale "Audit Record not yet canonised" note (Section 6). No behavioural change. |
 | 0.1 | 2026-07-19 | Stu / canon-generate-batch | Initial draft. Public API is read-only (list + get-by-id); no state machine (status is set internally, no public transition). Documents Service as the identity of an internal platform component alongside User and API Token, with no Actor-based field suppression and an identity-attribution relationship to Audit Records. Derived from the OpenAPI schema, a multi-Actor live fetch, source research, and the Service Identity business-context page. 0 open questions. |

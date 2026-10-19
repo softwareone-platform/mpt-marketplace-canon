@@ -2,7 +2,7 @@
 
 > **Version:** 0.2
 > **Owner:** Stu
-> **Last Updated:** 2026-10-06
+> **Last Updated:** 2026-10-14
 > **Status:** Draft
 
 ---
@@ -215,5 +215,5 @@ The audit block captures `created`, `updated`, `active`, `updating`, `terminatin
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.2 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). States, T3–T9 and the diagram now name the Renewal Order: Updating/Terminating on processing (Terminating when every line is at 0), back to Active on scheduling, Terminated/Active on completion, and deletion of Draft Order Subscriptions when the Renewal Order is cancelled. Added BR-013 and the matching §6, §7.1 and §8 entries. |
+| 0.2 | 2026-10-14 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). States, T3–T9 and the diagram now name the Renewal Order: Updating/Terminating on processing (Terminating when every line is at 0), back to Active on scheduling, Terminated/Active on completion, and deletion of Draft Order Subscriptions when the Renewal Order is cancelled. Added BR-013 and the matching §6, §7.1 and §8 entries. Removed stray non-canon markup from the end of the document. |
 | 0.1 | 2026-07-17 | Stu / canon-generate | Initial canon. Documents the Order-scoped, in-flight Subscription representation: Draft/Active/Updating/Terminating/Terminated/Deleted statuses; Vendor-only creation on a processing Order with matching-terms lines; the promotion-on-completion model (net-new promoted to a new live Subscription with the same SUB id; existing Subscription merged from edits); Actor write scoping (Vendor broad, Operations `commitmentDate`/`externalIds.operations`, Client `externalIds.client`); Draft-only deletion by Vendor or owning Client (not Operations); pricing-field Actor visibility; and self-scoped read visibility. Documents the mirrored suspend/resume/expiry statuses (Suspending/Suspended/Resuming/Expired) as real. SUB-004 parked on whether an Operations Suspend/Resume Order produces an Order Subscription record (no live sample). |

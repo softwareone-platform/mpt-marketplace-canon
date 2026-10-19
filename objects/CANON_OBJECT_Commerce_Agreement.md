@@ -2,7 +2,7 @@
 
 > **Version:** 0.11
 > **Owner:** Stu
-> **Last Updated:** 2026-10-06
+> **Last Updated:** 2026-10-14
 > **Status:** Draft
 
 ---
@@ -249,7 +249,7 @@ No open questions at this time.
 
 | Version | Date | Author | Notes |
 | --- | --- | --- | --- |
-| 0.11 | 2026-10-06 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). Updating and Active now name the Renewal Order (§3.1); T9 also covers a Scheduled Renewal Order returning to Processing (under the renewal service or the Vendor) and T10 a Renewal Order being scheduled; T11 names Renewal termination. Added BR-019 (scheduling releases the Agreement; the renewal service waits for it to be Active), a BR-017 note that a Scheduled Renewal Order does not hold the Agreement, and matching §8 and §9 entries. |
+| 0.11 | 2026-10-14 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6). Updating and Active now name the Renewal Order (§3.1); T9 also covers a Scheduled Renewal Order returning to Processing (under the renewal service or the Vendor) and T10 a Renewal Order being scheduled; T11 names Renewal termination. Added BR-019 (scheduling releases the Agreement; the renewal service waits for it to be Active), a BR-017 note that a Scheduled Renewal Order does not hold the Agreement, and matching §8 and §9 entries. |
 | 0.10 | 2026-07-19 | Stu / canon-maintenance | Wikilinked the now-canonised `[[User]]` (BR-014, the accepting User of the recorded T&Cs). No behavioural change. |
 | 0.9 | 2026-07-17 | Stu / canon-generate | Terminology corrected while refreshing Commerce: Order: fulfilment actions are attributed to "the Vendor" (the Actor), not a "Vendor Extension"/"Vendor's fulfilment Extension" — Vendor fulfilment is manual-first and does not require an extension. §3.1 Provisioning state, BR-010, and the §6 Subscription/Asset child rows updated. |
 | 0.8 | 2026-07-17 | Stu / canon-generate | BR-006 (and the §3.1 Terminated state, T11 precondition, and §6 Subscription row) corrected while refreshing Commerce: Subscription: the Agreement auto-terminates when every Subscription is Terminated **or Expired**, not Terminated alone — Expired Subscriptions count toward the condition. |
