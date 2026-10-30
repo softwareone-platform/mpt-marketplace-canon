@@ -1,7 +1,7 @@
 # Canon Open Questions
 
-> **Version:** 3.3
-> **Last Updated:** 2026-07-15
+> **Version:** 3.7
+> **Last Updated:** 2026-10-14
 > **Status:** Living Document — updated continuously as canon is developed
 
 ---
@@ -123,6 +123,7 @@ Question IDs use the API identifier prefix of the object they concern (e.g. PAR-
 
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
+| 3.7 | 2026-10-14 | Anton Hinz / Marcerito | Renewal Orders (Commerce: Order v0.6): four questions raised while drafting were settled with the product side and canonised in Commerce: Order, not tracked — a Processing Renewal Order ends in Failed, never Cancelled (BR-046); a Scheduled Renewal Order whose Subscription expires stays Scheduled until the Vendor cancels it (BR-043); a cancellation declined after the renewal waits for the following renewal (T18); the discrepancy notice of the product design was not built and is recorded as an edge case (§9). |
 | 3.6 | 2026-07-19 | Stu / canon-generate-batch | Billing batch: added BJO-005 (Billing: Journal — possible Operations manual-upload/custom-ledger injection path) and CHG-001 (Billing: Charge — origin of the Consolidated billing type). Billing: Journal Attachment has no open questions. |
 | 3.5 | 2026-07-19 | Stu / canon-generate-batch | Audit batch: added AET-002 (Audit: Event Type — the update endpoint enforces no actor restriction, diverging from the Operations-curated intent; engineering to decide if defect or intended). Audit: Audit Record has no open questions. |
 | 3.4 | 2026-07-17 | Stu / canon-generate-batch | Order batch: ORD-001/002/003 resolved and removed (Querying is Vendor-only to enter and Operations-only to fail from; valid creation statuses Draft/Quoted/Processing) — ORD-004/005/006/007 retained. ORD-008 (Suspend/Resume Order types) and the /quote authority question resolved into the Order canon, not tracked. Added AST-004/AST-005 (Commerce: Order Asset) and SUB-004 (Commerce: Order Subscription). Order Line has no open questions. |
